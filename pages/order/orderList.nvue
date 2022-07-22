@@ -1,0 +1,114 @@
+<template>
+	<view class="u-page">
+		<u-list
+			@scrolltolower="scrolltolower"
+		>
+			<u-list-item
+				v-for="(item, index) in indexList"
+				:key="index"
+			>
+				<u-cell
+					:title="`列表长度-${index + 1}`"
+					value="你吼这么大声干什么嘛"
+					center
+					label="订单状态"
+					isLink
+					url="/pages/order/order?phoer"
+				>
+					<u-avatar
+						slot="icon"
+						shape="square"
+						size="70"
+						:src="item.url"
+						customStyle="margin: -3px 5px -3px 0"
+					></u-avatar>
+					<text>sss</text>
+				</u-cell>
+			</u-list-item>
+		</u-list>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				indexList: [],
+				urls: [
+					'https://cdn.uviewui.com/uview/album/1.jpg',
+					'https://cdn.uviewui.com/uview/album/2.jpg',
+					'https://cdn.uviewui.com/uview/album/3.jpg',
+					'https://cdn.uviewui.com/uview/album/4.jpg',
+					'https://cdn.uviewui.com/uview/album/5.jpg',
+					'https://cdn.uviewui.com/uview/album/6.jpg',
+					'https://cdn.uviewui.com/uview/album/7.jpg',
+					'https://cdn.uviewui.com/uview/album/8.jpg',
+					'https://cdn.uviewui.com/uview/album/9.jpg',
+					'https://cdn.uviewui.com/uview/album/10.jpg',
+				]
+			}
+		},
+		onLoad(e) {
+			console.log("检测是否有其他页面跳转传递的数据");
+			// 若无参数，则为摄影师查询所有状态为“发起”的订单
+			// 有orderId则为order页面传过来的，目的是查询“我的预约”，
+			// 有phoerId则为摄影师点击“查看我接的单”
+			// console.log(this.$store.state.user.info);
+			const character=Object.keys(e)[0]
+			if(character=='order'){
+				console.log("order");
+				setTimeout(this.getListByOrder(),1000)
+			}else if(character=='phoer'){
+				console.log("phoer");
+				setTimeout(this.getListByPhoer(),1000)
+			}else{
+				console.log("get All")
+				setTimeout(this.getAllList(),1000)
+			};
+
+			this.loadmore()
+		},
+		methods: {
+			scrolltolower() {
+				this.loadmore()
+			},
+			loadmore() {
+				for (let i = 0; i < 30; i++) {
+					this.indexList.push({
+						url: this.urls[uni.$u.random(0, this.urls.length - 1)]
+					})
+				}
+			},
+			getListByOrder(){
+				this.odb.where({
+					userId:this.$store.state.user.info._id,
+				}).get().then(res=>{
+					console.log("getListByOrder");
+					console.log(res);
+				})
+			},
+			getListByPhoer(){
+				this.odb.where({
+					phoerId:this.$store.state.user.info._id
+				}).get().then(res=>{
+					console.log("getListByPhoer");
+					console.log(res);
+				})
+			},
+			getAllList(){
+				this.odb.where({
+					orderStatus:0
+				}).get().then(res=>{
+					console.log("getAllList");
+					console.log(res);
+				})
+			}
+		},
+	}
+</script>
+
+<style lang="scss">
+	.u-page {
+		padding: 0;
+	}
+</style>

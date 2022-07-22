@@ -1,0 +1,154 @@
+{
+	"bsonType": "object",
+	"required": [],
+	"permission": {
+		"read": true,
+		"create": true,
+		//下单者自己可以改and摄影师可以改
+		"update": "doc.userId == auth.uid || get('database.photographer.${doc.uid}').WorkStatus == true ",
+		"delete": "doc.userId == auth.uid"
+	},
+	"properties": {
+		"_id": {
+			"description": "存储文档 ID（统一订单 ID），系统自动生成"
+		},
+		"userInfo": {
+			"bsonType": "object",
+			"name": {
+				"bsonType": "string",
+				"description": "下单给谁",
+				"defaultValue": "自己"
+			},
+			"phoneNumber": {
+				"bsonType": "string",
+				"description": "摄影对象电话号码"
+			}
+		},
+		"intro": {
+			"bsonType": "string",
+			"description": "备注"
+		},
+		"time": {
+			"bsonType": "string",
+			"description": "约定\/发起约定摄影的时间"
+		},
+		"place": {
+			"bsonType": "string",
+			"description": "约定\/发起约定摄影的地点"
+		},
+		"price": {
+			"bsonType": "int",
+			"description": "约定价格 单位:元"
+		},
+		"type": {
+			"bsonType": "string",
+			"description": "个人照、情侣照or集体照"
+		},
+		"orderStatus": {
+			"bsonType": "int",
+			"description": "订单状态：0 已发起 1 响应中 2 已完成",
+			"title": "订单状态",
+			"defaultValue": 0,
+			"permission": {
+				"write": false
+			},
+			"enum": [{
+					"text": "已发起",
+					"value": 0
+				},
+				{
+					"text": "响应中",
+					"value": 1
+				},
+				{
+					"text": "已完成",
+					"value": 2
+				}
+			]
+		},
+		"userId": {
+			"bsonType": "string",
+			"description": "下单用户的id"
+		},
+		"phoerId": {
+			"bsonType": "string",
+			"description": "接单摄影师用户id"
+		},
+		"phoerName": {
+			"bsonType": "string",
+			"description": "接单摄影师的name字段"
+		},
+		"phoerShowUrl": {
+			"bsonType": "string",
+			"description": "摄影师形象连接"
+		}
+
+
+		// "pay_type": {
+		// 	"bsonType": "string",
+		// 	"description": "支付渠道，wxpay | alipay"
+		// },
+		// "total_fee": {
+		// 	"bsonType": "int",
+		// 	"description": "订单总金额，单位：分。"
+		// },
+		// "user_id": {
+		// 	"bsonType": "String",
+		// 	"description": "下单用户ID，uni-id-users表",
+		// 	"foreignKey": "uni-id-users._id",
+		// 	"forceDefaultValue": {
+		// 		"$env": "uid"
+		// 	}
+		// },
+		// "platform": {
+		// 	"bsonType": "String",
+		// 	"description": "下单平台类型：h5、mp-weixin、mp-alipay、app-plus等"
+		// },
+		// "status": {
+		// 	"bsonType": "int",
+		// 	"minimum": -3,
+		// 	"maximum": 5,
+		// 	"description": "订单状态，1：待付款，2：已付款，3：退款审核中，4：退款中，5：已退款，-1已取消付款\/退款，-2：退款拒绝，-3：退款失败"
+		// },
+		// "is_refund": {
+		// 	"bsonType": "bool",
+		// 	"description": "是否是退款订单"
+		// },
+		// "refund_amount": {
+		// 	"bsonType": "int",
+		// 	"description": "退款金额（非退款订单表示已退款总金额，退款订单表示该笔退款的退款金额），单位：分"
+		// },
+		// "refund_count": {
+		// 	"bsonType": "int",
+		// 	"description": "总退款笔数（非退款订单有值）"
+		// },
+		// "create_time": {
+		// 	"bsonType": "timestamp",
+		// 	"description": "订单创建时间\/发起退款时间"
+		// },
+		// "update_time": {
+		// 	"bsonType": "timestamp",
+		// 	"description": "订单更新时间"
+		// },
+		// "paid_time": {
+		// 	"bsonType": "timestamp",
+		// 	"description": "订单付款时间"
+		// },
+		// "refund_time": {
+		// 	"bsonType": "timestamp",
+		// 	"description": "订单完成退款时间"
+		// },
+		// "refund_desc": {
+		// 	"bsonType": "String",
+		// 	"description": "退款原因"
+		// },
+		// "transaction_id": {
+		// 	"bsonType": "String",
+		// 	"description": "微信或支付宝交易单号"
+		// },
+		// "info": {
+		// 	"bsonType": "string",
+		// 	"description": "自定义的订单拓展信息，如商品信息、会员卡种类信息等"
+		// }
+	}
+}

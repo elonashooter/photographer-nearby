@@ -1,0 +1,128 @@
+{
+	"bsonType": "object",
+	"required": [],
+	"permission": {
+		"read": true,
+		"create": true,
+		"update": "doc._id==auth.uid || 'WP_manager' in auth.role",
+		"delete": "doc._id==auth.uid || 'WP_manager' in auth.role"
+	},
+	"fieldRules": [{
+		"rule": "WorkStatus == true",
+		"errorMessage": "您处于非在职状态"
+	}],
+	"properties": {
+		"_id": {
+			"description": "存储文档 ID（统一订单 ID），系统自动生成"
+		},
+		"intro": {
+			"bsonType": "int",
+			"description": "自我介绍、个性签名"
+		},
+		"phoerNumber": {
+			"bsonType": "string",
+			"description": "摄影师电话号码"
+		},
+		"name": {
+			"bsonType": "string",
+			"description": "摄影师姓名 物理本211张怀民"
+		},
+		"userId": {
+			"bsonType": "string",
+			"description": "摄影师在user表的id"
+		},
+		"symbols": {
+			"bsonType": "string",
+			"description": "代表作名称"
+		},
+		"symbolsUrl": {
+			"bsonType": "array",
+			"description": "代表作图片链接"
+		},
+		"phoerShowUrl": {
+			"bsonType": "string",
+			"description": "摄影师形象连接"
+		},
+		"WorkState": {
+			"bsonType": "bool",
+			"description": "true为在职，false为不在职（含离职与审核中）",
+			"defaultValue": false
+		},
+		"OnlineStatus": {
+			"bsonType": "bool",
+			"description": "摄影师是否处于在线接单状态",
+			"defaultValue": false
+		},
+		"presentOrder": {
+			"bsonType": "int",
+			"description": "该摄影师当前所接单数，平台规定不可超过3 2022/7/12",
+			"defaultValue": 0
+		}
+		// "pay_type": {
+		// 	"bsonType": "string",
+		// 	"description": "支付渠道，wxpay | alipay"
+		// },
+		// "total_fee": {
+		// 	"bsonType": "int",
+		// 	"description": "订单总金额，单位：分。"
+		// },
+		// "user_id": {
+		// 	"bsonType": "String",
+		// 	"description": "下单用户ID，uni-id-users表",
+		// 	"foreignKey": "uni-id-users._id",
+		// 	"forceDefaultValue": {
+		// 		"$env": "uid"
+		// 	}
+		// },
+		// "platform": {
+		// 	"bsonType": "String",
+		// 	"description": "下单平台类型：h5、mp-weixin、mp-alipay、app-plus等"
+		// },
+		// "status": {
+		// 	"bsonType": "int",
+		// 	"minimum": -3,
+		// 	"maximum": 5,
+		// 	"description": "订单状态，1：待付款，2：已付款，3：退款审核中，4：退款中，5：已退款，-1已取消付款\/退款，-2：退款拒绝，-3：退款失败"
+		// },
+		// "is_refund": {
+		// 	"bsonType": "bool",
+		// 	"description": "是否是退款订单"
+		// },
+		// "refund_amount": {
+		// 	"bsonType": "int",
+		// 	"description": "退款金额（非退款订单表示已退款总金额，退款订单表示该笔退款的退款金额），单位：分"
+		// },
+		// "refund_count": {
+		// 	"bsonType": "int",
+		// 	"description": "总退款笔数（非退款订单有值）"
+		// },
+		// "create_time": {
+		// 	"bsonType": "timestamp",
+		// 	"description": "订单创建时间\/发起退款时间"
+		// },
+		// "update_time": {
+		// 	"bsonType": "timestamp",
+		// 	"description": "订单更新时间"
+		// },
+		// "paid_time": {
+		// 	"bsonType": "timestamp",
+		// 	"description": "订单付款时间"
+		// },
+		// "refund_time": {
+		// 	"bsonType": "timestamp",
+		// 	"description": "订单完成退款时间"
+		// },
+		// "refund_desc": {
+		// 	"bsonType": "String",
+		// 	"description": "退款原因"
+		// },
+		// "transaction_id": {
+		// 	"bsonType": "String",
+		// 	"description": "微信或支付宝交易单号"
+		// },
+		// "info": {
+		// 	"bsonType": "string",
+		// 	"description": "自定义的订单拓展信息，如商品信息、会员卡种类信息等"
+		// }
+	}
+}
