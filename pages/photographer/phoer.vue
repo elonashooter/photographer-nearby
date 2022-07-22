@@ -56,8 +56,8 @@
 											<image class="uni-uploader__img" :src="phoerInfo.phoerShow" :data-src="phoerInfo.phoerShow" @tap="previewImage"></image>
 										</view>
 									</block>
-									<view class="uni-uploader__input-box">
-										<view class="uni-uploader__input" @tap="chooseImage('phoerInfo.phoerShow')"></view>
+									<view class="uni-uploader__input-box" v-if="phoerInfo.phoerShow==''">
+										<view class="uni-uploader__input" @tap="choosePShow()"></view>
 									</view>
 								</view>
 							</view>
@@ -88,7 +88,7 @@
 							multipleSize="68"
 						></u-album> -->
 					</u-form-item>
-					<view class="uni-uploader">
+					<view class="uni-uploader" v-if="phoerInfo.phoerShow">
 						<view class="uni-uploader-head">
 							<view class="uni-uploader-title">点击可预览选好的图片</view>
 							<view class="uni-uploader-info">{{phoerInfo.symbols.length}}/9</view>
@@ -101,12 +101,12 @@
 									</view>
 								</block>
 								<view class="uni-uploader__input-box">
-									<view class="uni-uploader__input" @tap="chooseImage()"></view>
+									<view class="uni-uploader__input" @tap="chooseSymbols()"></view>
 								</view>
 							</view>
 						</view>
 					</view>
-					<view style="margin: 20rpx 10rpx;" v-if="phoerId==phoerInfo.userId">
+					<view style="margin: 20rpx 10rpx;">
 						<u--text
 							text='作品名称'
 							type="warning"
@@ -119,7 +119,7 @@
 							:disabled="inputDisable"
 						></u--input>
 					</view>
-					<view style="margin: 20rpx 10rpx;" v-else="phoerId!==userId">
+					<view style="margin: 20rpx 10rpx;" >
 						<u--text
 							:text="'作品名:  '+phoerInfo.symbolsTag"
 							type="warning"
@@ -135,7 +135,7 @@
 				></u-button>
 			</view>
 			
-			<view class="u-page" v-if="phoerId==phoerInfo.userId">
+			<view class="u-page">
 				用户查看到的效果：
 				<u-list>
 					<u-list-item>
@@ -410,7 +410,16 @@
 				}
 				return status;
 			},
-			chooseImage(){
+			choosePShow(){
+				uni.chooseImage({
+					count:1,
+					success: (res) => {
+						this.phoerInfo.phoerShow=res.tempFilePaths[0]
+						console.log(res);
+					},
+				})
+			},
+			chooseSymbols(){
 				uni.chooseImage({
 					count: 9,
 					// sourceType: 'album',
@@ -484,7 +493,7 @@
 	width: 210rpx;
 	height: 210rpx;
 }
-.uni-uploader__img {
+.uni-uploader__img{
 	display: block;
 	width: 210rpx;
 	height: 210rpx;
