@@ -15,23 +15,19 @@
 		"_id": {
 			"description": "存储文档 ID（统一订单 ID），系统自动生成"
 		},
-		"intro": {
-			"bsonType": "int",
-			"description": "自我介绍、个性签名"
-		},
-		"phoerNumber": {
-			"bsonType": "string",
-			"description": "摄影师电话号码"
-		},
 		"name": {
 			"bsonType": "string",
 			"description": "摄影师姓名 物理本211张怀民"
 		},
-		"userId": {
+		"phoneNumber": {
 			"bsonType": "string",
-			"description": "摄影师在user表的id"
+			"description": "摄影师电话号码"
 		},
-		"symbols": {
+		"intro": {
+			"bsonType": "string",
+			"description": "自我介绍、个性签名"
+		},
+		"symbolsTag": {
 			"bsonType": "string",
 			"description": "代表作名称"
 		},
@@ -39,6 +35,14 @@
 			"bsonType": "array",
 			"description": "代表作图片链接"
 		},
+		"userId": {
+			"bsonType": "string",
+			"description": "摄影师在user表的id"
+		},
+		"phoerShow": {
+			"bsonType": "array",
+			"description": "摄影师形象"
+		},		
 		"phoerShowUrl": {
 			"bsonType": "string",
 			"description": "摄影师形象连接"

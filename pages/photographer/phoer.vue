@@ -40,7 +40,7 @@
 					>
 						<view class="uni-uploader">
 							<view class="uni-uploader-head">
-								<view class="uni-uploader-title">个人形象图片</view>
+								<view class="uni-uploader-title">个人形象</view>
 								<view class="uni-uploader-info">								
 								<u-button
 									text="说明"
@@ -51,12 +51,12 @@
 							</view>
 							<view class="uni-uploader-body">
 								<view class="uni-uploader__files">
-									<block>
+									<block v-for="(image,index) in phoerInfo.phoerShow" :key="index">
 										<view class="uni-uploader__file">
-											<image class="uni-uploader__img" :src="phoerInfo.phoerShow" :data-src="phoerInfo.phoerShow" @tap="previewImage"></image>
+											<image class="uni-uploader__img" :src="image" mode="aspectFill" :data-src="image" @tap="previewPhoerShow"></image>
 										</view>
 									</block>
-									<view class="uni-uploader__input-box" v-if="phoerInfo.phoerShow==''">
+									<view class="uni-uploader__input-box" v-if="phoerInfo.phoerShow[0]==undefined">
 										<view class="uni-uploader__input" @tap="choosePShow()"></view>
 									</view>
 								</view>
@@ -88,16 +88,18 @@
 							multipleSize="68"
 						></u-album> -->
 					</u-form-item>
-					<view class="uni-uploader" v-if="phoerInfo.phoerShow">
+					<view class="uni-uploader" v-if="phoerInfo.phoerShow[0]!==undefined">
 						<view class="uni-uploader-head">
 							<view class="uni-uploader-title">点击可预览选好的图片</view>
-							<view class="uni-uploader-info">{{phoerInfo.symbols.length}}/9</view>
+							<view class="uni-uploader-info">{{symbols.length}}/9</view>
 						</view>
 						<view class="uni-uploader-body">
 							<view class="uni-uploader__files">
-								<block v-for="(image,index) in phoerInfo.symbols" :key="index">
+								<block v-for="(image,index) in symbols" :key="index">
 									<view class="uni-uploader__file">
-										<image class="uni-uploader__img" :src="image" :data-src="image" @tap="previewImage"></image>
+										<!-- 注：uni.preview函数写在这只能是不加括号的，不然会报错 -->
+										<uni-icons type="closeempty" class="close" size="20" @click="DelImg(index)"></uni-icons>
+										<image class="uni-uploader__img" mode="aspectFill" :src="image" :data-src="image" @tap="previewSymbols"></image>
 									</view>
 								</block>
 								<view class="uni-uploader__input-box">
@@ -135,7 +137,7 @@
 				></u-button>
 			</view>
 			
-			<view class="u-page">
+			<view style="margin-top: 25rpx;">
 				用户查看到的效果：
 				<u-list>
 					<u-list-item>
@@ -149,8 +151,9 @@
 								slot="icon"
 								shape="square"
 								size="70"
-								src="https://cdn.uviewui.com/uview/album/1.jpg"
+								:src="phoerInfo.phoerShow[0]"
 								customStyle="margin: -3px 5px -3px 0"
+								mode="aspectFill"
 							></u-avatar>
 						</u-cell>
 					</u-list-item>
@@ -177,7 +180,17 @@
 					</view>
 					<view class="u-demo-block">
 						<text class="u-demo-block__title">可使用头像</text>
-						<view class="u-demo-block__content">
+						<!-- 若已同步为头像，则返回true 否则返回false 1/3-->
+						<view class="u-demo-block__content" v-if="AvatarSet()">
+							<view class="text-item">
+								<u--text 
+								text="已将个人形象照设为头像"
+								type="success"
+								></u--text>
+							</view>
+						</view>
+						<!-- 若已同步为头像，则返回true 否则返回false 2/3 -->
+						<view class="u-demo-block__content" v-else>
 							<view class="text-item">
 								<u--text text="若已将个人形象照设为头像"></u--text>
 								<u--text text="可直接点击"></u--text>
@@ -185,9 +198,11 @@
 									text="同步头像"
 									type="success"
 									size="normal"
+									@click="SynAvatar()"
 								></u-button>
 							</view>
 						</view>
+
 					</view>
 					<view class="u-demo-block">
 						<text class="u-demo-block__title">肖像权</text>
@@ -217,6 +232,7 @@
 				mode="message"
 				icon="/static/history.png">
 			</u-empty> -->
+
 						
 		</view>
 	</view>
@@ -233,13 +249,15 @@
 					name: '',
 					phoneNumber: '',
 					intro: '',
-					symbols:[],//作品对象
-					symbolsTag:'朝花夕拾',//作品名称
-					userId:this.$store.state.user.info._id,
+					symbolsTag:'',//作品名称
 					symbolsUrl:[],
-					phoerShow:"",//摄影师形象对象
+					phoerShow:[],//摄影师形象对象  本来可以直接用字符串的，但uni.preview的预览参数格式为uni.chooseimage返回的数组请求体格式
 					phoerShowUrl:"",//摄影师形象连接
+					userId:this.$store.state.user.info._id,
 				},
+				phoerShowName:'',
+				symbolsUploadMsg:[],
+				symbols:[],//作品对象
 				phoerId:'',//从phoerList点进来传来的参数
 				presentCharacter:'',
 				testV:"123",
@@ -249,16 +267,18 @@
 						required: true,
 						message: '请填写姓名',
 						trigger: ['blur', 'change']
-					}, {
-						// 此为同步验证，可以直接返回true或者false，如果是异步验证，稍微不同，见下方说明
-						validator: (rule, value, callback) => {
-							// 调用uView自带的js验证规则，详见：https://www.uviewui.com/js/test.html
-							return uni.$u.test.chinese(value);
-						},
-						message: "姓名必须为中文",
-						// 触发器可以同时用blur和change，二者之间用英文逗号隔开
-						trigger: ["change", "blur"],
-					}],
+					}, 
+					// {
+					// 	// 此为同步验证，可以直接返回true或者false，如果是异步验证，稍微不同，见下方说明
+					// 	validator: (rule, value, callback) => {
+					// 		// 调用uView自带的js验证规则，详见：https://www.uviewui.com/js/test.html
+					// 		return uni.$u.test.chinese(value);
+					// 	},
+					// 	message: "姓名必须为中文",
+					// 	// 触发器可以同时用blur和change，二者之间用英文逗号隔开
+					// 	trigger: ["change", "blur"],
+					// },
+					],
 					intro: {
 						type: 'string',
 						min: 3,
@@ -278,16 +298,12 @@
 		},
 		onReady() {
 			// 如果需要兼容微信小程序，并且校验规则中含有方法等，只能通过setRules方法设置规则
-
-			//
-
-
-
 			this.$refs.form1.setRules(this.rules)
 		},
 		onLoad(e) {		//根据传来的参数确定是什么角色点进来的
 			// 已是摄影师if(e.phoerId&&phoerId==this.phoerInfo.userId)=true  新申请摄影师if(e)=false  预约用户if(e.phoerId)=true
 			// console.log(e.phoerId);  //???不知道为什么会执行两次
+			
 			if(e.phoerId){
 				this.phoerId=e.phoerId  //其他页面传过来的
 				this.pdb.where({userId:this.phoerId}).get().then(res=>{
@@ -309,6 +325,7 @@
 				this.inputDisable=false
 				this.presentCharacter="newPhoer"
 				this.SubmitButtonText="提交"
+				this.setDefaultValue()
 			}
 
 			
@@ -328,8 +345,27 @@
 			navigateBack() {
 				uni.navigateBack()
 			},
-
-
+			//同步头像
+			SynAvatar(){
+				// console.log(this.$store.state.user.info.avatar_file.url);
+				if(this.$store.state.user.info.avatar_file.url!==undefined){
+					// let AvatarUrl=Afile.url
+					this.phoerInfo.phoerShow.push(this.$store.state.user.info.avatar_file.url) 
+					console.log(this.phoerInfo.phoerShow);
+				}
+			},
+			AvatarSet(){
+				if(this.phoerInfo.phoerShow[0]==this.$store.state.user.info.avatar_file.url){
+					return true
+				}else{
+					return false
+				}
+			},
+			setDefaultValue(){
+				this.phoerInfo.name=this.$store.state.user.info.nickname,
+				this.phoerInfo.phoneNumber=this.$store.state.user.info.mobile
+				
+			},
 			submit() {
 				// 校验表单  如果有错误，会在catch中返回报错信息数组，校验通过则在then中返回true
 				this.$refs.form1.validate().then(res => {
@@ -349,22 +385,7 @@
 						url:'/pages/order/order?phoerInfo='+this.phoerInfo
 					})
 				}else if(this.presentCharacter=="newPhoer"){
-					this.pdb.add(this.phoerInfo).then((res) => {
-						// console.log("res here");
-						// console.log(res);
-					  uni.showToast({
-					    icon: 'none',
-					    title: '新增成功'
-					  })
-					  // debugger
-					  this.getOpenerEventChannel().emit('refreshData')
-					  // setTimeout(() => uni.navigateBack(), 500)
-					}).catch((err) => {
-					  uni.showModal({
-					    content: err.message || '请求服务失败',
-					    showCancel: false
-					  })
-					})
+					this.getImgUrlAndUpload()
 				}
 				
 			},
@@ -385,11 +406,18 @@
 				})
 			},
 			// 代表作导入并预览  start
-			previewImage: function(e) {
+			previewPhoerShow: function(e) {
 				var current = e.target.dataset.src
 				uni.previewImage({
 					current: current,
-					urls: this.phoerInfo.symbols
+					urls: this.phoerInfo.phoerShow
+				})
+			},
+			previewSymbols: function(e) {
+				var current = e.target.dataset.src
+				uni.previewImage({
+					current: current,
+					urls: this.symbols
 				})
 			},
 			async checkPermission() {
@@ -414,18 +442,9 @@
 				uni.chooseImage({
 					count:1,
 					success: (res) => {
-						this.phoerInfo.phoerShow=res.tempFilePaths[0]
-						console.log(res);
-					},
-				})
-			},
-			chooseSymbols(){
-				uni.chooseImage({
-					count: 9,
-					// sourceType: 'album',
-					// sizeType: 'original',
-					success: (res) => {
-						this.phoerInfo.symbols=this.phoerInfo.symbols.concat(res.tempFilePaths)
+						this.phoerInfo.phoerShow=this.phoerInfo.phoerShow.concat(res.tempFilePaths)
+						this.phoerShowName=res.tempFiles[0].name
+						// console.log(res.tempFiles[0].name);
 					},
 					fail: (err) => {
 						console.log("err: ",err);
@@ -457,11 +476,90 @@
 						// #endif
 					}
 				})
+			},
+			chooseSymbols(){
+				uni.chooseImage({
+					count: 9,
+					// sourceType: 'album',
+					// sizeType: 'original',
+					success: (res) => {
+						// console.log(res);
+						this.symbols=this.symbols.concat(res.tempFilePaths)
+						for(let i=0;i<res.tempFilePaths.length;i++){
+							this.symbolsUploadMsg.push({
+								name:res.tempFiles[i].name,
+								url:res.tempFilePaths[i]
+							})
+						}
+						// console.log("sbn");
+						// console.log(this.symbolsUploadMsg);
+					},
+
+				})
 			},// 代表作导入并预览  end
-			
+			DelImg(index){
+				this.symbols.splice(index,1)
+				
+			},
 			
 			phoneCall(){
 				console.log("phoneCall");
+				// #ifdef APP-PLUS
+				uni.makePhoneCall({
+					phoneNumber:this.phoerInfo.phoneNumber
+				})
+				// #endif
+			},
+			uploadMsg(){
+				this.pdb.add(this.phoerInfo).then((res) => {
+				  uni.showToast({
+				    icon: 'none',
+				    title: '提交成功'
+				  })
+				  // debugger
+				  this.getOpenerEventChannel().emit('refreshData')
+				  // setTimeout(() => uni.navigateBack(), 500)
+				}).catch((err) => {
+				  uni.showModal({
+				    content: err.message || '请求服务失败',
+				    showCancel: false
+				  })
+				})
+			},
+			getImgUrlAndUpload(){
+				//上传个人形象
+				let that = this
+				if (this.phoerShowName) {
+				    uniCloud.uploadFile({
+					filePath: this.phoerInfo.phoerShow[0],
+					cloudPath: this.phoerShowName,
+				    success(res){
+						that.phoerInfo.phoerShowUrl=res.fileID
+						}
+				    });
+				}
+				//上传代表作
+				if(this.symbols){
+					//无法一次性上传多张  只能循环上传了
+					// debugger
+					for(var i of this.symbolsUploadMsg){
+						uniCloud.uploadFile({
+							filePath:i.url,
+							cloudPath:i.name,
+							success(res) {
+								that.phoerInfo.symbolsUrl.push(res.fileID)
+								// 上传的图片连接等于返回的代表作链接  意味着图片上传完毕 url获取完毕 可以上传了
+								if(that.phoerInfo.symbolsUrl.length==that.symbolsUploadMsg.length){
+									that.uploadMsg()
+								}
+							}
+						})
+					}
+					// console.log("symbolsUrl");
+					// console.log(this.phoerInfo.symbolsUrl);
+				}
+				
+				
 			},
 		},
 	}
@@ -489,6 +587,7 @@
 	flex-wrap: wrap;
 }
 .uni-uploader__file {
+	position: relative;
 	margin: 10rpx;
 	width: 210rpx;
 	height: 210rpx;
@@ -546,4 +645,11 @@
 	height: 100%;
 	opacity: 0;
 }
+.close{
+	position: absolute;
+	right: 0;
+	background-color: rgba(0, 0, 0, .4);
+	color:#fff;
+	z-index:10
+}	
 </style>
