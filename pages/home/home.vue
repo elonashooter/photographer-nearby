@@ -36,11 +36,12 @@
 				<text>发布预约</text>
 			</view>
 			<!-- 摄影师同时也是用户 -->
-			<view class="cate-item" v-if="phoerId&&orderId">
+			<view class="cate-item" v-if="character=='phoer'">
 				<image src="/static/temp/c7.png" @tap="toPhoer(phoerId)"></image>
 				<text>编辑自己</text>
 			</view>
-			<view class="cate-item" v-else-if="orderId">
+			<!-- 用户有三种状态：游客 普通 摄影师 -->
+			<view class="cate-item" v-else-if="character=='order'">
 				<image src="/static/temp/c7.png" @tap="toBePhoer()"></image>
 				<text>加入湾拍 </text>
 			</view>
@@ -107,14 +108,14 @@
 			v-if="phoerId"
 		></u-button>
 		<!-- 加载组件  onshow触发一秒，用于防止恶意高频率访问 -->
-		<u-loading-page
+<!-- 		<u-loading-page
 		    loadingText="感谢支持(*•̀ㅂ•́)و"
 		    bgColor="#ffffff"
 		    :loading="loading"
 		    color="#C8C8C8"
 		    loadingColor="#C8C8C8"
 		>
-		</u-loading-page>
+		</u-loading-page> -->
 	</view>
 </template>
 
@@ -143,9 +144,13 @@
 				swiperLength: 0,
 				goodsList: [],
 				loadTime:'', //避免被恶意频繁刷访问造成服务器负担  1/4
+				character:this.$store.state.user.character,
+				WP_manager:this.$store.state.user.WP_manager
 			};
 		},
-
+		onLaunch() {
+			this.checkPhoer()
+		},
 		onLoad() {
 			this.loadData();
 			console.log("this.info");
@@ -156,10 +161,10 @@
 		},
 		onShow() {
 			//避免被恶意频繁刷访问造成服务器负担  2/4
-			this.loadTime=setTimeout(()=>{
-				this.showLoading(),
-				this.checkPhoer()
-			},3000)
+			// this.loadTime=setTimeout(()=>{
+			// 	this.showLoading(),
+			// 	this.checkPhoer()
+			// },3000)
 
 			
 		},
@@ -203,7 +208,7 @@
 			},
 			toBePhoer(){
 				uni.navigateTo({
-					url: '/pages/photographer/phoer'
+					url: '/pages/photographer/pre-phoer'
 				});
 			},
 			toPhoer(e){
@@ -240,30 +245,20 @@
 				this.carouselList = carouselList;
 			},
 			//避免被恶意频繁刷访问造成服务器负担  4/4
-			showLoading(){
-				this.loading = false
-				// console.log("showLoading");
-			},
+			// showLoading(){
+			// 	this.loading = false
+			// 	// console.log("showLoading");
+			// },
 			checkPhoer(){
 				// console.log("this.info 用户信息");
 				//检测当前用户是摄影师还是普通用户
-				if(this.$store.state.user.hasLogin){
-					this.orderId=this.$store.state.user.info._id
-					// 摄影师身份且在phoer表里有名，这样别人查询在线摄影师才能查得到  摄影师按userid记
-					if(this.$store.state.user.info.role.includes("photographer")){
-						this.pdb.where({
-							userId:this.orderId
-						}).get().then(res=>{
-							this.phoerId=res.userId
-							this.$store.commit('user/character','phoer')
-						})
-						this.OnlineStatus=false
-						
-					}else{
-						
-					}
-				}else{
-					this.phoerId=''
+				let userInfo=this.$store.state.user.info
+				if(userInfo.role.includes("WP_manager")){
+					this.$store.commit('user/WP_manager',true)
+				}
+				if(userInfo.role.includes("photographer")){
+					this.$store.commit('user/checkCharacter','phoer')
+					this.phoerId=userInfo._id
 				}
 
 			},

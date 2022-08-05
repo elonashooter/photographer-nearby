@@ -64,6 +64,12 @@
 			}
 		}, 
 		{
+			"path": "pages/photographer/pre-phoer",
+			"style": {
+			"navigationBarTitleText": "编辑摄影师信息"
+			}
+		}, 
+		{
 			"path": "pages/photographer/phoerList",
 			"style": {
 			

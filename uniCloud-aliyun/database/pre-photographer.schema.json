@@ -47,20 +47,10 @@
 			"bsonType": "string",
 			"description": "摄影师形象连接"
 		},
-		"WorkState": {
+		"AuditStatus": {
 			"bsonType": "bool",
-			"description": "true为在职，false为不在职（含离职与审核中）",
-			"defaultValue": true
-		},
-		"OnlineStatus": {
-			"bsonType": "bool",
-			"description": "摄影师是否处于在线接单状态",
+			"description": "true审核已通过，false为在审中",
 			"defaultValue": false
-		},
-		"presentOrder": {
-			"bsonType": "int",
-			"description": "该摄影师当前所接单数，平台规定不可超过3 2022/7/12",
-			"defaultValue": 0
 		},
 		"create_time": {
 			"bsonType": "timestamp",
@@ -107,10 +97,7 @@
 		// 	"bsonType": "int",
 		// 	"description": "总退款笔数（非退款订单有值）"
 		// },
-		// "create_time": {
-		// 	"bsonType": "timestamp",
-		// 	"description": "订单创建时间\/发起退款时间"
-		// },
+
 		// "update_time": {
 		// 	"bsonType": "timestamp",
 		// 	"description": "订单更新时间"

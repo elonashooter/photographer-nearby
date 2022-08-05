@@ -9,6 +9,7 @@ Vue.config.productionTip = false
 Vue.prototype.$store = store
 Vue.prototype.odb=uniCloud.database().collection('photography-order')
 Vue.prototype.pdb=uniCloud.database().collection('photographer')
+Vue.prototype.ppdb=uniCloud.database().collection('pre-photographer')//申请中的摄影师
 App.mpType = 'app'
 const app = new Vue({
 	i18n,

@@ -6,7 +6,8 @@ let state = {
 		//用户信息
 		info: userInfoHistory,
 		//2022-7-16 普通用户order  摄影师phoer（photographer）
-		character:'order',
+		character:'',
+		WP_manager:false
 	},
 	getters = {
 		info(state) {
@@ -39,14 +40,14 @@ let state = {
 				});
 				uni.setStorageSync('uni_id_token_expired', state.info.tokenExpired)
 			}
-			//2022-7-16 hz 登陆后确认角色 属于方案二 采用方案一于是暂时先注释掉
-			// if(state.info.role.includes("photographer")){
-			// 	state.character='phoer'
-			// }
+
 		},
 					//2022-7-16 hz 重新确认角色
 		character(state,character){
 			state.character=character
+		},
+		WP_manager(state,isWP_manager){
+			state.WP_manager=isWP_manager
 		},
 		logout(state) {
 			state.info = {};

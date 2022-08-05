@@ -29,7 +29,7 @@ export default {
 			* 注意：黑名单与白名单模式二选一
 		*/
 		"needLogin" : [
-		 	// {pattern:/^\/pages\/home.*/},	//支持正则表达式
+		 	{pattern:/^\/pages\/home.*/},	//支持正则表达式
 			{pattern:/^\/pages\/order.*/},
 			{pattern:/^\/pages\/photographer.*/},
 				"/pages/ucenter/ucenter",

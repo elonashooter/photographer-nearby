@@ -1,28 +1,26 @@
 <template>
 	<view class="u-page">
-		<u-list
-			@scrolltolower="scrolltolower"
-		>
+		<u-list>
 			<u-list-item
-				v-for="(item, index) in indexList"
+				v-for="(item, index) in prePhoerList"
 				:key="index"
 			>
 				<u-cell
-					:title="`列表长度-${index + 1}`"
-					value="你吼这么大声干什么嘛"
+					:title="item.name"
+					:value="item.intro"
+					:label="item.phoneNumber"
 					center
-					label="订单状态"
 					isLink
-					url="/pages/order/order?phoerId=${item.phoerId}"
+					:url="'/pages/WP_manager/phoer-request?phoerId='+item.userId"
 				>
 					<u-avatar
 						slot="icon"
 						shape="square"
 						size="70"
-						:src="item.url"
+						:src="item.phoerShowUrl"
 						customStyle="margin: -3px 5px -3px 0"
+						mode="aspectFill"
 					></u-avatar>
-					<text>sss</text>
 				</u-cell>
 			</u-list-item>
 		</u-list>
@@ -33,42 +31,25 @@
 	export default {
 		data() {
 			return {
-				indexList: [],
-				urls: [
-					'https://cdn.uviewui.com/uview/album/1.jpg',
-					'https://cdn.uviewui.com/uview/album/2.jpg',
-					'https://cdn.uviewui.com/uview/album/3.jpg',
-					'https://cdn.uviewui.com/uview/album/4.jpg',
-					'https://cdn.uviewui.com/uview/album/5.jpg',
-					'https://cdn.uviewui.com/uview/album/6.jpg',
-					'https://cdn.uviewui.com/uview/album/7.jpg',
-					'https://cdn.uviewui.com/uview/album/8.jpg',
-					'https://cdn.uviewui.com/uview/album/9.jpg',
-					'https://cdn.uviewui.com/uview/album/10.jpg',
-				]
+				prePhoerList: [],
+				
 			}
 		},
 		onLoad(e) {
-			this.getPhoerList()
-
-			this.loadmore()
+			this.getPrePhoerList()
 		},
 		methods: {
 			scrolltolower() {
-				this.loadmore()
+				// this.loadmore()
 			},
-			loadmore() {
-				for (let i = 0; i < 30; i++) {
-					this.indexList.push({
-						url: this.urls[uni.$u.random(0, this.urls.length - 1)]
-					})
-				}
-			},
-			getPhoerList(){
-				this.pdb.where({
-					OnlineStatusChange:true
+
+			getPrePhoerList(){
+				this.ppdb.where({
+					AuditStatus:false
 				}).get().then(res=>{
-					console.log("getPhoerList");
+					this.prePhoerList=res.result.data
+					console.log("getPrePhoerList");
+					console.log(this.prePhoerList);
 				})
 			}
 		},
