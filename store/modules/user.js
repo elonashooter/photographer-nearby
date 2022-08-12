@@ -6,7 +6,7 @@ let state = {
 		//用户信息
 		info: userInfoHistory,
 		//2022-7-16 普通用户order  摄影师phoer（photographer）
-		character:'',
+		character:'order',
 		WP_manager:false
 	},
 	getters = {

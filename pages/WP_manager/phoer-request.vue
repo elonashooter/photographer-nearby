@@ -99,10 +99,16 @@
 					<u-line></u-line>
 				</u--form>
 				<u-button
-					type="primary"
+					type="success"
 					text="通过"
-					customStyle="margin-top: 30px"
+					customStyle="margin-top: 30px;width:600rpx"
 					@click="submit"
+				></u-button>
+				<u-button
+					type="error"
+					text="驳回"
+					customStyle="margin-top: 10px;width:600rpx"
+					@click="popupOpen()"
 				></u-button>
 			</view>
 			
@@ -118,6 +124,32 @@
 				@confirm="modalConfirm()"
 				@cancel="() => showModal = false"
 			></u-modal>
+			<!-- 驳回信息弹出框 -->
+			<u-popup
+				mode="bottom"
+				:show="showPopup"
+				round="0"
+				@close="popupClose()"
+				@open="popupOpen()"
+			>
+				<view class="u-page">
+					<view class="u-demo-block">
+						<text class="u-demo-block__title">填写驳回理由</text>
+						<u-textarea
+						v-model="rejectReason"
+						placeholder="若只是希望小改一些信息,仍希望让此人加入,可以先通过,后再修改"
+						confirmType="done"
+						></u-textarea>
+						<u-button
+							text="确认驳回"
+							type="error"
+							size="normal"
+							@click="reject()"
+							customStyle="margin-top:10rpx"
+						></u-button>
+					</view>
+				</view>
+			</u-popup>
 		</view>
 	</view>
 </template>
@@ -127,6 +159,7 @@
 		data() {
 			return {
 				showModal:false,//提交确认框
+				showPopup:false,//驳回信息弹出框
 				inputDisable:'',
 				phoerInfo: {
 					name: '',
@@ -138,6 +171,7 @@
 					phoerShowUrl:"",//摄影师形象连接
 					userId:this.$store.state.user.info._id,
 				},
+				rejectReason:'',
 				phoerShowName:'',
 				symbolsUploadMsg:[],
 				symbols:[],//作品对象
@@ -165,11 +199,12 @@
 		},
 		onLoad(e) {		//根据传来的参数确定是什么角色点进来的
 			// 只有管理员
-			if(e.phoerId){
-				console.log("onload get an e");
-				console.log(e);
-				this.phoerId=e.phoerId  //其他页面传过来的
-				this.ppdb.where({userId:this.phoerId}).orderBy("create_time").get().then(res=>{
+			console.log("onload get an e");
+			console.log(e);
+			if(e._id){
+				
+				this.phoerId=e._id  //其他页面传过来的请求id
+				this.ppdb.doc(e._id).get().then(res=>{
 					// this.phoerInfo={...res}
 					// console.log("ppdb");
 					console.log(res.result.data);
@@ -181,6 +216,14 @@
 			}
 		},
 		methods: {
+			popupOpen() {
+				// console.log('open');
+				this.showPopup = true
+			},
+			popupClose() {
+				this.showPopup = false
+				// console.log('close');
+			},
 			openModal(){
 				this.showModal=true
 			},
@@ -194,10 +237,46 @@
 			async submit() {
 				//pre-phoer状态为已完成  新增一个摄影师
 				await this.ppdb.doc(this.phoerId).update({
-					AuditStatus:true
+					AuditStatus:1 ,//1即为通过
+					rejectReason:''
 				})
-				await this.pdb.add(this.phoerInfo)
+				let pdbMsg=this.phoerInfo
+				// 删除审核状态字段和拒绝理由字段
+				delete pdbMsg._id
+				delete pdbMsg.AuditStatus
+				delete pdbMsg.rejectReason
+				if(this.$store.state.user.character=='photographer'){
+					await this.pdb.doc(this.phoerId).update(pdbMsg)
+				}else{
+					await this.pdb.add(pdbMsg)
+					uniCloud.database().collection('uni-id-users').where({
+						_id:this.phoerInfo.userId
+					}).update({
+						role:['photographer']
+					})
+				}
+				uni.navigateBack()
 				
+
+			},
+			reject(){
+				this.ppdb.where({
+					userId:this.phoerId
+				}).update({
+					AuditStatus:2,
+					rejectReason:this.rejectReason
+				}).then(e=>{
+					uni.showToast({
+					  icon: 'none',
+					  title: '驳回操作完成'
+					})
+					setTimeout(()=>{
+						uni.navigateBack()
+					},1000)
+				}).catch(e=>{
+					console.log("reject fail");
+					console.log(e);
+				})
 			},
 			// 代表作导入并预览  start
 			previewPhoerShow: function(e) {

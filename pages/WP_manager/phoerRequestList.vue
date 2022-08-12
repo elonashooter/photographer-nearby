@@ -1,5 +1,8 @@
 <template>
-	<view class="u-page">
+	<view class="u-page" v-if="empty">
+		<u-empty></u-empty>
+	</view>
+	<view class="u-page" v-else>
 		<u-list>
 			<u-list-item
 				v-for="(item, index) in prePhoerList"
@@ -11,7 +14,7 @@
 					:label="item.phoneNumber"
 					center
 					isLink
-					:url="'/pages/WP_manager/phoer-request?phoerId='+item.userId"
+					:url="'/pages/WP_manager/phoer-request?_id='+item._id"
 				>
 					<u-avatar
 						slot="icon"
@@ -32,10 +35,10 @@
 		data() {
 			return {
 				prePhoerList: [],
-				
+				empty:false
 			}
 		},
-		onLoad(e) {
+		onShow() {
 			this.getPrePhoerList()
 		},
 		methods: {
@@ -45,11 +48,16 @@
 
 			getPrePhoerList(){
 				this.ppdb.where({
-					AuditStatus:false
+					AuditStatus:0
 				}).get().then(res=>{
-					this.prePhoerList=res.result.data
-					console.log("getPrePhoerList");
-					console.log(this.prePhoerList);
+					if(res.result.data.length>0){
+						this.prePhoerList=res.result.data
+						console.log("getPrePhoerList");
+						console.log(this.prePhoerList);
+					}else{
+						this.empty=true
+					}
+
 				})
 			}
 		},

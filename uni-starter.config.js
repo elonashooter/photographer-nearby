@@ -32,6 +32,7 @@ export default {
 		 	{pattern:/^\/pages\/home.*/},	//支持正则表达式
 			{pattern:/^\/pages\/order.*/},
 			{pattern:/^\/pages\/photographer.*/},
+				"/pages/photographer/pre-phoer",
 				"/pages/ucenter/ucenter",
 				"/uni_modules/uni-news-favorite/pages/uni-news-favorite/list",
 				"/uni_modules/uni-feedback/pages/uni-feedback/add"

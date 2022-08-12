@@ -15,7 +15,7 @@
 			<view class="titleNview-background" :style="{backgroundColor:titleNViewBackground}"></view>
 			<swiper class="carousel" indicator-color="rgba(255, 170, 127, 0.3)" indicator-active-color="rgba(85, 255, 127, 0.3)" autoplay="true" interval="5000" indicator-dots="true" circular  duration="200" @change="swiperChange">
 				<swiper-item v-for="(item, index) in carouselList" :key="index" class="carousel-item" @click="">
-					<image :src="item.src" />
+					<image :src="item.src" mode="aspectFill"/>
 				</swiper-item>
 			</swiper>
 			<!-- 自定义swiper指示器 -->
@@ -149,7 +149,7 @@
 			};
 		},
 		onLaunch() {
-			this.checkPhoer()
+			// this.checkPhoer()
 		},
 		onLoad() {
 			this.loadData();
@@ -163,7 +163,7 @@
 			//避免被恶意频繁刷访问造成服务器负担  2/4
 			// this.loadTime=setTimeout(()=>{
 			// 	this.showLoading(),
-			// 	this.checkPhoer()
+				this.checkPhoer()
 			// },3000)
 
 			
@@ -252,14 +252,17 @@
 			checkPhoer(){
 				// console.log("this.info 用户信息");
 				//检测当前用户是摄影师还是普通用户
-				let userInfo=this.$store.state.user.info
-				if(userInfo.role.includes("WP_manager")){
-					this.$store.commit('user/WP_manager',true)
+				if(this.$store.state.user.hasLogin){
+					let userInfo=this.$store.state.user.info
+					if(userInfo.role.includes("WP_manager")){
+						this.$store.commit('user/WP_manager',true)
+					}
+					if(userInfo.role.includes("photographer")){
+						this.$store.commit('user/checkCharacter','phoer')
+						this.phoerId=userInfo._id
+					}
 				}
-				if(userInfo.role.includes("photographer")){
-					this.$store.commit('user/checkCharacter','phoer')
-					this.phoerId=userInfo._id
-				}
+				
 
 			},
 			//轮播图切换修改背景色

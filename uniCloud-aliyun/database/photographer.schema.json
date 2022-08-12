@@ -65,7 +65,7 @@
 		"create_time": {
 			"bsonType": "timestamp",
 			"description": "订单创建时间\/发起退款时间",
-			"forceDefaultValue": {
+			"defaultValue": {
 			"$env": "now"
 			}
 		}
