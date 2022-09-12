@@ -146,7 +146,7 @@ export default {
 		download: "下载",
 	},
 	login:{
-		phoneLogin: "登录后即可展示自己",
+		phoneLogin: "注册和登陆都很快的",
 		phoneLoginTip: "未注册的手机号验证通过后将自动注册",
 		getVerifyCode: "获取验证码",
 	},

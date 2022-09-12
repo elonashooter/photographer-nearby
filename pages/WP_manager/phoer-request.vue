@@ -238,14 +238,15 @@
 				//pre-phoer状态为已完成  新增一个摄影师
 				await this.ppdb.doc(this.phoerId).update({
 					AuditStatus:1 ,//1即为通过
-					rejectReason:''
+					rejectReason:'',
+					requestTimes:this.phoerInfo.requestTimes+1
 				})
 				let pdbMsg=this.phoerInfo
 				// 删除审核状态字段和拒绝理由字段
 				delete pdbMsg._id
 				delete pdbMsg.AuditStatus
 				delete pdbMsg.rejectReason
-				if(this.$store.state.user.character=='photographer'){
+				if(this.phoerInfo.requestTimes>0){
 					await this.pdb.doc(this.phoerId).update(pdbMsg)
 				}else{
 					await this.pdb.add(pdbMsg)
@@ -260,10 +261,8 @@
 
 			},
 			reject(){
-				this.ppdb.where({
-					userId:this.phoerId
-				}).update({
-					AuditStatus:2,
+				this.ppdb.doc(this.phoerInfo._id).update({
+					AuditStatus:2,//2即为驳回
 					rejectReason:this.rejectReason
 				}).then(e=>{
 					uni.showToast({
@@ -301,60 +300,7 @@
 					phoneNumber:this.phoerInfo.phoneNumber
 				})
 				// #endif
-			},
-			uploadMsg(){
-				this.ppdb.add(this.phoerInfo).then((res) => {
-				  uni.showToast({
-				    icon: 'none',
-				    title: '提交成功'
-				  })
-				  // debugger
-				  this.getOpenerEventChannel().emit('refreshData')
-				  // setTimeout(() => uni.navigateBack(), 500)
-				}).catch((err) => {
-				  uni.showModal({
-				    content: err.message || '请求服务失败',
-				    showCancel: false
-				  })
-				})
-			},
-			getImgUrlAndUpload(){
-				//上传个人形象
-				let that = this
-				if (this.phoerInfo.phoerShow[0]!==undefined) {
-					uniCloud.uploadFile({
-					filePath: this.phoerInfo.phoerShow[0],
-					cloudPath: this.phoerShowName,
-					success(res){
-						console.log("success");
-						console.log(res);
-						that.phoerInfo.phoerShowUrl=res.fileID
-						}
-					});
-				}else{
-					return this.$u.toast("请上传个人形象照")
-				}
-				//上传代表作
-				if(this.symbols){
-					//无法一次性上传多张  只能循环上传了
-					// debugger
-					for(var i of this.symbolsUploadMsg){
-						uniCloud.uploadFile({
-							filePath:i.url,
-							cloudPath:i.name,
-							success(res) {
-								that.phoerInfo.symbolsUrl.push(res.fileID)
-								// 上传的图片连接等于返回的代表作链接  意味着图片上传完毕 url获取完毕 可以上传了
-								if(that.phoerInfo.symbolsUrl.length==that.symbolsUploadMsg.length){
-									that.uploadMsg()
-								}
-							}
-						})
-					}
-				}
-
-				
-			},
+			}
 		},
 	}
 </script>

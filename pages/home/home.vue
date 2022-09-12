@@ -1,5 +1,12 @@
 <template>
-	<view class="container">
+	<view v-if="haveNoNet==true">
+		<u-empty
+			text="未检测到网络连接\n请连接网络后重新打开应用"
+			textSize="20"
+			customStyle="padding-top:200px"
+		></u-empty>
+	</view>
+	<view class="container" v-else>
 		<!-- 小程序头部兼容 -->
 		<!-- #ifdef MP -->
 		<view class="mp-search-box">
@@ -50,7 +57,7 @@
 				<text>在线摄影师 </text>
 			</view>
 			<view class="cate-item">
-				<image src="/static/temp/c8.png" @tap="toOrderList()"></image>
+				<image src="/static/temp/c8.png" @tap="toMyOrderList()"></image>
 				<text>我的预约</text>
 			</view>
 			
@@ -60,7 +67,8 @@
 			<image src="/static/temp/ad2.jpg" mode="scaleToFill"></image>
 		</view>
 		
-		<!-- 猜你喜欢 -->
+		<!-- 摄影师部分 -->
+
 		<view class="f-header m-t">
 			<image src="/static/temp/h1.png" ></image>
 			<view class="tit-box">
@@ -70,24 +78,19 @@
 			<text class="yticon icon-you"></text>
 		</view>
 		
+		<u-line></u-line>
 		
-		<view class="guess-section">
-			<view 
-				v-for="(item, index) in goodsList" :key="index"
-				class="guess-item"
-				@click=""
-			>
-				<view class="image-wrapper">
-					<image :src="item.image" mode="aspectFill"></image>
-				</view>
-				<text class="title clamp">{{item.title}}</text>
-				<text class="price">￥{{item.price}}</text>
-			</view>
-		</view>
+		<u--text
+			v-if="phoerId"
+			text='以下为摄影师操作项'
+			type='primary'
+			style='margin:5% 34%;'
+		></u--text>
 		<view class="f-header m-t" v-if="phoerId">
-			<u-switch v-model="OnlineStatus" @change="OnlineStatusChange()" ></u-switch>
+			<u-switch v-model="OnlineStatus" @change="OnlineStatusChange" ></u-switch>
 			<view class="tit-box">
-				<text class="tit">点击上线</text>
+				<text class="tit" v-if="!OnlineStatus">点击上线</text>
+				<text class="tit" v-else>已处于上线状态</text>
 				<text class="tit2">上线后其他同学就可以搜到你并找你下单</text>
 			</view>
 			<text class="yticon icon-you"></text>
@@ -104,7 +107,7 @@
 			text="查看我接的单"
 			customStyle="margin-top: 50px;width:400rpx"
 			color="linear-gradient(to right, rgb(255, 170, 0), rgb(4, 151, 99))"
-			@click="getMyList()"
+			@click="getPhoerReceiveList()"
 			v-if="phoerId"
 		></u-button>
 		<!-- 加载组件  onshow触发一秒，用于防止恶意高频率访问 -->
@@ -124,8 +127,8 @@
 		data() {
 			return {
 				loading:true,//加载组件的加载状态
-				OnlineStatus:'', //摄影师上线状态
-				orderId:"",
+				OnlineStatus:false, //摄影师上线状态
+				orderId:this.$store.state.user.info._id,
 				phoerId:'',
 				carouselList:[{
 						src: "/static/temp/phoer-male.jpg",
@@ -145,21 +148,34 @@
 				goodsList: [],
 				loadTime:'', //避免被恶意频繁刷访问造成服务器负担  1/4
 				character:this.$store.state.user.character,
-				WP_manager:this.$store.state.user.WP_manager
+				WP_manager:this.$store.state.user.WP_manager,
+				haveNoNet:false
 			};
 		},
 		onLaunch() {
-			// this.checkPhoer()
+
 		},
 		onLoad() {
-			this.loadData();
-			console.log("this.info");
-			console.log(this.$store.getters['user/info']);
-			//检测是否为摄影师
-			// this.checkPhoer()
-			// console.log(this.$store.state);
+			//检测网络状态
+			// this.haveNoNet=true
+			uni.getNetworkType({
+				success: res=> {
+					// debugger
+					console.log("net status:"+res.networkType);
+					if(res.networkType!=="none"){
+						this.loadData();
+					}else{
+						this.haveNoNet=true
+					}
+				}
+			});
+			//测试全局弹窗组件
+			// uni.navigateTo({
+			// 	url:"/pages/order/fab"
+			// })
 		},
 		onShow() {
+			
 			//避免被恶意频繁刷访问造成服务器负担  2/4
 			// this.loadTime=setTimeout(()=>{
 			// 	this.showLoading(),
@@ -176,28 +192,32 @@
 		// 	this.loadData()
 		// },
 		methods: {
+			//发布预约
 			toOrder(){
 				uni.navigateTo({
 					url: '/pages/order/order'
 				});
 			},
-			toOrderList(){
+			//我的预约
+			toMyOrderList(){
 				uni.navigateTo({
-					url: '/pages/order/orderList?order'
+					url: '/pages/order/orderList?orderId='+this.orderId
 				});
 			},
+			//摄影师查看所有用户已发布的预约列表
 			getAllOrder(){
 				uni.navigateTo({
-					url: '/pages/order/orderList'
+					url: '/pages/order/orderList?phoerChoiceOrder=1'
 				});
 				// this.odb.get().then(res=>{
 				// 	console.log("getOrder");
 				// 	console.log(res);
 				// })
 			},
-			getMyList(){
+			//摄影师查看自己接的单
+			getPhoerReceiveList(){
 				uni.navigateTo({
-					url: '/pages/order/orderList?phoer'
+					url: '/pages/order/orderList?phoerId='+this.phoerId
 				});
 				// this.odb.where({
 				// 	phoerId:this.phoerId
@@ -206,21 +226,23 @@
 				// 	console.log(res);
 				// })
 			},
+			//加入湾拍
 			toBePhoer(){
 				uni.navigateTo({
 					url: '/pages/photographer/pre-phoer'
 				});
 			},
+			//编辑自己
 			toPhoer(e){
 				// console.log(e);
 				uni.navigateTo({
-					url: '/pages/photographer/phoer?phoerId='+e
+					url: '/pages/photographer/pre-phoer?phoerId='+e
 				});
 			},
 			//查询在线摄影师 用户用于预约摄影师
 			getPhoer(){
 				uni.navigateTo({
-					url: '/pages/photographer/phoerList'
+					url: '/pages/photographer/phoerList?orderId='+this.orderId
 				});
 				// this.pdb.where('OnlineStatus == true').get().then(res=>
 				// 	console.log(res)
@@ -228,9 +250,11 @@
 			},
 			// 摄影师点击上线时上传数据  只有摄影师可见
 			OnlineStatusChange(){
-				this.OnlineStatus=!this.OnlineStatus
-				this.pdb.where({_id:this.phoerId}).update({
+				this.pdb.where({userId:this.phoerId}).update({
 					OnlineStatus:this.OnlineStatus
+				}).then(()=>{
+					this.$store.commit('user/OnlineStatus',this.OnlineStatus)
+					console.log(this.$store.state.user.OnlineStatus);
 				})
 			},
 			
@@ -256,11 +280,15 @@
 					let userInfo=this.$store.state.user.info
 					if(userInfo.role.includes("WP_manager")){
 						this.$store.commit('user/WP_manager',true)
+						this.WP_manager=this.$store.state.user.WP_manager
 					}
 					if(userInfo.role.includes("photographer")){
-						this.$store.commit('user/checkCharacter','phoer')
+						this.$store.commit('user/character','phoer')
 						this.phoerId=userInfo._id
+						// console.log('now character is :'+this.$store.state.user.character);
+						this.character=this.$store.state.user.character//phoer
 					}
+					this.orderId=userInfo._id
 				}
 				
 
@@ -541,6 +569,7 @@
 			flex: 1;
 			display: flex;
 			flex-direction: column;
+			margin-left: 20px;
 		}
 		.tit{
 			font-size: $font-lg +2upx;

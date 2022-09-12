@@ -9,6 +9,7 @@ const store = new Vuex.Store({
 		user
 	},
 	strict: true
+	
 })
 // #endif
 

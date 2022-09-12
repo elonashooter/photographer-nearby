@@ -91,7 +91,7 @@ export default async function() {
 				'TOKEN_INVALID_ANONYMOUS_USER'
 			].includes(code)) {
 			uni.navigateTo({
-				url: '/pages/ucenter/login-page/index/index'
+				url: '/pages/ucenter/login-page/pwd-login/pwd-login'
 			})
 		}
 	}
@@ -252,12 +252,12 @@ export default async function() {
 			switch (e.result.code) {
 				case 403:
 					uni.navigateTo({
-						url: "/pages/ucenter/login-page/index/index"
+						url: "/pages/ucenter/login-page/pwd-login/pwd-login"
 					})
 					break;
 				case 30203:
 					uni.navigateTo({
-						url: "/pages/ucenter/login-page/index/index"
+						url: "/pages/ucenter/login-page/pwd-login/pwd-login"
 					})
 					break;
 				case 50101:
@@ -279,7 +279,7 @@ export default async function() {
 						icon: 'none'
 					});
 					uni.navigateTo({
-						url: "/pages/ucenter/login-page/index/index"
+						url: "/pages/ucenter/login-page/pwd-login/pwd-login"
 					})
 					break;
 				default:
@@ -319,7 +319,7 @@ export default async function() {
 
 				//控制登录优先级
 				if ( //判断当前窗口是否为登录页面，如果是则不重定向路由
-					url == '/pages/ucenter/login-page/index/index' &&
+					url == '/pages/ucenter/login-page/pwd-login/pwd-login' &&
 					!inLoginPage
 				) {
 					//一键登录（univerify）、账号（username）、验证码登录（短信smsCode）
@@ -360,7 +360,7 @@ export default async function() {
 							icon: 'none'
 						})
 						uni.navigateTo({
-							url: "/pages/ucenter/login-page/index/index"
+							url: "/pages/ucenter/login-page/pwd-login/pwd-login"
 						})
 						return false
 					}
@@ -387,13 +387,13 @@ export default async function() {
 		console.log(res.networkType);
 		if (res.networkType != 'none') {
 			uni.showToast({
-				title: '当前网络类型：' + res.networkType,
+				title: '测到网络',
 				icon: 'none',
 				duration: 3000
 			})
 		} else {
 			uni.showToast({
-				title: '网络类型：' + res.networkType,
+				title: '未检测到网络：',
 				icon: 'none',
 				duration: 3000
 			})

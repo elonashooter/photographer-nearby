@@ -9,7 +9,7 @@ export default {
 		// 	//左侧显示的应用名称	
 		// 	"appname": 'uni-starter',
 		// 	//应用的图标	
-		// 	"logo": './static/logo.png',
+			"logo": './static/72X72.png',
 		// }
 	},
 	"mp": {
@@ -29,7 +29,7 @@ export default {
 			* 注意：黑名单与白名单模式二选一
 		*/
 		"needLogin" : [
-		 	{pattern:/^\/pages\/home.*/},	//支持正则表达式
+		 	// {pattern:/^\/pages\/home.*/},	//支持正则表达式
 			{pattern:/^\/pages\/order.*/},
 			{pattern:/^\/pages\/photographer.*/},
 				"/pages/photographer/pre-phoer",

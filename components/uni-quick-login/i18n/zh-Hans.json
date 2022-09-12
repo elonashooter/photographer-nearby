@@ -3,7 +3,7 @@
 	"SMSLogin": "短信验证码",
 	"wechatLogin": "微信登录",
 	"appleLogin": "苹果登录",
-	"oneClickLogin": "一键登录",
+	"oneClickLogin": "一键登录(跳过注册)",
 	"QQLogin": "QQ登录",
 	"xiaomiLogin": "小米登录",
 	"getProviderFail": "获取服务供应商失败",

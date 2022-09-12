@@ -1,30 +1,33 @@
 <template>
 	<view class="u-page">
-		<u-list
-			@scrolltolower="scrolltolower"
-		>
+		<u-empty
+			v-if="empty"
+			text="暂无在线摄影师"
+		></u-empty>
+		<u-list>
 			<u-list-item
-				v-for="(item, index) in indexList"
+				v-for="(item, index) in phoerList"
 				:key="index"
 			>
 				<u-cell
-					:title="`列表长度-${index + 1}`"
-					value="你吼这么大声干什么嘛"
+					:title="item.name"
+					:value="item.intro"
+					:label="item.phoneNumber"
 					center
-					label="订单状态"
 					isLink
-					url="/pages/order/order?phoerId=${item.phoerId}"
+					@click="getItemAndGo(item)" 
 				>
 					<u-avatar
 						slot="icon"
 						shape="square"
 						size="70"
-						:src="item.url"
+						:src="item.phoerShowUrl"
 						customStyle="margin: -3px 5px -3px 0"
+						mode="aspectFill"
 					></u-avatar>
-					<text>sss</text>
 				</u-cell>
 			</u-list-item>
+			
 		</u-list>
 	</view>
 </template>
@@ -33,42 +36,49 @@
 	export default {
 		data() {
 			return {
-				indexList: [],
-				urls: [
-					'https://cdn.uviewui.com/uview/album/1.jpg',
-					'https://cdn.uviewui.com/uview/album/2.jpg',
-					'https://cdn.uviewui.com/uview/album/3.jpg',
-					'https://cdn.uviewui.com/uview/album/4.jpg',
-					'https://cdn.uviewui.com/uview/album/5.jpg',
-					'https://cdn.uviewui.com/uview/album/6.jpg',
-					'https://cdn.uviewui.com/uview/album/7.jpg',
-					'https://cdn.uviewui.com/uview/album/8.jpg',
-					'https://cdn.uviewui.com/uview/album/9.jpg',
-					'https://cdn.uviewui.com/uview/album/10.jpg',
-				]
+				orderChoicePhoer:{},
+				phoerList: [],
+				empty:false,
 			}
 		},
-		onLoad(e) {
+		onShow() {
 			this.getPhoerList()
-
-			this.loadmore()
+		},
+		onLoad(e) {
+			if(e.orderId){
+				this.orderChoicePhoer.orderId=e.orderId
+			}
 		},
 		methods: {
 			scrolltolower() {
-				this.loadmore()
+				// this.loadmore()
 			},
-			loadmore() {
-				for (let i = 0; i < 30; i++) {
-					this.indexList.push({
-						url: this.urls[uni.$u.random(0, this.urls.length - 1)]
+			getItemAndGo(phoerInfo){
+				if(this.orderChoicePhoer.orderId){
+					this.orderChoicePhoer={
+						orderId:this.orderChoicePhoer.orderId,
+						...phoerInfo
+					}  //获取item.userId数据并打包到phoerChoiceOrder发送到order页 3/3 
+					uni.navigateTo({
+						url:'/pages/photographer/phoer?orderChoicePhoer='+encodeURIComponent(JSON.stringify(this.orderChoicePhoer))
 					})
 				}
 			},
 			getPhoerList(){
-				this.pdb.where({
-					OnlineStatusChange:true
-				}).get().then(res=>{
-					console.log("getPhoerList");
+				this.phoerList=[]
+				this.pdb.get().then(res=>{
+					console.log('pdb get success');
+					console.log(res);
+					if(res.result.data.length>0){
+						for(var i of res.result.data){
+							if (i.OnlineStatus==true){
+								this.phoerList.push(i)
+							}
+						}
+					}
+					if(this.phoerList.length==0){
+						this.empty=true
+					}
 				})
 			}
 		},

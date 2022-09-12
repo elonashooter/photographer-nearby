@@ -14,7 +14,7 @@
 						"searchInput": {
 							"backgroundColor": "rgba(231, 231, 231,.7)",
 							"borderRadius": "16px",
-							"placeholder": "I can do it",
+							"placeholder": "可能删除的搜索栏",
 							"disabled": true,
 							"placeholderColor": "#606266"
 						},
@@ -48,11 +48,11 @@
 		{
 			"path": "pages/order/orderList",
 			"style": {
-				"navigationBarTitleText": "我的订单列表"
+				"navigationBarTitleText": "订单列表"
 			}
 		}, 
 		{
-			"path": "pages/order/specificOrder",
+			"path": "pages/order/verifyOrder",
 			"style": {
 				"navigationBarTitleText": "定向预约"
 			}
@@ -256,7 +256,20 @@
 			}
 		}
     
-],
+    ,{
+            "path" : "pages/order/fab",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "transparent",
+				"app-plus": {
+					"animationType": "fade-in",
+					"background": "transparent",
+					"popGesture": "none"
+				}
+			}
+            
+        }
+    ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "湾大简拍",
@@ -265,11 +278,7 @@
 		"enablePullDownRefresh": false
 	},
 	"condition": {
-		"list": [{
-				"path": "pages/list/detail"
-			}, {
-				"path": "pages/list/list"
-			},
+		"list": [
 			{
 				"path": "pages/ucenter/login-page/index/index"
 			}, {
@@ -291,13 +300,16 @@
 			"iconPath": "static/tabbar/list.png",
 			"selectedIconPath": "static/tabbar/list_active.png",
 			"text": "首页"
-		}, {
+		}, 
+ 
+		{
 			"pagePath": "pages/grid/grid",
 			"iconPath": "static/tabbar/grid.png",
 			"selectedIconPath": "static/tabbar/grid_active.png",
-			"text": "宫格"
-		}
-		, {
+			"text": "管理员"
+		}, 
+		
+		{
 			"pagePath": "pages/ucenter/ucenter",
 			"iconPath": "static/tabbar/me.png",
 			"selectedIconPath": "static/tabbar/me_active.png",

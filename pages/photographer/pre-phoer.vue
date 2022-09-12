@@ -37,10 +37,11 @@
 							:disabled="inputDisable"
 						>
 							<template slot="suffix">
+								<!-- @click要么没有括号要么加形参 不然打包到app会显示undefined -->
 								<u-icon
 									size="28"
 									name='phone'
-									@click="phoneCall()"
+									@click="phoneCall"
 								></u-icon>
 							</template>
 						</u--input>
@@ -310,8 +311,12 @@
 					this.phoerInfo=res.result.data[res.result.data.length-1] //最新数据
 					this.symbols=this.phoerInfo.symbolsUrl
 					this.symbols_online=this.phoerInfo.symbolsUrl
+					delete this.phoerInfo._id  //删除_id用于新增
 				})
-				this.inputDisable=!this.phoerInfo.AuditStatus //AuditStatus=true为审核完毕 可修改   false为审核中 不可修改
+				if(this.phoerInfo.AuditStatus!==0){
+					this.inputDisable=false
+				}
+				
 				
 				
 			}else{
@@ -516,6 +521,7 @@
 			
 			phoneCall(){
 				console.log("phoneCall");
+				// console.log(typeof(this.phoerInfo.phoneNumber));
 				// #ifdef APP-PLUS
 				uni.makePhoneCall({
 					phoneNumber:this.phoerInfo.phoneNumber

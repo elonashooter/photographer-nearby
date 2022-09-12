@@ -40,14 +40,7 @@
 					>
 						<view class="uni-uploader">
 							<view class="uni-uploader-head">
-								<view class="uni-uploader-title">个人形象</view>
-								<view class="uni-uploader-info">								
-								<u-button
-									text="说明"
-									type="warning"
-									size="small"
-									@click="popupOpen()"
-								></u-button></view>
+								<view class="uni-uploader-title">人像</view>
 							</view>
 							<view class="uni-uploader-body">
 								<view class="uni-uploader__files">
@@ -56,9 +49,6 @@
 											<image class="uni-uploader__img" :src="image" mode="aspectFill" :data-src="image" @tap="previewPhoerShow"></image>
 										</view>
 									</block>
-									<view class="uni-uploader__input-box" v-if="phoerInfo.phoerShow[0]==undefined">
-										<view class="uni-uploader__input" @tap="choosePShow()"></view>
-									</view>
 								</view>
 							</view>
 						</view>
@@ -79,43 +69,25 @@
 						></u--textarea>
 					</u-form-item>
 					<u-form-item
-						label="代表作"
+						label="作品"
 						prop="symbols"
 						ref="item5"
 					>
 					</u-form-item>
 					<view class="uni-uploader" v-if="phoerInfo.phoerShow[0]!==undefined">
 						<view class="uni-uploader-head">
-							<view class="uni-uploader-title">点击可预览选好的图片</view>
-							<view class="uni-uploader-info">{{symbols.length}}/9</view>
+							<view class="uni-uploader-title">点击可预览图片</view>
 						</view>
 						<view class="uni-uploader-body">
 							<view class="uni-uploader__files">
 								<block v-for="(image,index) in symbols" :key="index">
 									<view class="uni-uploader__file">
 										<!-- 注：uni.preview函数写在这只能是不加括号的，不然会报错 -->
-										<uni-icons type="closeempty" class="close" size="20" @click="DelImg(index)"></uni-icons>
 										<image class="uni-uploader__img" mode="aspectFill" :src="image" :data-src="image" @tap="previewSymbols"></image>
 									</view>
 								</block>
-								<view class="uni-uploader__input-box">
-									<view class="uni-uploader__input" @tap="chooseSymbols()"></view>
-								</view>
 							</view>
 						</view>
-					</view>
-					<view style="margin: 20rpx 10rpx;">
-						<u--text
-							text='作品名称'
-							type="warning"
-						></u--text>
-						<u--input
-							v-model="phoerInfo.symbolsTag"
-							placeholder="用户可能会根据名字查找照片"
-							border="surround"
-							shape="circle"
-							:disabled="inputDisable"
-						></u--input>
 					</view>
 					<view style="margin: 20rpx 10rpx;" >
 						<u--text
@@ -126,108 +98,26 @@
 					<u-line></u-line>
 				</u--form>
 				<u-button
+					v-if="SubmitButtonText=='返回'"
 					type="primary"
-					:text="SubmitButtonText"
+					text="返回"
 					customStyle="margin-top: 30px"
-					@click="submit"
+					@click="backVOrder()"
+				></u-button>
+				<u-button
+					v-else
+					type="primary"
+					text="预约"
+					customStyle="margin-top: 30px"
+					@click="navYuyue()"
 				></u-button>
 			</view>
 			
-			<view style="margin-top: 25rpx;">
-				用户查看到的效果：
-				<u-list>
-					<u-list-item>
-						<u-cell
-							:title="phoerInfo.name"
-							:value="phoerInfo.intro"
-							center
-							:label="phoerInfo.phoneNumber"
-						>
-							<u-avatar
-								slot="icon"
-								shape="square"
-								size="70"
-								:src="phoerInfo.phoerShow[0]"
-								customStyle="margin: -3px 5px -3px 0"
-								mode="aspectFill"
-							></u-avatar>
-						</u-cell>
-					</u-list-item>
-				</u-list>
-			</view>
-			<!-- “个人形象”弹出框 -->
-			<u-popup
-				mode="right"
-				:show="showPopup"
-				round="0"
-				@close="popupClose()"
-				@open="popupOpen()"
-			>
-				<view class="u-page">
-					<view class="u-demo-block">
-						<text class="u-demo-block__title">能力审核</text>
-						<view class="u-demo-block__content">
-							<view class="text-item">
-								<u--text text="请提交一张"></u--text>
-								<u--text text="最能体现个人摄影水平的\n形象照," type='error'></u--text>
-								<u--text text="此照用以确认申请人为本人\n同时确认申请人水平"></u--text>
-							</view>
-						</view>
-					</view>
-					<view class="u-demo-block">
-						<text class="u-demo-block__title">可使用头像</text>
-						<!-- 若已同步为头像，则返回true 否则返回false 1/3-->
-						<view class="u-demo-block__content" v-if="AvatarSet()">
-							<view class="text-item">
-								<u--text 
-								text="已将个人形象照设为头像"
-								type="success"
-								></u--text>
-							</view>
-						</view>
-						<!-- 若已同步为头像，则返回true 否则返回false 2/3 -->
-						<view class="u-demo-block__content" v-else>
-							<view class="text-item">
-								<u--text text="若已将个人形象照设为头像"></u--text>
-								<u--text text="可直接点击"></u--text>
-								<u-button
-									text="同步头像"
-									type="success"
-									size="normal"
-									@click="SynAvatar()"
-								></u-button>
-							</view>
-						</view>
 
-					</view>
-					<view class="u-demo-block">
-						<text class="u-demo-block__title">肖像权</text>
-						<view class="u-demo-block__content">
-							<view class="text-item">
-								<u--text text="此照片仅用于\n让用tong户xue在此app内搜到\n"></u--text>
-							</view>
-						</view>
-					</view>
-					<view class="u-demo-block">
-						<text class="u-demo-block__title">tip:</text>
-						<view class="u-demo-block__content">
-							<view class="text-item">
-								<u--text text="价格可以与摄影师协商,\n双方达成共识后支付" type="warning"></u--text>
-							</view>
-							<u-button
-								type="warning"
-								text="点我关闭"
-								customStyle="width: 200rpx;margin-top:10rpx"
-								@click="popupClose()"
-							></u-button>
-						</view>
-					</view>
-				</view>
-			</u-popup>
 			<!-- 提交提示弹出框 -->
 			<u-modal
 				:show="showModal"
-				title="确认信息填写无误"
+				title="确定提交预约?"
 				content="提交成功后,直到审核通过或驳回之前无法修改"
 				showCancelButton
 				closeOnClickOverlay
@@ -242,10 +132,9 @@
 	export default {
 		data() {
 			return {
-				showPopup:false,//个人形象说明框
 				showModal:false,//提交确认框
 				SubmitButtonText:'',
-				inputDisable:'',
+				inputDisable:true,
 				phoerInfo: {
 					name: '',
 					phoneNumber: '',
@@ -286,40 +175,24 @@
 		onLoad(e) {		//根据传来的参数确定是什么角色点进来的
 			// 已是摄影师if(e.phoerId&&phoerId==this.phoerInfo.userId)=true  新申请摄影师if(e)=false  预约用户if(e.phoerId)=true
 			// console.log(e.phoerId);  //???不知道为什么会执行两次
-			
 			if(e.phoerId){
 				this.phoerId=e.phoerId  //其他页面传过来的
 				this.pdb.where({userId:this.phoerId}).get().then(res=>{
-					this.phoerInfo={...res}
+					this.phoerInfo={...res.result.data[0]}
+					this.symbols=this.phoerInfo.symbolsUrl
 				})
-				if(e.phoerId==this.phoerInfo.userId){
-					//已是摄影师修改
-					this.inputDisable=false
-					this.presentCharacter="phoer"
-					this.SubmitButtonText="修改"
-				}else{
-					//用户预约
-					this.inputDisable=true
-					this.presentCharacter="order"
-					this.SubmitButtonText="预约"
-				}
+				this.SubmitButtonText="返回"
+			}else if(e.orderChoicePhoer){
+				this.SubmitButtonText="预约"
+				this.phoerInfo=JSON.parse(decodeURIComponent(e.orderChoicePhoer));
+				this.symbols=this.phoerInfo.symbolsUrl
 			}else{
-				//新摄影师申请
-				this.inputDisable=false
-				this.presentCharacter="newPhoer"
-				this.SubmitButtonText="提交"
-				this.setDefaultValue()
+
 			}
-			this.init()
 		},
 		methods: {
-			popupOpen() {
-				// console.log('open');
-				this.showPopup = true
-			},
-			popupClose() {
-				this.showPopup = false
-				// console.log('close');
+			backVOrder(){
+				uni.navigateBack()
 			},
 			openModal(){
 				this.showModal=true
@@ -328,73 +201,8 @@
 				this.showModal=false
 				this.getImgUrlAndUpload()
 			},
-			navigateBack() {
-				uni.navigateBack()
-			},
-			//同步头像
-			SynAvatar(){
-				// console.log(this.$store.state.user.info.avatar_file.url);
-				if(this.$store.state.user.info.avatar_file.url!==undefined){
-					// let AvatarUrl=Afile.url
-					this.phoerInfo.phoerShow.push(this.$store.state.user.info.avatar_file.url) 
-					console.log(this.phoerInfo.phoerShow);
-				}
-			},
-			AvatarSet(){
-				if(this.phoerInfo.phoerShow[0]==this.$store.state.user.info.avatar_file.url){
-					return true
-				}else{
-					return false
-				}
-			},
-			setDefaultValue(){
-				this.phoerInfo.name=this.$store.state.user.info.nickname,
-				this.phoerInfo.phoneNumber=this.$store.state.user.info.mobile
-				
-			},
-			submit() {
-				// 校验表单  如果有错误，会在catch中返回报错信息数组，校验通过则在then中返回true
-				if(this.symbolsUploadMsg[0]!==undefined){
-					this.$refs.form1.validate().then(res => {
-						uni.$u.toast('校验通过')
-					}).catch(errors => {
-						uni.$u.toast('请完整填写数据')
-					})
-				}else{
-					uni.$u.toast('还没上传代表作哦')
-				}
-
-				
-				if(this.presentCharacter=="phoer"){
-					this.pdb.where({
-						userId:this.phoerId
-					}).update(this.phoerInfo).then(res=>{
-						console.log(res);
-					})
-				}else if(this.presentCharacter=="order"){
-					uni.navigateTo({
-						url:'/pages/order/order?phoerInfo='+this.phoerInfo
-					})
-				}else if(this.presentCharacter=="newPhoer"){
-					this.openModal()
-				}
-				
-			},
 			hideKeyboard() {
 				uni.hideKeyboard()
-			},
-			init(){ //初始化  phoer表有此id的数据则读取，没有数据则默认账户姓名和联系电话
-				this.pdb.where({
-					userId:this.$store.state.user.info._id
-				}).get().then(res=>{
-					if(res._id){
-						this.phoerInfo={...res}
-					}
-					else{
-						this.name=this.$store.state.user.info.nickname,
-						this.phoneNumber=this.$store.state.user.info.mobile
-					}
-				})
 			},
 			// 代表作导入并预览  start
 			previewPhoerShow: function(e) {
@@ -411,85 +219,8 @@
 					urls: this.symbols
 				})
 			},
-			async checkPermission() {
-				let status = permision.isIOS ? await permision.requestIOS(sourceType[type][0]) :
-					await permision.requestAndroid('android.permission.READ_EXTERNAL_STORAGE');
-				if (status === null || status === 1) {
-					status = 1;
-				} else {
-					uni.showModal({
-						content: "没有开启权限",
-						confirmText: "设置",
-						success: function(res) {
-							if (res.confirm) {
-								permision.gotoAppSetting();
-							}
-						}
-					})
-				}
-				return status;
-			},
-			choosePShow(){
-				uni.chooseImage({
-					count:1,
-					success: (res) => {
-						this.phoerInfo.phoerShow=this.phoerInfo.phoerShow.concat(res.tempFilePaths)
-						this.phoerShowName=res.tempFiles[0].name
-						// console.log(res.tempFiles[0].name);
-					},
-					fail: (err) => {
-						console.log("err: ",err);
-						// #ifdef APP-PLUS
-						this.checkPermission();
-						// #endif
-						// #ifdef MP
-						if(err.errMsg.indexOf('cancel') !== '-1'){
-							return;
-						}
-						uni.getSetting({
-							success: (res) => {
-								let authStatus = false;
-								authStatus = res.authSetting['scope.album'];
-								}
-								if (!authStatus) {
-									uni.showModal({
-										title: '授权失败',
-										content: '获取相册图片权限失败，请在设置界面打开相关权限',
-										success: (res) => {
-											if (res.confirm) {
-												uni.openSetting()
-											}
-										}
-									})
-								}
-							}
-						})
-						// #endif
-					}
-				})
-			},
-			chooseSymbols(){
-				uni.chooseImage({
-					count: 9,
-					// sourceType: 'album',
-					// sizeType: 'original',
-					success: (res) => {
-						// console.log(res);
-						this.symbols=this.symbols.concat(res.tempFilePaths)
-						for(let i=0;i<res.tempFilePaths.length;i++){
-							this.symbolsUploadMsg.push({
-								name:res.tempFiles[i].name,
-								url:res.tempFilePaths[i]
-							})
-						}
-					},
-				})
-			},// 代表作导入并预览  end
-			DelImg(index){
-				this.symbols.splice(index,1)
-				this.symbolsUploadMsg.splice(index,1)
-			},
-			
+
+
 			phoneCall(){
 				console.log("phoneCall");
 				// #ifdef APP-PLUS
@@ -514,37 +245,13 @@
 				  })
 				})
 			},
-			getImgUrlAndUpload(){
-				//上传个人形象
-				let that = this
-				if (this.phoerShowName) {
-				    uniCloud.uploadFile({
-					filePath: this.phoerInfo.phoerShow[0],
-					cloudPath: this.phoerShowName,
-				    success(res){
-						that.phoerInfo.phoerShowUrl=res.fileID
-						}
-				    });
-				}
-				//上传代表作
-				if(this.symbols){
-					//无法一次性上传多张  只能循环上传了
-					// debugger
-					for(var i of this.symbolsUploadMsg){
-						uniCloud.uploadFile({
-							filePath:i.url,
-							cloudPath:i.name,
-							success(res) {
-								that.phoerInfo.symbolsUrl.push(res.fileID)
-								// 上传的图片连接等于返回的代表作链接  意味着图片上传完毕 url获取完毕 可以上传了
-								if(that.phoerInfo.symbolsUrl.length==that.symbolsUploadMsg.length){
-									that.uploadMsg()
-								}
-							}
-						})
-					}
-				}
-			},
+			
+			navYuyue(){
+				console.log("yuyue");
+				uni.navigateTo({
+					url:"/pages/order/order?orderChoicePhoer="+this.phoerInfo
+				})
+			}
 		},
 	}
 </script>

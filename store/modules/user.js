@@ -7,7 +7,9 @@ let state = {
 		info: userInfoHistory,
 		//2022-7-16 普通用户order  摄影师phoer（photographer）
 		character:'order',
-		WP_manager:false
+		WP_manager:false,
+		//摄影师上线状态  目前用于摄影师退出应用时的取消接单状态的提醒
+		OnlineStatus:false
 	},
 	getters = {
 		info(state) {
@@ -18,6 +20,9 @@ let state = {
 		},
 		character(state){
 			return state.character;
+		},
+		OnlineStatus(state){
+			return state.OnlineStatus
 		}
 	},
 	mutations = {
@@ -48,6 +53,9 @@ let state = {
 		},
 		WP_manager(state,isWP_manager){
 			state.WP_manager=isWP_manager
+		},
+		OnlineStatus(state,OnlineStatus){
+			state.OnlineStatus=OnlineStatus
 		},
 		logout(state) {
 			state.info = {};

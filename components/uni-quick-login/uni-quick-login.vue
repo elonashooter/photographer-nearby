@@ -99,7 +99,13 @@
 						"suffix": "并使用本机号码登录", // 条款后的文案 默认值：“并使用本机号码登录”  
 						"privacyItems": [],
 						"checkBoxSize":30,
-					}
+					},
+					"otherLoginButton":{
+						"visible":false
+					},
+					"icon": {  
+					        "path": "static/72x72.png" // 自定义显示在授权框中的logo，仅支持本地图片 默认显示App logo   
+					    },  
 				}
 			}
 		},
@@ -242,7 +248,7 @@
 						fail(err) {
 							uni.showToast({
 								// title: JSON.stringify(err),
-								title:"一键登录功能请开启流量",
+								title:"一键登录功能请先暂时开启流量",
 								icon: 'none'
 							});
 						},

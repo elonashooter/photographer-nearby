@@ -79,7 +79,8 @@
                         "com.apple.developer.associated-domains" : [ "applinks:static-76ce2c5e-31c7-4d81-8fcf-ed1541ecbc6e.bspapp.com" ]
                     }
                 },
-                "idfa" : false
+                "idfa" : false,
+                "dSYMs" : false
             },
             "sdkConfigs" : {
                 "oauth" : {
@@ -105,7 +106,27 @@
                     }
                 },
                 "push" : {
-                    "unipush" : {}
+                    "unipush" : {
+                        "version" : "2",
+                        "offline" : false,
+                        "icons" : {
+							"push":{
+								"ldpi" : "unpackage/res/icons/48x48.png",
+								"mdpi" : "unpackage/res/icons/48x48.png",
+								"hdpi" : "unpackage/res/icons/72x72.png",
+								"xhdpi" : "unpackage/res/icons/96x96.png",
+								"xxhdpi" : "unpackage/res/icons/144x144.png",
+								"xxxhdpi" : "unpackage/res/icons/192x192.png"
+							},
+                            "small" : {
+                                "ldpi" : "unpackage/res/icons/18x18.png",
+                                "mdpi" : "unpackage/res/icons/24x24.png",
+                                "hdpi" : "unpackage/res/icons/36x36.png",
+                                "xhdpi" : "unpackage/res/icons/48x48.png",
+                                "xxhdpi" : "unpackage/res/icons/72x72.png"
+                            }
+                        }
+                    }
                 },
                 "payment" : {}
             },
@@ -147,7 +168,10 @@
                 "useOriginalMsgbox" : true
             }
         },
-        "nvueLaunchMode" : ""
+        "nvueLaunchMode" : "",
+        "uniStatistics" : {
+            "enable" : true
+        }
     },
     "quickapp" : {},
     "mp-weixin" : {
@@ -162,6 +186,9 @@
             "scope.userLocation" : {
                 "desc" : "演示在onShow生命周期获取地理位置"
             }
+        },
+        "unipush" : {
+            "enable" : true
         }
     },
     "mp-alipay" : {
@@ -190,6 +217,9 @@
             "base" : ""
         },
         "uniStatistics" : {
+            "enable" : true
+        },
+        "unipush" : {
             "enable" : true
         }
     },

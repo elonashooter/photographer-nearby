@@ -4,8 +4,8 @@
 	"permission": {
 		"read": true,
 		"create": true,
-		//下单者自己可以改and摄影师可以改
-		"update": "doc.userId == auth.uid || get('database.photographer.${doc.uid}').WorkStatus == true ",
+		//下单者自己可以改and在职摄影师可以改
+		"update": "doc.userId == auth.uid ||'photographer' in auth.role",
 		"delete": "doc.userId == auth.uid"
 	},
 	"properties": {
@@ -46,25 +46,34 @@
 		},
 		"orderStatus": {
 			"bsonType": "int",
-			"description": "订单状态：0 已发起 1 响应中 2 已完成",
+			"description": "订单状态：0 已发起 1 待下单方回应 101待摄影师回应 2 约拍进行中  3已完成",
 			"title": "订单状态",
 			"defaultValue": 0,
-			"permission": {
-				"write": false
-			},
 			"enum": [{
 					"text": "已发起",
 					"value": 0
 				},
 				{
-					"text": "响应中",
+					"text": "待下单方回应",
 					"value": 1
 				},
 				{
-					"text": "已完成",
+					"text": "待摄影师回应",
+					"value": 101
+				},
+				{
+					"text": "约拍进行中",
 					"value": 2
+				},
+				{
+					"text": "已完成",
+					"value": 3
 				}
 			]
+		},
+		"rejectReason": {
+			"bsonType": "string",
+			"description": "用户拒绝摄影师的理由"
 		},
 		"userId": {
 			"bsonType": "string",
@@ -74,9 +83,17 @@
 			"bsonType": "string",
 			"description": "接单摄影师用户id"
 		},
+		"phoerPhoneNumber":{
+			"bsonType": "string",
+			"description": "接单摄影师用户id"
+		},
 		"phoerName": {
 			"bsonType": "string",
 			"description": "接单摄影师的name字段"
+		},
+		"phoerIntro":{
+			"bsonType": "string",
+			"description": "摄影师自我介绍"
 		},
 		"phoerShowUrl": {
 			"bsonType": "string",

@@ -46,23 +46,28 @@
 		},
 		"AuditStatus": {
 			"bsonType": "int",
-			"description": "审核状态：0 审核中 1 已驳回 2 已通过",
+			"description": "审核状态：0 审核中 1 已通过 2 已驳回",
 			"title": "订单状态",
 			"defaultValue": 0,
 			"enum": [{
 				"text": "审核中",
 				"value": 0
 			}, {
-				"text": "已驳回",
+				"text": "已通过",
 				"value": 1
 			}, {
-				"text": "已通过",
+				"text": "已驳回",
 				"value": 2
 			}]
 		},
 		"rejectReason": {
 			"bsonType": "string",
 			"description": "驳回原因"
+		},
+		"requestTimes": {
+			"bsonType": "int",
+			"description": "请求成功次数 用于判断通过时(0次)是增加摄影师(0次以上)还是修改摄影师信息",
+			"defaultValue":0
 		},
 		"create_time": {
 			"bsonType": "timestamp",

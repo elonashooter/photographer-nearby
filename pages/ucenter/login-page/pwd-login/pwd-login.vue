@@ -1,9 +1,10 @@
 <template>
 	<view class="content">
 		<!-- 顶部文字 -->
-		<text class="title">{{$t('pwdLogin.pwdLogin')}}</text>
+		<text class="title" v-if="eyes">(ﾉ•̀ㅂ•́)ﾉ 欢迎来到湾大简拍 (≖ ω ≖)✧</text>
+		<text class="title" v-else>(ﾉ>_<)ﾉ 欢迎来到湾大简拍 (- ω -)★</text>
 		<input class="input-box" :inputBorder="false" v-model="username" :placeholder="$t('pwdLogin.placeholder')"/>
-		<input type="password" class="input-box" :inputBorder="false" v-model="password" :placeholder="$t('pwdLogin.passwordPlaceholder')"/>
+		<input @blur="turnEyes()" @focus="turnEyes()"  type="password" class="input-box" :inputBorder="false" v-model="password" :placeholder="$t('pwdLogin.passwordPlaceholder')"/>
 		<view class="captcha-box" v-if="captchaBase64">
 			<image class="captcha-img" @click="createCaptcha" :src="captchaBase64" mode="widthFix"></image>
 			<input type="text" class="input-box captcha" :inputBorder="false" v-model="captcha" :placeholder="$t('pwdLogin.verifyCodePlaceholder')"/>
@@ -26,6 +27,7 @@
 		mixins: [mixin],
 		data() {
 			return {
+				eyes:true,
 				"password": "",
 				"username": "",
 				"agree": false,
@@ -44,8 +46,18 @@
 				return /^1\d{10}$/.test(this.phone);
 			},
 		},
+		onLoad() {
+			//#ifdef APP-PLUS
+			setTimeout(() => {
+				this.$refs.uniQuickLogin.login_before('univerify')
+			}, 100)
+			//#endif
+		},
 		methods: {
 			// 页面跳转，找回密码
+			turnEyes(){
+				this.eyes=!this.eyes
+			},
 			toRetrievePwd() {
 				uni.navigateTo({
 					url: '../pwd-retrieve/pwd-retrieve?phoneNumber=' + (this.isPhone ? this.username : '') +
