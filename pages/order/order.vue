@@ -89,25 +89,15 @@
 							placeholder="可为0,愿者上钩"
 							prefixIcon="rmb-circle"
 							prefixIconStyle="font-size: 22px;color: #909399"
-						>
-							<template slot="suffix">
-								<u-button
-									text="参考价位"
-									type="warning"
-									size="small"
-									@click="popupOpen()"
-								></u-button>
-							</template>
-						</u--input>
+						></u--input>
+						<u-button
+							text="参考价位"
+							type="warning"
+							size="small"
+							customStyle="width:200rpx"
+							@click="popupOpen()"
+						></u-button>
 					</u-form-item>
-<!-- 					<u-slider
-					    v-model="agreed.price"
-						showValue
-					    min="0"
-					    max="200"
-						step="10"
-					></u-slider>
-					<u-line></u-line> -->
 					<u-form-item
 						label="地点"
 						prop="place"
@@ -301,10 +291,6 @@
 					</view>
 				</u-popup>
 			</view>
-<!-- 			<u-empty
-				mode="message"
-				icon="/static/history.png">
-			</u-empty> -->
 			<view style="margin-top: 25rpx;" v-if='agreed.phoerId'>
 				对接摄影师：
 					<u-cell
@@ -329,6 +315,7 @@
 </template>
 
 <script>
+	let odb=uniCloud.database().collection('photography-order')
 	export default {
 		data() {
 			return {
@@ -538,7 +525,7 @@
 				}
 			},
 			getDataByPhoerId(phoerId){
-				this.pdb.where({
+				uniCloud.database().collection('photographer').where({
 					userId:phoerId
 				}).get().then(res=>{
 					if(res.result.data.length>0){
@@ -560,7 +547,7 @@
 			},
 			//接单
 			takeOrder(){
-				this.odb.doc(this.agreed._id).update({
+				odb.doc(this.agreed._id).update({
 					phoerId:this.phoerMsg.userId,
 					phoerPhoneNumber:this.phoerMsg.phoneNumber,
 					phoerName:this.phoerMsg.name,
@@ -593,7 +580,7 @@
 				})
 			},
 			editOrder(){
-				this.odb.doc(this.agreed._id).update({
+				odb.doc(this.agreed._id).update({
 					userInfo:this.agreed.userInfo,
 					type:this.agreed.type,
 					price:this.agreed.price,
@@ -611,7 +598,7 @@
 				})
 			},
 			deleteOrder(){
-				this.odb.doc(this.agreed._id).remove().then(res=>{
+				odb.doc(this.agreed._id).remove().then(res=>{
 					uni.showToast({
 						title:"删除完成"
 					}),
@@ -621,7 +608,7 @@
 				})
 			},
 			completeOrder(){
-				this.odb.doc(this.agreed._id).update({
+				odb.doc(this.agreed._id).update({
 					orderStatus:3
 				}).then(res=>{
 					uni.showToast({
@@ -636,7 +623,7 @@
 			yuyue(){
 				this.$refs.form1.validate().then(res => {
 					// uni.$u.toast('校验通过')
-					this.odb.add(this.agreed).then((res) => {
+					odb.add(this.agreed).then((res) => {
 					  uni.showToast({icon: 'none',title: '预约发起成功'})
 					 //  uniCloud.callFunction({
 					 //  	name:"push2",

@@ -250,7 +250,7 @@
 			},
 			// 摄影师点击上线时上传数据  只有摄影师可见
 			OnlineStatusChange(){
-				this.pdb.where({userId:this.phoerId}).update({
+				uniCloud.database().collection('photographer').where({userId:this.phoerId}).update({
 					OnlineStatus:this.OnlineStatus
 				}).then(()=>{
 					this.$store.commit('user/OnlineStatus',this.OnlineStatus)

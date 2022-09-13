@@ -155,6 +155,9 @@
 </template>
 
 <script>
+	let pdb=uniCloud.database().collection('photographer')
+	let ppdb=uniCloud.database().collection('pre-photographer')
+
 	export default {
 		data() {
 			return {
@@ -204,7 +207,7 @@
 			if(e._id){
 				
 				this.phoerId=e._id  //其他页面传过来的请求id
-				this.ppdb.doc(e._id).get().then(res=>{
+				ppdb.doc(e._id).get().then(res=>{
 					// this.phoerInfo={...res}
 					// console.log("ppdb");
 					console.log(res.result.data);
@@ -236,7 +239,7 @@
 			},
 			async submit() {
 				//pre-phoer状态为已完成  新增一个摄影师
-				await this.ppdb.doc(this.phoerId).update({
+				await ppdb.doc(this.phoerId).update({
 					AuditStatus:1 ,//1即为通过
 					rejectReason:'',
 					requestTimes:this.phoerInfo.requestTimes+1
@@ -247,9 +250,9 @@
 				delete pdbMsg.AuditStatus
 				delete pdbMsg.rejectReason
 				if(this.phoerInfo.requestTimes>0){
-					await this.pdb.doc(this.phoerId).update(pdbMsg)
+					await pdb.doc(this.phoerId).update(pdbMsg)
 				}else{
-					await this.pdb.add(pdbMsg)
+					await pdb.add(pdbMsg)
 					uniCloud.database().collection('uni-id-users').where({
 						_id:this.phoerInfo.userId
 					}).update({
@@ -261,7 +264,7 @@
 
 			},
 			reject(){
-				this.ppdb.doc(this.phoerInfo._id).update({
+				ppdb.doc(this.phoerInfo._id).update({
 					AuditStatus:2,//2即为驳回
 					rejectReason:this.rejectReason
 				}).then(e=>{

@@ -78,6 +78,8 @@
 </template>
 
 <script>
+	let ppdb=uniCloud.database().collection('pre-photographer')
+
 	export default {
 		data() {
 			return {
@@ -99,7 +101,7 @@
 			getPrePhoerList(){
 				this.pendingData=[]
 				this.solvedData=[]
-				this.ppdb.get().then(res=>{
+				ppdb.get().then(res=>{
 					if(res.result.data.length>0){
 						for(var i of res.result.data){
 							if (i.AuditStatus==0){

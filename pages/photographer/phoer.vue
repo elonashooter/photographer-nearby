@@ -24,14 +24,12 @@
 							placeholder="联系电话"
 							:disabled="inputDisable"
 						>
-							<template slot="suffix">
-								<u-icon
-									size="28"
-									name='phone'
-									@click="phoneCall()"
-								></u-icon>
-							</template>
 						</u--input>
+						<u-icon
+							size="28"
+							name='phone'
+							@click="phoneCall()"
+						></u-icon>
 					</u-form-item>
 					<u-form-item
 						label=""

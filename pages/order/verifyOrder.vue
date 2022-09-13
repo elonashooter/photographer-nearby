@@ -151,6 +151,7 @@
 </template>
 
 <script>
+	let odb=uniCloud.database().collection('photography-order')
 	export default {
 		data() {
 			return {
@@ -191,7 +192,7 @@
 			},
 			//接单
 			verifyOrder(id){
-				this.odb.doc(id).update({
+				odb.doc(id).update({
 					orderStatus:2,
 					rejectReason:''
 				}).then(res=>{
@@ -205,7 +206,7 @@
 				})
 			},
 			rejectOrder(id){
-				this.odb.doc(id).update({
+				odb.doc(id).update({
 					orderStatus:0,
 					rejectReason:this.rejectReason,
 					phoerId:'',
@@ -243,7 +244,7 @@
 				})
 			},
 			takeOrder(id){
-				this.odb.doc(id).update({
+				odb.doc(id).update({
 					orderStatus:2,
 					rejectReason:''
 				}).then(res=>{

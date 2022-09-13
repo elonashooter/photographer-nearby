@@ -33,6 +33,7 @@
 </template>
 
 <script>
+	let pdb=uniCloud.database().collection('photographer')
 	export default {
 		data() {
 			return {
@@ -66,7 +67,7 @@
 			},
 			getPhoerList(){
 				this.phoerList=[]
-				this.pdb.get().then(res=>{
+				pdb.get().then(res=>{
 					console.log('pdb get success');
 					console.log(res);
 					if(res.result.data.length>0){

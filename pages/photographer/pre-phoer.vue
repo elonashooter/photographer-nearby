@@ -35,16 +35,12 @@
 							border="none"
 							placeholder="联系电话"
 							:disabled="inputDisable"
-						>
-							<template slot="suffix">
-								<!-- @click要么没有括号要么加形参 不然打包到app会显示undefined -->
-								<u-icon
-									size="28"
-									name='phone'
-									@click="phoneCall"
-								></u-icon>
-							</template>
-						</u--input>
+						></u--input>
+						<u-icon
+							size="28"
+							name='phone'
+							@click="phoneCall"
+						></u-icon>
 					</u-form-item>
 					<u-form-item
 						label=""
@@ -148,25 +144,21 @@
 			
 			<view style="margin-top: 25rpx;">
 				用户查看到的效果：
-				<u-list>
-					<u-list-item>
-						<u-cell
-							:title="phoerInfo.name"
-							:value="phoerInfo.intro"
-							center
-							:label="phoerInfo.phoneNumber"
-						>
-							<u-avatar
-								slot="icon"
-								shape="square"
-								size="70"
-								:src="phoerInfo.phoerShow[0]"
-								customStyle="margin: -3px 5px -3px 0"
-								mode="aspectFill"
-							></u-avatar>
-						</u-cell>
-					</u-list-item>
-				</u-list>
+				<u-cell
+					:title="phoerInfo.name"
+					:value="phoerInfo.intro"
+					center
+					:label="phoerInfo.phoneNumber"
+				>
+					<u-avatar
+						slot="icon"
+						shape="square"
+						size="70"
+						:src="phoerInfo.phoerShow[0]"
+						customStyle="margin: -3px 5px -3px 0"
+						mode="aspectFill"
+					></u-avatar>
+				</u-cell>
 			</view>
 			<!-- “个人形象”弹出框 -->
 			<u-popup
@@ -252,13 +244,14 @@
 </template>
 
 <script>
+	let ppdb=uniCloud.database().collection('pre-photographer')
 	export default {
 		data() {
 			return {
 				showPopup:false,//个人形象说明框
 				showModal:false,//提交确认框
 				showWaitingPage:false,//提交信息在审核中的显示页面参数
-				inputDisable:'',
+				inputDisable:false,
 				phoerInfo: {
 					name: '',
 					phoneNumber: '',
@@ -273,10 +266,7 @@
 				symbolsUploadMsg:[],
 				symbols:[],//作品对象
 				symbols_online:[],//读取到的已存在云端的图，用于给DELIMG方法识别
-				symbols_delete:[],
 				phoerId:'',//从phoerList点进来传来的参数
-				character:this.$store.state.user.character,
-				isWP_manager:this.$store.state.user.WP_manager,
 				rules: {
 					'name': [{
 						type: 'string',
@@ -305,7 +295,7 @@
 				console.log("onload get an e");
 				console.log(e);
 				this.phoerId=e.phoerId  //其他页面传过来的
-				this.ppdb.where({userId:this.phoerId}).orderBy('create_time').get().then(res=>{
+				ppdb.where({userId:this.phoerId}).orderBy('create_time').get().then(res=>{
 					// console.log("ppdb");
 					console.log(res.result.data);
 					this.phoerInfo=res.result.data[res.result.data.length-1] //最新数据
@@ -322,7 +312,7 @@
 			}else{
 				//新摄影师申请
 				this.inputDisable=false
-				this.ppdb.where({
+				ppdb.where({
 					userId:this.phoerInfo.userId
 				}).get().then(res=>{
 					console.log('ppdb');
@@ -342,7 +332,6 @@
 					}
 				})
 			}
-			this.init()
 		},
 		methods: {
 			popupOpen() {
@@ -404,19 +393,6 @@
 			},
 			hideKeyboard() {
 				uni.hideKeyboard()
-			},
-			init(){ //初始化  phoer表有此id的数据则读取，没有数据则默认账户姓名和联系电话
-				// this.ppdb.where({
-				// 	userId:this.$store.state.user.info._id
-				// }).get().then(res=>{
-				// 	if(res._id){
-				// 		this.phoerInfo={...res}
-				// 	}
-				// 	else{
-				// 		this.name=this.$store.state.user.info.nickname,
-				// 		this.phoneNumber=this.$store.state.user.info.mobile
-				// 	}
-				// })
 			},
 			// 代表作导入并预览  start
 			previewPhoerShow: function(e) {
@@ -530,7 +506,7 @@
 			},
 			uploadMsg(){
 				this.phoerInfo.AuditStatus=0
-				this.ppdb.add(this.phoerInfo).then((res) => {
+				ppdb.add(this.phoerInfo).then((res) => {
 				  uni.showToast({
 				    icon: 'none',
 				    title: '提交成功'
@@ -562,13 +538,6 @@
 				}else{
 					return this.$u.toast("请上传个人形象照")
 				}
-				//删除云图
-				// if(this.symbols_delete!==[]){
-				// 	uniCloud.deleteFile({
-				// 		fileList:this.symbols_delete
-				// 	})
-				// }
-
 				//上传代表作
 				if(this.symbols){
 					//无法一次性上传多张  只能循环上传了
@@ -590,12 +559,6 @@
 					}else{
 						this.uploadMsg()
 					}
-
-					//循环完毕后 若返回的链接数与当前页面代表作数不符 那就是还有已上传的部分要合并
-					// if(this.phoerInfo.symbolsUrl.length!==this.symbols.length){  //不会有这种情况  
-					// 	this.phoerInfo.symbolsUrl=this.phoerInfo.symbolsUrl.concat(this.symbols_online)
-					// 	this.uploadMsg()
-					// }
 				}
 				
 			},
