@@ -306,9 +306,6 @@
 				if(this.phoerInfo.AuditStatus!==0){
 					this.inputDisable=false
 				}
-				
-				
-				
 			}else{
 				//新摄影师申请
 				this.inputDisable=false
@@ -324,6 +321,7 @@
 							this.showWaitingPage=true
 						}else{
 							//库里有已通过或已驳回数据  则页面可编辑
+							this.phoerId=e.phoerId 
 							this.symbols=this.phoerInfo.symbolsUrl
 							delete this.phoerInfo._id  //删除_id用于新增
 						}
@@ -506,6 +504,7 @@
 			},
 			uploadMsg(){
 				this.phoerInfo.AuditStatus=0
+					//用户申请一般流程
 				ppdb.add(this.phoerInfo).then((res) => {
 				  uni.showToast({
 				    icon: 'none',
@@ -521,6 +520,7 @@
 				    showCancel: false
 				  })
 				})
+				
 			},
 			getImgUrlAndUpload(){
 				//上传个人形象

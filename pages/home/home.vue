@@ -63,53 +63,51 @@
 			
 		</view>
 		
-		<view class="ad-1">
+<!-- 		<view class="ad-1">
 			<image src="/static/temp/ad2.jpg" mode="scaleToFill"></image>
-		</view>
+		</view> -->
 		
-		<!-- 摄影师部分 -->
+		<view class="ltsAnd2hand" @click="AFunctionWillBeDeleteSoon()">
+			<view class="ltsItem">
+				<text>匿名聊天室</text>
+			</view>
+			<view class="ltsItem">
+				<text>校内二手</text>
+			</view>
+		</view>
 
-		<view class="f-header m-t">
-			<image src="/static/temp/h1.png" ></image>
-			<view class="tit-box">
-				<text class="tit">在线摄影师</text>
-				<text class="tit2">非摄影师用户可通过此查看在线的摄影师</text>
+		<!-- 摄影师操作部分 -->
+		<view class="phoerCard" v-if="phoerId">
+			<u--text
+				text='以下为摄影师操作项'
+				type='primary'
+			></u--text>
+			<view class="f-header m-t">
+				<u-switch v-model="OnlineStatus" @change="OnlineStatusChange" ></u-switch>
+				<view class="tit-box">
+					<text class="tit" v-if="!OnlineStatus">点击上线</text>
+					<text class="tit" v-else>已处于上线状态</text>
+					<text class="tit2">上线后其他同学就可以搜到你并找你下单</text>
+				</view>
 			</view>
-			<text class="yticon icon-you"></text>
+			<u-button
+				type="primary"
+				text="查看用户已发布的预约列表"
+				customStyle="margin-top: 50px;width:400upx"
+				@click="getAllOrder()"
+			></u-button>
+			<u-button
+				type="primary"
+				text="查看我接的单"
+				customStyle="margin-top: 50px;width:400upx"
+				color="linear-gradient(to right, rgb(255, 170, 0), rgb(4, 151, 99))"
+				@click="getPhoerReceiveList()"
+			></u-button>
 		</view>
 		
-		<u-line></u-line>
 		
-		<u--text
-			v-if="phoerId"
-			text='以下为摄影师操作项'
-			type='primary'
-			style='margin:5% 34%;'
-		></u--text>
-		<view class="f-header m-t" v-if="phoerId">
-			<u-switch v-model="OnlineStatus" @change="OnlineStatusChange" ></u-switch>
-			<view class="tit-box">
-				<text class="tit" v-if="!OnlineStatus">点击上线</text>
-				<text class="tit" v-else>已处于上线状态</text>
-				<text class="tit2">上线后其他同学就可以搜到你并找你下单</text>
-			</view>
-			<text class="yticon icon-you"></text>
-		</view>
-		<u-button
-			type="primary"
-			text="查看用户已发布的预约列表"
-			customStyle="margin-top: 50px;width:400rpx"
-			@click="getAllOrder()"
-			v-if="phoerId"
-		></u-button>
-		<u-button
-			type="primary"
-			text="查看我接的单"
-			customStyle="margin-top: 50px;width:400rpx"
-			color="linear-gradient(to right, rgb(255, 170, 0), rgb(4, 151, 99))"
-			@click="getPhoerReceiveList()"
-			v-if="phoerId"
-		></u-button>
+		
+		
 		<!-- 加载组件  onshow触发一秒，用于防止恶意高频率访问 -->
 <!-- 		<u-loading-page
 		    loadingText="感谢支持(*•̀ㅂ•́)و"
@@ -128,36 +126,37 @@
 			return {
 				loading:true,//加载组件的加载状态
 				OnlineStatus:false, //摄影师上线状态
-				orderId:this.$store.state.user.info._id,
+				orderId:'',
 				phoerId:'',
 				carouselList:[{
-						src: "/static/temp/phoer-male.jpg",
-						background: "rgb(203, 87, 60)",
+						src: "/static/temp/yl.png",
+						background: "rgb(109, 120, 78)",
 					},
 					{
-						src: "/static/temp/phoer-female.jpg",
-						background: "rgb(205, 215, 218)",
+						src: "/static/temp/phoer-female.png",
+						background: "rgb(242, 166, 90)",
 					},
 					{
-						src: "/static/temp/lengjingfenxi.jpg",
-						background: "rgb(183, 73, 69)",
+						src: "/static/temp/cyx.png",
+						background: "rgb(143, 145, 162)",
 					}],
 				titleNViewBackground: '',
 				swiperCurrent: 0,
 				swiperLength: 0,
 				goodsList: [],
 				loadTime:'', //避免被恶意频繁刷访问造成服务器负担  1/4
-				character:this.$store.state.user.character,
-				WP_manager:this.$store.state.user.WP_manager,
+				character:'',
+				WP_manager:false,
 				haveNoNet:false
 			};
-		},
-		onLaunch() {
-
 		},
 		onLoad() {
 			//检测网络状态
 			// this.haveNoNet=true
+			uni.setTabBarItem({
+				index:1,
+				visible:false
+			})
 			uni.getNetworkType({
 				success: res=> {
 					// debugger
@@ -193,6 +192,9 @@
 		// },
 		methods: {
 			//发布预约
+			AFunctionWillBeDeleteSoon(){
+				uni.$u.toast("未开放")
+			},
 			toOrder(){
 				uni.navigateTo({
 					url: '/pages/order/order'
@@ -278,15 +280,22 @@
 				//检测当前用户是摄影师还是普通用户
 				if(this.$store.state.user.hasLogin){
 					let userInfo=this.$store.state.user.info
+					console.log(userInfo);
 					if(userInfo.role.includes("WP_manager")){
 						this.$store.commit('user/WP_manager',true)
-						this.WP_manager=this.$store.state.user.WP_manager
+						this.WP_manager=true
+						uni.setTabBarItem({
+							index:1,
+							visible:true
+						})
 					}
 					if(userInfo.role.includes("photographer")){
 						this.$store.commit('user/character','phoer')
 						this.phoerId=userInfo._id
 						// console.log('now character is :'+this.$store.state.user.character);
-						this.character=this.$store.state.user.character//phoer
+						this.character='phoer'
+					}else{
+						this.character='order'
 					}
 					this.orderId=userInfo._id
 				}
@@ -387,7 +396,7 @@
 		background: #f5f5f5;
 	}
 	.m-t{
-		margin-top: 16upx;
+		margin-top: 40upx;
 	}
 	/* 头部 轮播图 */
 	.carousel-section {
@@ -472,7 +481,6 @@
 			font-size: $font-sm + 2upx;
 			color: $font-color-dark;
 		}
-		/* 原图标颜色太深,不想改图了,所以加了透明度 */
 		image {
 			width: 88upx;
 			height: 88upx;
@@ -490,66 +498,6 @@
 		image{
 			width:100%;
 			height: 100%; 
-		}
-	}
-	/* 秒杀专区 */
-	.seckill-section{
-		padding: 4upx 30upx 24upx;
-		background: #fff;
-		.s-header{
-			display:flex;
-			align-items:center;
-			height: 92upx;
-			line-height: 1;
-			.s-img{
-				width: 140upx;
-				height: 30upx;
-			}
-			.tip{
-				font-size: $font-base;
-				color: $font-color-light;
-				margin: 0 20upx 0 40upx;
-			}
-			.timer{
-				display:inline-block;
-				width: 40upx;
-				height: 36upx;
-				text-align:center;
-				line-height: 36upx;
-				margin-right: 14upx;
-				font-size: $font-sm+2upx;
-				color: #fff;
-				border-radius: 2px;
-				background: rgba(0,0,0,.8);
-			}
-			.icon-you{
-				font-size: $font-lg;
-				color: $font-color-light;
-				flex: 1;
-				text-align: right;
-			}
-		}
-		.floor-list{
-			white-space: nowrap;
-		}
-		.scoll-wrapper{
-			display:flex;
-			align-items: flex-start;
-		}
-		.floor-item{
-			width: 150upx;
-			margin-right: 20upx;
-			font-size: $font-sm+2upx;
-			color: $font-color-dark;
-			line-height: 1.8;
-			image{
-				width: 150upx;
-				height: 150upx;
-				border-radius: 6upx;
-			}
-			.price{
-				color: $uni-color-primary;
-			}
 		}
 	}
 	
@@ -574,191 +522,38 @@
 		.tit{
 			font-size: $font-lg +2upx;
 			color: #font-color-dark;
-			line-height: 1.3;
+			line-height: 1.7;
 		}
 		.tit2{
 			font-size: $font-sm;
 			color: $font-color-light;
 		}
 		.icon-you{
-			font-size: $font-lg +2upx;
+			font-size: 28upx;
 			color: $font-color-light;
 		}
 	}
-	/* 团购楼层 */
-	.group-section{
-		background: #fff;
-		.g-swiper{
-			height: 650upx;
-			padding-bottom: 30upx;
-		}
-		.g-swiper-item{
-			width: 100%;
-			padding: 0 30upx;
-			display:flex;
-		}
-		image{
-			width: 100%;
-			height: 460upx;
-			border-radius: 4px;
-		}
-		.g-item{
-			display:flex;
-			flex-direction: column;
-			overflow:hidden;
-		}
-		.left{
-			flex: 1.2;
-			margin-right: 24upx;
-			.t-box{
-				padding-top: 20upx;
-			}
-		}
-		.right{
-			flex: 0.8;
-			flex-direction: column-reverse;
-			.t-box{
-				padding-bottom: 20upx;
-			}
-		}
-		.t-box{
-			height: 160upx;
-			font-size: $font-base+2upx;
-			color: $font-color-dark;
-			line-height: 1.6;
-		}
-		.price{
-			color:$uni-color-primary;
-		}
-		.m-price{
-			font-size: $font-sm+2upx;
-			text-decoration: line-through;
-			color: $font-color-light;
-			margin-left: 8upx;
-		}
-		.pro-box{
-			display:flex;
-			align-items:center;
-			margin-top: 10upx;
-			font-size: $font-sm;
-			color: $font-base;
-			padding-right: 10upx;
-		}
-		.progress-box{
-			flex: 1;
-			border-radius: 10px;
-			overflow: hidden;
-			margin-right: 8upx;
-		}
+
+	.phoerCard{
+		background-color:antiquewhite;
+		border-style: groove;
+		border-color: azure;
+		margin: 20upx 50upx;
+		padding: 20upx;
 	}
-	/* 分类推荐楼层 */
-	.hot-floor{
-		width: 100%;
-		overflow: hidden;
-		margin-bottom: 20upx;
-		.floor-img-box{
-			width: 100%;
-			height:320upx;
-			position:relative;
-			&:after{
-				content: '';
-				position:absolute;
-				left: 0;
-				top: 0;
-				width: 100%;
-				height: 100%;
-				background: linear-gradient(rgba(255,255,255,.06) 30%, #f8f8f8);
-			}
-		}
-		.floor-img{
-			width: 100%;
-			height: 100%;
-		}
-		.floor-list{
-			white-space: nowrap;
-			padding: 20upx;
-			padding-right: 50upx;
-			border-radius: 6upx;
-			margin-top:-140upx;
-			margin-left: 30upx;
-			background: #fff;
-			box-shadow: 1px 1px 5px rgba(0,0,0,.2);
-			position: relative;
-			z-index: 1;
-		}
-		.scoll-wrapper{
-			display:flex;
-			align-items: flex-start;
-		}
-		.floor-item{
-			width: 180upx;
-			margin-right: 20upx;
-			font-size: $font-sm+2upx;
-			color: $font-color-dark;
-			line-height: 1.8;
-			image{
-				width: 180upx;
-				height: 180upx;
-				border-radius: 6upx;
-			}
-			.price{
-				color: $uni-color-primary;
-			}
-		}
-		.more{
-			display:flex;
-			align-items: center;
-			justify-content: center;
-			flex-direction: column;
-			flex-shrink: 0;
-			width: 180upx;
-			height: 180upx;
-			border-radius: 6upx;
-			background: #f3f3f3;
-			font-size: $font-base;
-			color: $font-color-light;
-			text:first-child{
-				margin-bottom: 4upx;
-			}
-		}
-	}
-	/* 猜你喜欢 */
-	.guess-section{
-		display:flex;
-		flex-wrap:wrap;
-		padding: 0 30upx;
-		background: #fff;
-		.guess-item{
-			display:flex;
-			flex-direction: column;
-			width: 48%;
-			padding-bottom: 40upx;
-			&:nth-child(2n+1){
-				margin-right: 4%;
-			}
-		}
-		.image-wrapper{
-			width: 100%;
-			height: 330upx;
-			border-radius: 3px;
-			overflow: hidden;
-			image{
-				width: 100%;
-				height: 100%;
-				opacity: 1;
-			}
-		}
-		.title{
-			font-size: $font-lg;
-			color: $font-color-dark;
-			line-height: 80upx;
-		}
-		.price{
-			font-size: $font-lg;
-			color: $uni-color-primary;
-			line-height: 1;
+	.ltsAnd2hand{
+		display: flex;margin-top: 60upx;
+		height: 500upx;
+		background:url('@/static/bg.png') no-repeat center;
+		background-size:cover;
+		.ltsItem{
+			border-radius: 20upx;
+			background-color:antiquewhite;
+			color:rgba(138, 109, 108, 1.0);
+			height:100upx;flex: 1;margin: 20upx;
+			border-color:white;
+			border-style: solid;text-align: center;
 		}
 	}
 	
-
 </style>

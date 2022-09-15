@@ -4,7 +4,12 @@
 			type="success"
 			:text="bothMsg.payload.fabShowText"
 		></u-text>
-		<button @click="goToVOrder()"> 立即前往 </button>
+		<u-text
+			v-if="bothMsg.payload.rejectReason"
+			type="warning"
+			:text="'拒绝理由为:'+bothMsg.payload.rejectReason"
+		></u-text>
+		<button v-else @click="goToVOrder()"> 立即前往 </button>
 	</view>
 </template>
 
@@ -25,7 +30,7 @@
 			},
 			goToVOrder(){
 				uni.navigateTo({
-					url:this.bothMsg.url+"?"+encodeURIComponent(JSON.stringify(this.bothMsg))
+					url:this.bothMsg.payload.url
 				})
 			}
 		}

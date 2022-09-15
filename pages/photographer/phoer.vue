@@ -247,7 +247,7 @@
 			navYuyue(){
 				console.log("yuyue");
 				uni.navigateTo({
-					url:"/pages/order/order?orderChoicePhoer="+this.phoerInfo
+					url:"/pages/order/order?orderChoicePhoer="+encodeURIComponent(JSON.stringify(this.phoerInfo)) 
 				})
 			}
 		},

@@ -14,6 +14,7 @@
 		onLaunch: function() {
 			// #ifdef APP-PLUS
 			uni.onPushMessage((res) => {
+				//4种情况  摄影师接单 摄影师接单得到确认  用户预约  用户预约得到确认
 				uni.navigateTo({
 					url:"pages/order/fab?bothMsg="+encodeURIComponent(JSON.stringify(res.data))
 				})

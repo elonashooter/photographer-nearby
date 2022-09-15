@@ -20,7 +20,7 @@
 					:label="item.phoneNumber"
 					center
 					isLink
-					:url="'/pages/WP_manager/phoer-request?_id='+item._id"
+					:url="'/pages/WP_manager/phoer-request?dealMsg='+encodeURIComponent(JSON.stringify(item))"
 				>
 					<u-avatar
 						slot="icon"
@@ -44,7 +44,7 @@
 					:label="item.phoneNumber"
 					center
 					isLink
-					:url="'/pages/WP_manager/phoer-request?_id='+item._id"
+					:url="'/pages/WP_manager/phoer-request?compMsg='+encodeURIComponent(JSON.stringify(item))"
 				>
 					<u-avatar
 						slot="icon"

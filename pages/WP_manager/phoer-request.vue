@@ -1,6 +1,16 @@
 <template>
 	<view class="u-page">
 		<view class="u-demo-block">
+			<u--text
+				v-if="phoerInfo.rejectReason&&phoerInfo.rejectReason!==''"
+				:text="'申请已被驳回,理由为:\n'+phoerInfo.rejectReason"
+				type="warning"
+			></u--text>
+			<u--text
+				v-else-if="phoerInfo.rejectReason&&phoerInfo.rejectReason==''"
+				text="申请已通过"
+				type="success"
+			></u--text>
 			<text class="u-demo-block__title">摄影师信息编辑</text>
 			<view class="u-demo-block__content">
 				<!-- 注意，如果需要兼容微信小程序，最好通过setRules方法设置rules规则 -->
@@ -103,12 +113,14 @@
 					text="通过"
 					customStyle="margin-top: 30px;width:600rpx"
 					@click="submit"
+					v-if="showButton"
 				></u-button>
 				<u-button
 					type="error"
 					text="驳回"
 					customStyle="margin-top: 10px;width:600rpx"
 					@click="popupOpen()"
+					v-if="showButton"
 				></u-button>
 			</view>
 			
@@ -163,6 +175,7 @@
 			return {
 				showModal:false,//提交确认框
 				showPopup:false,//驳回信息弹出框
+				showButton:true,
 				inputDisable:'',
 				phoerInfo: {
 					name: '',
@@ -202,20 +215,15 @@
 		},
 		onLoad(e) {		//根据传来的参数确定是什么角色点进来的
 			// 只有管理员
-			console.log("onload get an e");
-			console.log(e);
-			if(e._id){
-				
-				this.phoerId=e._id  //其他页面传过来的请求id
-				ppdb.doc(e._id).get().then(res=>{
-					// this.phoerInfo={...res}
-					// console.log("ppdb");
-					console.log(res.result.data);
-					this.phoerInfo=res.result.data[res.result.data.length-1] //最新数据
-					this.symbols=this.phoerInfo.symbolsUrl
-				})
-			}else{
-
+			// console.log("onload get an e");
+			// console.log(e);
+			if(e.compMsg){
+				this.showButton=false
+				this.phoerInfo=JSON.parse(decodeURIComponent(e.compMsg))
+				this.symbols=this.phoerInfo.symbolsUrl
+			}else if(e.dealMsg){
+				this.phoerInfo=JSON.parse(decodeURIComponent(e.dealMsg))
+				this.symbols=this.phoerInfo.symbolsUrl
 			}
 		},
 		methods: {
@@ -253,13 +261,26 @@
 					await pdb.doc(this.phoerId).update(pdbMsg)
 				}else{
 					await pdb.add(pdbMsg)
-					uniCloud.database().collection('uni-id-users').where({
-						_id:this.phoerInfo.userId
-					}).update({
-						role:['photographer']
-					})
+					if(this.$store.state.user.info.role.includes("WP_manager")){
+						uniCloud.database().collection('uni-id-users').where({
+							_id:this.phoerInfo.userId
+						}).update({
+							role:['WP_manager','photographer']
+						})
+					}else{
+						uniCloud.database().collection('uni-id-users').where({
+							_id:this.phoerInfo.userId
+						}).update({
+							role:['photographer']
+						})
+					}
+					
 				}
-				uni.navigateBack()
+				uni.showToast({
+					title:"操作完成",
+					icon:"none"
+				}),
+				setTimeout(() => uni.navigateBack(), 1000)
 				
 
 			},

@@ -164,18 +164,12 @@
 			}
 		},
 		onLoad(e) {
-			//orderList过来的
+			//orderList或fab过来的
 			if(e.orderWaitPhoerMsg){
 				this.orderMsg=JSON.parse(decodeURIComponent(e.orderWaitPhoerMsg))
 				// console.log(this.orderMsg);
 			}else if(e.phoerWaitOrderMsg){
 				this.orderMsg=JSON.parse(decodeURIComponent(e.phoerWaitOrderMsg))
-			}
-			//fab过来的
-			else if(e.bothMsg){
-				let bothMsg=JSON.parse(decodeURIComponent(e.bothMsg))
-				this.orderMsg=bothMsg.orderMsg
-				this.phoerMsg=bothMsg.phoerMsg
 			}
 		},
 		methods: {
@@ -215,20 +209,20 @@
 					phoerIntro:'',
 					phoerShowUrl:''
 				}).then(res=>{
-					// uniCloud.callFunction({
-					// 	name:"push2",
-					// 	data:{
-					// 		uid:this.agreed.phoerId,
-					// 		title:"订单拒绝响应",
-					// 		content:"以下订单拒绝了你的响应",
-					// 		payload:{
-					// 			fabShowText:"以下"+this.agreed.type+"订单拒绝了你的响应",
-					// 			url:'/pages/order/verifyOrder',
-					// 			phoerMsg:this.phoerMsg,
-					// 			orderMsg:this.agreed
-					// 		}
-					// 	}
-					// })
+					// #ifdef APP-PLUS
+					uniCloud.callFunction({
+						name:"push2",
+						data:{
+							uid:this.agreed.phoerId,
+							title:"订单拒绝响应",
+							content:"以下订单拒绝了你的响应",
+							payload:{
+								fabShowText:"用户"+this.agreed.name+"拒绝了你的响应",
+								rejectReason:this.rejectReason
+							}
+						}
+					})
+					// #endif
 					uni.showToast({
 						title:"已向对方发送消息",
 						icon:"none"
@@ -248,6 +242,20 @@
 					orderStatus:2,
 					rejectReason:''
 				}).then(res=>{
+					// #ifdef APP-PLUS
+					uniCloud.callFunction({
+						name:"push2",
+						data:{
+							uid:this.agreed.phoerId,
+							title:"摄影师接受了你的预约",
+							content:"请按时到场噢，如有问题请call ta",
+							payload:{
+								fabShowText:"摄影师"+this.agreed.phoerName+"接受了你的预约,请按时到场噢，如有问题请call ta",
+								url:'/pages/order/order?orderMsg='+encodeURIComponent(JSON.stringify(this.agreed))
+							}
+						}
+					})
+					// #endif
 					uni.showToast({
 						title:"已向对方发送消息",
 						icon:"none"

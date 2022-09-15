@@ -430,22 +430,22 @@
 			else if(e.phoerChoiceOrder){
 				console.log("PCO");
 				console.log(JSON.parse(decodeURIComponent(e.phoerChoiceOrder)));
-				let pCO=JSON.parse(decodeURIComponent(e.phoerChoiceOrder))
-				this.agreed=pCO
+				this.agreed=JSON.parse(decodeURIComponent(e.phoerChoiceOrder))
 				this.getDataByPhoerId(pCO.phoerId)
 				this.disabled=true
 			}
 			else if(e.orderChoicePhoer){
 				//用户预约跳转填写订单信息
-				phoerMsg=e.orderChoicePhoer
+				this.phoerMsg=JSON.parse(decodeURIComponent(e.orderChoicePhoer))
 				this.agreed={
+					...this.agreed,
 					phoerId:this.phoerMsg.userId,
 					phoerPhoneNumber:this.phoerMsg.phoneNumber,
 					phoerName:this.phoerMsg.name,
 					phoerShowUrl:this.phoerMsg.phoerShow[0],
-					phoerIntro:this.phoerMsg.intro,
-					...agreed
+					phoerIntro:this.phoerMsg.intro
 				}
+				this.setDefaultValue()
 			}else{
 				//用户新建
 				this.setDefaultValue()
@@ -524,20 +524,20 @@
 					phoneNumber:this.$store.state.user.info.mobile
 				}
 			},
-			getDataByPhoerId(phoerId){
+			getDataByPhoerId(id){
 				uniCloud.database().collection('photographer').where({
-					userId:phoerId
+					userId:id
 				}).get().then(res=>{
 					if(res.result.data.length>0){
 						this.agreed.phoerId=res.result.data[0].userId
 						this.phoerMsg=res.result.data[0]
 						this.agreed={
+							...this.agreed,
 							phoerId:this.phoerMsg.userId,
 							phoerPhoneNumber:this.phoerMsg.phoneNumber,
 							phoerName:this.phoerMsg.name,
 							phoerShowUrl:this.phoerMsg.phoerShow[0],
-							phoerIntro:this.phoerMsg.intro,
-							...this.agreed
+							phoerIntro:this.phoerMsg.intro
 						}
 					}
 					else{
@@ -557,20 +557,20 @@
 				}).then(res=>{
 					console.log("takeOrder success");
 					console.log(res);
-					// uniCloud.callFunction({
-					// 	name:"push2",
-					// 	data:{
-					// 		uid:this.agreed.userId,
-					// 		title:"预约有响应",
-					// 		content:"有摄影师接了你的单",
-					// 		payload:{
-					// 			fabShowText:"摄影师"+this.phoerMsg.name+"响应了你的订单",
-					// 			url:'/pages/order/verifyOrder',
-					// 			phoerMsg:this.phoerMsg,
-					// 			orderMsg:this.agreed
-					// 		}
-					// 	}
-					// })
+					// #ifdef APP
+					uniCloud.callFunction({
+						name:"push2",
+						data:{
+							uid:this.agreed.userId,
+							title:"预约有响应",
+							content:"有摄影师接了响应了您的预约",
+							payload:{
+								fabShowText:"摄影师"+this.phoerMsg.name+"响应了你的订单",
+								url:'/pages/order/verifyOrder?orderWaitPhoerMsg='+encodeURIComponent(JSON.stringify({orderWaitPhoer:true,...this.agreed}))
+							}
+						}
+					})
+					// #endif
 					uni.showModal({
 						content:"接单操作完成，等待对方同意即可"
 					})
@@ -623,24 +623,28 @@
 			yuyue(){
 				this.$refs.form1.validate().then(res => {
 					// uni.$u.toast('校验通过')
+					this.agreed.orderStatus=101
 					odb.add(this.agreed).then((res) => {
 					  uni.showToast({icon: 'none',title: '预约发起成功'})
-					 //  uniCloud.callFunction({
-					 //  	name:"push2",
-						// data:{
-						// 	uid:this.agreed.phoerId,
-						// 	title:"有新的预约订单",
-						// 	content:"有用户找你约拍啦",
-						// 	payload:{
-						// 		fabtext:"用户"+this.agreed.userInfo.name+"找你预约了以下订单",
-						// 		orderMsg:this.agreed
-						// 	}
-						// }
-					 //  }).finish(()=>{
-						  setTimeout(() => uni.reLaunch({
-						  	url:"/pages/home/home"
-						  }), 500)
-					  // })
+					// #ifdef APP
+					//用户预约摄影师
+					uniCloud.callFunction({
+						name:"push2",
+						data:{
+						uid:this.agreed.phoerId,
+						title:"有新的预约订单",
+						content:"有用户找你约拍啦",
+						payload:{
+							fabShowText:"用户"+this.agreed.userInfo.name+"找你预约了以下订单",
+							url:'/pages/order/verifyOrder?phoerWaitOrderMsg='+encodeURIComponent(JSON.stringify({phoerWaitOrder:true,...this.agreed}))
+						}
+					}
+					})
+					// #endif
+					setTimeout(() => uni.reLaunch({
+						url:"/pages/home/home"
+					}), 500)
+
 
 					}).catch((err) => {
 					  uni.showModal({
