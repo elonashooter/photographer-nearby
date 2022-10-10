@@ -21,7 +21,7 @@
 						slot="icon"
 						shape="square"
 						size="70"
-						:src="item.phoerShowUrl"
+						:src="item.phoerShow[0]"
 						customStyle="margin: -3px 5px -3px 0"
 						mode="aspectFill"
 					></u-avatar>
@@ -33,7 +33,7 @@
 </template>
 
 <script>
-	let pdb=uniCloud.database().collection('photographer')
+	import AES from '@/js_sdk/ar-aes/ar-aes.js'
 	export default {
 		data() {
 			return {
@@ -51,15 +51,12 @@
 			}
 		},
 		methods: {
-			scrolltolower() {
-				// this.loadmore()
-			},
 			getItemAndGo(phoerInfo){
 				if(this.orderChoicePhoer.orderId){
 					this.orderChoicePhoer={
 						orderId:this.orderChoicePhoer.orderId,
 						...phoerInfo
-					}  //获取item.userId数据并打包到phoerChoiceOrder发送到order页 3/3 
+					}  //获取item.userId数据并打包到orderChoicePhoer发送到phoer页 3/3 
 					uni.navigateTo({
 						url:'/pages/photographer/phoer?orderChoicePhoer='+encodeURIComponent(JSON.stringify(this.orderChoicePhoer))
 					})
@@ -67,14 +64,21 @@
 			},
 			getPhoerList(){
 				this.phoerList=[]
-				pdb.get().then(res=>{
-					console.log('pdb get success');
-					console.log(res);
+				// #ifdef APP-PLUS
+				let version=plus.runtime.version
+				// #endif
+				// #ifdef H5 || MP
+				let version='H5OrMP'
+				// #endif
+				uniCloud.database().action('filterLowVersion').collection('photographer').where({
+					OnlineStatus:true,
+					version:version
+				}).get().then((res)=>{
+					res.result.data=AES.AES.decrypt(res.result.data,'1234567891234567','1234567891234567')
+					res.result.data=JSON.parse(decodeURIComponent(res.result.data))
 					if(res.result.data.length>0){
 						for(var i of res.result.data){
-							if (i.OnlineStatus==true){
-								this.phoerList.push(i)
-							}
+							this.phoerList.push(i)
 						}
 					}
 					if(this.phoerList.length==0){

@@ -82,6 +82,12 @@
 					networkType
 				}) => {
 					this.networkType = networkType;
+				},
+				fail: (res) => {
+					uni.showToast({
+						title: '手机网络异常',
+						icon: 'none'
+					});
 				}
 			});
 		},

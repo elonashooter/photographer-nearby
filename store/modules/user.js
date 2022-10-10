@@ -9,7 +9,8 @@ let state = {
 		character:'order',
 		WP_manager:false,
 		//摄影师上线状态  目前用于摄影师退出应用时的取消接单状态的提醒
-		OnlineStatus:false
+		OnlineStatus:false,
+		inQinZhou:false
 	},
 	getters = {
 		info(state) {
@@ -21,8 +22,14 @@ let state = {
 		character(state){
 			return state.character;
 		},
+		WP_manager(state){
+			return state.WP_manager;
+		},
 		OnlineStatus(state){
 			return state.OnlineStatus
+		},
+		inQinZhou(state){
+			return state.inQinZhou
 		}
 	},
 	mutations = {
@@ -57,14 +64,15 @@ let state = {
 		OnlineStatus(state,OnlineStatus){
 			state.OnlineStatus=OnlineStatus
 		},
+		inQinZhou(state,inQinZhou){
+			state.inQinZhou=inQinZhou
+		},
 		logout(state) {
 			state.info = {};
 			state.hasLogin = false;
 			uni.setStorageSync('userInfo', {});
 			uni.removeStorageSync('uni_id_token');
 			uni.setStorageSync('uni_id_token_expired', 0)
-			//2022-7-16 hz 登出后确认角色
-			state.character=''
 		}
 	},
 	actions = {

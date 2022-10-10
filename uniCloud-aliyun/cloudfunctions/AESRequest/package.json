@@ -1,0 +1,9 @@
+{
+  "name": "AESRequest",
+  "dependencies": {
+    "aestry": "file:../common/aestry"
+  },
+  "extensions": {
+    "uni-cloud-jql": {}
+  }
+}

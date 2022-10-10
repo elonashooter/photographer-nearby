@@ -2,7 +2,7 @@
 const uniPush = uniCloud.getPushManager({appId:"__UNI__B2F4D33"})
 exports.main = async (event) => {
 const res = await uniPush.sendMessage({
-"user_id": event.uid,
+"push_clientid": event.cid,
 "title": event.title,
 "content": event.content,
 "payload": event.payload,

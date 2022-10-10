@@ -22,7 +22,8 @@
 						slot="title"
 						class="u-slot-title"
 					>
-						<text class="u-cell-text">{{item.type}}</text>
+						<text class="u-cell-text" v-if="item.orderStatus===0">{{item.type}}</text>
+						<text class="u-cell-text" v-else>{{item.type+":"+item.phoerName}}</text>
 						<u-tag
 							text="已发起"
 							size="mini"
@@ -80,6 +81,7 @@
 				phoerId:'',
 				phoerChoiceOrder:{},
 				url:'',
+				WP_manager:false
 			}
 		},
 		onShow() {
@@ -88,6 +90,7 @@
 		onLoad(e) {
 			if(e.WP_manager){
 				this.WPgetOrder()
+				this.WP_manager=true
 			}
 			else if(e.orderId){
 				//用户查看'我的预约'
@@ -145,8 +148,6 @@
 				odb.where({
 					userId:orderId
 				}).get().then(res=>{
-					console.log('odb get by orderId success');
-					console.log(res);
 					if(res.result.data.length>0){
 						for(var i of res.result.data){
 							this.orderList.push(i)

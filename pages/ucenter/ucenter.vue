@@ -27,22 +27,32 @@
 				</template>
 			</uni-list-item>
 		</uni-list>
+		<!-- 退出/登录 按钮 -->
+<!-- 		<view class="bottom-back" @click="clickLogout">
+			<text class="bottom-back-text" v-if="hasLogin">退出登陆</text>
+			<text class="bottom-back-text" v-else>登陆</text>
+		</view> -->
+		<Wpage style="margin-top: 50upx;"></Wpage>
 	</view>
 </template>
 
 <script>
 	import {
 		mapGetters,
-		mapMutations
+		mapMutations,
+		mapActions
 	} from 'vuex';
 	import checkUpdate from '@/uni_modules/uni-upgrade-center-app/utils/check-update';
 	import callCheckVersion from '@/uni_modules/uni-upgrade-center-app/utils/call-check-version';
 	// #ifdef APP
 	import UniShare from '@/uni_modules/uni-share/js_sdk/uni-share.js';
+
 	const uniShare = new UniShare()
 	// #endif
 	const db = uniCloud.database();
+	import Wpage from '@/pages/WP_manager/Wpage.vue';
 	export default {
+		components:{Wpage},
 		// #ifdef APP
 		onBackPress({from}) {
 			if(from=='backbutton'){
@@ -74,58 +84,58 @@
 				],
 				ucenterList: [
 					[
-						// #ifdef APP-PLUS
-						{
-							"title": this.$t('mine.signInByAd'),
-							"event": 'signInByAd',
-							"icon": "compose"
-						},
-						// #endif
-						{
-							"title": this.$t('mine.signIn'),
-							"event": 'signIn',
-							"icon": "compose"
-						},
-						// #ifdef APP-PLUS
-						{
-							"title": this.$t('mine.toEvaluate'),
-							"event": 'gotoMarket',
-							"icon": "hand-thumbsup"
-						},
-						//#endif
-						{
-							"title":this.$t('mine.readArticles'),
-							"to": '/pages/ucenter/read-news-log/read-news-log',
-							"icon": "flag"
-						},
-						{
-							"title": this.$t('mine.myScore'),
-							"to": '',
-							"event": 'getScore',
-							"icon": "paperplane"
-						}
-						// #ifdef APP-PLUS
-						, {
-							"title": this.$t('mine.invite'),
-							"event": 'share',
-							"icon": "redo"
-						}
-						// #endif
+						// // #ifdef APP-PLUS
+						// {
+						// 	"title": this.$t('mine.signInByAd'),
+						// 	"event": 'signInByAd',
+						// 	"icon": "compose"
+						// },
+						// // #endif
+						// {
+						// 	"title": this.$t('mine.signIn'),
+						// 	"event": 'signIn',
+						// 	"icon": "compose"
+						// },
+						// // #ifdef APP-PLUS
+						// {
+						// 	"title": this.$t('mine.toEvaluate'),
+						// 	"event": 'gotoMarket',
+						// 	"icon": "hand-thumbsup"
+						// },
+						// //#endif
+						// {
+						// 	"title":this.$t('mine.readArticles'),
+						// 	"to": '/pages/ucenter/read-news-log/read-news-log',
+						// 	"icon": "flag"
+						// },
+						// {
+						// 	"title": this.$t('mine.myScore'),
+						// 	"to": '',
+						// 	"event": 'getScore',
+						// 	"icon": "paperplane"
+						// }
+					// 	// #ifdef APP-PLUS
+					// 	, {
+					// 		"title": this.$t('mine.invite'),
+					// 		"event": 'share',
+					// 		"icon": "redo"
+					// 	}
+					// 	// #endif
 					],
 					[{
+						"title": "我的账号",
+						"to": '/pages/ucenter/settings/settings',
+						"icon": "gear"
+					},{
 						"title": this.$t('mine.feedback'),
 						"to": '/uni_modules/uni-feedback/pages/opendb-feedback/opendb-feedback',
 						"icon": "help"
-					}, {
-						"title": this.$t('mine.settings'),
-						"to": '/pages/ucenter/settings/settings',
-						"icon": "gear"
 					}],
-					[{
-						"title": this.$t('mine.about'),
-						"to": '/pages/ucenter/about/about',
-						"icon": "info"
-					}]
+					// [{
+					// 	"title": this.$t('mine.about'),
+					// 	"to": '/pages/ucenter/about/about',
+					// 	"icon": "info"
+					// }]
 				],
 				listStyles: {
 					"height": "150rpx", // 边框高度
@@ -150,11 +160,13 @@
 				showBadge: this.appVersion.hasNew
 			})
 			//#endif
+			
 		},
 		computed: {
 			...mapGetters({
 				userInfo: 'user/info',
-				hasLogin: 'user/hasLogin'
+				hasLogin: 'user/hasLogin',
+				WP_manager:'user/WP_manager'
 			})
 			// #ifdef APP-PLUS
 			,
@@ -163,25 +175,51 @@
 			}
 			// #endif
 			,
-			appConfig() {
-				return getApp().globalData.config
-			}
+			// 市场评分
+			// appConfig() {
+			// 	return getApp().globalData.config
+			// }
 		},
 		methods: {
 			...mapMutations({
 				setUserInfo: 'user/login'
 			}),
+			...mapActions({
+				logout: 'user/logout'
+			}),
+			// clickLogout() {
+			// 	if (this.hasLogin) {
+			// 		uni.showModal({
+			// 			title: "退出提示",
+			// 			content: "确定退出登陆？",
+			// 			cancelText: "取消",
+			// 			confirmText: "确定",
+			// 			success: res => {
+			// 				if (res.confirm) {
+			// 					this.logout()
+			// 					uni.navigateBack();
+			// 				}
+			// 			},
+			// 			fail: () => {},
+			// 			complete: () => {}
+			// 		});
+			// 	} else {
+			// 		uni.navigateTo({
+			// 			url: '/pages/ucenter/login-page/pwd-login/pwd-login'
+			// 		});
+			// 	}
+			// },
 			toSettings() {
 				uni.navigateTo({
 					url: "/pages/ucenter/settings/settings"
 				})
 			},
-			signIn() { //普通签到
-				this.$refs.signIn.open()
-			},
-			signInByAd(){ //看激励视频广告签到
-				this.$refs.signIn.showRewardedVideoAd()
-			},
+			// signIn() { //普通签到
+			// 	this.$refs.signIn.open()
+			// },
+			// signInByAd(){ //看激励视频广告签到
+			// 	this.$refs.signIn.showRewardedVideoAd()
+			// },
 			/**
 			 * 个人中心项目列表点击事件
 			 */
@@ -217,129 +255,129 @@
 			/**
 			 * 去应用市场评分
 			 */
-			gotoMarket() {
-				// #ifdef APP-PLUS
-				if (uni.getSystemInfoSync().platform == "ios") {
-					// 这里填写appstore应用id
-					let appstoreid = this.appConfig.marketId.ios; // 'id1417078253';
-					plus.runtime.openURL("itms-apps://" + 'itunes.apple.com/cn/app/wechat/' + appstoreid + '?mt=8');
-				}
-				if (uni.getSystemInfoSync().platform == "android") {
-					var Uri = plus.android.importClass("android.net.Uri");
-					var uri = Uri.parse("market://details?id=" + this.appConfig.marketId.android);
-					var Intent = plus.android.importClass('android.content.Intent');
-					var intent = new Intent(Intent.ACTION_VIEW, uri);
-					var main = plus.android.runtimeMainActivity();
-					main.startActivity(intent);
-				}
-				// #endif
-			},
+			// gotoMarket() {
+			// 	// #ifdef APP-PLUS
+			// 	if (uni.getSystemInfoSync().platform == "ios") {
+			// 		// 这里填写appstore应用id
+			// 		let appstoreid = this.appConfig.marketId.ios; // 'id1417078253';
+			// 		plus.runtime.openURL("itms-apps://" + 'itunes.apple.com/cn/app/wechat/' + appstoreid + '?mt=8');
+			// 	}
+			// 	if (uni.getSystemInfoSync().platform == "android") {
+			// 		var Uri = plus.android.importClass("android.net.Uri");
+			// 		var uri = Uri.parse("market://details?id=" + this.appConfig.marketId.android);
+			// 		var Intent = plus.android.importClass('android.content.Intent');
+			// 		var intent = new Intent(Intent.ACTION_VIEW, uri);
+			// 		var main = plus.android.runtimeMainActivity();
+			// 		main.startActivity(intent);
+			// 	}
+			// 	// #endif
+			// },
 			/**
 			 * 获取积分信息
 			 */
-			getScore() {
-				if (!this.userInfo) return uni.showToast({
-					title: this.$t('mine.checkScore'),
-					icon: 'none'
-				});
-				uni.showLoading({
-					mask: true
-				})
-				db.collection("uni-id-scores")
-					.where('"user_id" == $env.uid')
-					.field('score,balance')
-					.orderBy("create_date", "desc")
-					.limit(1)
-					.get()
-					.then((res) => {
-						console.log(res);
-						const data = res.result.data[0];
-						let msg = '';
-						msg = data ? (this.$t('mine.currentScore')+ data.balance) : this.$t('mine.noScore');
-						uni.showToast({
-							title: msg,
-							icon: 'none'
-						});
-					}).finally(()=>{
-						uni.hideLoading()
-					})
-			},
-			async share() {
-				let {
-					result
-				} = await uniCloud.callFunction({
-					name: 'uni-id-cf',
-					data: {
-						action: 'getUserInviteCode'
-					}
-				})
-				console.log(result);
-				let myInviteCode = result.myInviteCode || result.userInfo.my_invite_code
-				console.log(myInviteCode);
-				let {
-					appName,
-					logo,
-					company,
-					slogan
-				} = this.appConfig.about
-				// #ifdef APP-PLUS
-				uniShare.show({
-					content: { //公共的分享类型（type）、链接（herf）、标题（title）、summary（描述）、imageUrl（缩略图）
-						type: 0,
-						href: this.appConfig.h5.url +
-							`/#/pages/ucenter/invite/invite?code=uniInvitationCode:${myInviteCode}`,
-						title: appName,
-						summary: slogan,
-						imageUrl: logo +
-							'?x-oss-process=image/resize,m_fill,h_100,w_100' //压缩图片解决，在ios端分享图过大导致的图片失效问题
-					},
-					menus: [{
-							"img": "/static/app-plus/sharemenu/wechatfriend.png",
-							"text": this.$t('common').wechatFriends,
-							"share": {
-								"provider": "weixin",
-								"scene": "WXSceneSession"
-							}
-						},
-						{
-							"img": "/static/app-plus/sharemenu/wechatmoments.png",
-							"text": this.$t('common').wechatBbs,
-							"share": {
-								"provider": "weixin",
-								"scene": "WXSceneTimeline"
-							}
-						},
-						{
-							"img": "/static/app-plus/sharemenu/weibo.png",
-							"text": this.$t('common').weibo,
-							"share": {
-								"provider": "sinaweibo"
-							}
-						},
-						{
-							"img": "/static/app-plus/sharemenu/qq.png",
-							"text": "QQ",
-							"share": {
-								"provider": "qq"
-							}
-						},
-						{
-							"img": "/static/app-plus/sharemenu/copyurl.png",
-							"text": this.$t('common').copy,
-							"share": "copyurl"
-						},
-						{
-							"img": "/static/app-plus/sharemenu/more.png",
-							"text": this.$t('common').more,
-							"share": "shareSystem"
-						}
-					],
-					cancelText: this.$t('common').cancelShare,
-				}, e => { //callback
-					console.log(e);
-				})
-				// #endif
-			}
+			// getScore() {
+			// 	if (!this.userInfo) return uni.showToast({
+			// 		title: this.$t('mine.checkScore'),
+			// 		icon: 'none'
+			// 	});
+			// 	uni.showLoading({
+			// 		mask: true
+			// 	})
+			// 	db.collection("uni-id-scores")
+			// 		.where('"user_id" == $env.uid')
+			// 		.field('score,balance')
+			// 		.orderBy("create_date", "desc")
+			// 		.limit(1)
+			// 		.get()
+			// 		.then((res) => {
+			// 			console.log(res);
+			// 			const data = res.result.data[0];
+			// 			let msg = '';
+			// 			msg = data ? (this.$t('mine.currentScore')+ data.balance) : this.$t('mine.noScore');
+			// 			uni.showToast({
+			// 				title: msg,
+			// 				icon: 'none'
+			// 			});
+			// 		}).finally(()=>{
+			// 			uni.hideLoading()
+			// 		})
+			// },
+			// async share() {
+			// 	let {
+			// 		result
+			// 	} = await uniCloud.callFunction({
+			// 		name: 'uni-id-cf',
+			// 		data: {
+			// 			action: 'getUserInviteCode'
+			// 		}
+			// 	})
+			// 	console.log(result);
+			// 	let myInviteCode = result.myInviteCode || result.userInfo.my_invite_code
+			// 	console.log(myInviteCode);
+			// 	let {
+			// 		appName,
+			// 		logo,
+			// 		company,
+			// 		slogan
+			// 	} = this.appConfig.about
+			// 	// #ifdef APP-PLUS
+			// 	uniShare.show({
+			// 		content: { //公共的分享类型（type）、链接（herf）、标题（title）、summary（描述）、imageUrl（缩略图）
+			// 			type: 0,
+			// 			href: this.appConfig.h5.url +
+			// 				`/#/pages/ucenter/invite/invite?code=uniInvitationCode:${myInviteCode}`,
+			// 			title: appName,
+			// 			summary: slogan,
+			// 			imageUrl: logo +
+			// 				'?x-oss-process=image/resize,m_fill,h_100,w_100' //压缩图片解决，在ios端分享图过大导致的图片失效问题
+			// 		},
+			// 		menus: [{
+			// 				"img": "/static/app-plus/sharemenu/wechatfriend.png",
+			// 				"text": this.$t('common').wechatFriends,
+			// 				"share": {
+			// 					"provider": "weixin",
+			// 					"scene": "WXSceneSession"
+			// 				}
+			// 			},
+			// 			{
+			// 				"img": "/static/app-plus/sharemenu/wechatmoments.png",
+			// 				"text": this.$t('common').wechatBbs,
+			// 				"share": {
+			// 					"provider": "weixin",
+			// 					"scene": "WXSceneTimeline"
+			// 				}
+			// 			},
+			// 			{
+			// 				"img": "/static/app-plus/sharemenu/weibo.png",
+			// 				"text": this.$t('common').weibo,
+			// 				"share": {
+			// 					"provider": "sinaweibo"
+			// 				}
+			// 			},
+			// 			{
+			// 				"img": "/static/app-plus/sharemenu/qq.png",
+			// 				"text": "QQ",
+			// 				"share": {
+			// 					"provider": "qq"
+			// 				}
+			// 			},
+			// 			{
+			// 				"img": "/static/app-plus/sharemenu/copyurl.png",
+			// 				"text": this.$t('common').copy,
+			// 				"share": "copyurl"
+			// 			},
+			// 			{
+			// 				"img": "/static/app-plus/sharemenu/more.png",
+			// 				"text": this.$t('common').more,
+			// 				"share": "shareSystem"
+			// 			}
+			// 		],
+			// 		cancelText: this.$t('common').cancelShare,
+			// 	}, e => { //callback
+			// 		console.log(e);
+			// 	})
+			// 	// #endif
+			// }
 		}
 	}
 </script>
@@ -456,5 +494,26 @@
 		border-radius: 10rpx;
 		/* #endif */
 		background-color: #DD524D;
+	}
+	.bottom-back {
+		margin-top: 10px;
+		width: 750rpx;
+		height: 44px;
+		/* #ifndef APP-NVUE */
+		display: flex;
+		/* #endif */
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		/* #ifndef APP-NVUE */
+		border: none;
+		/* #endif */
+		border-width: 0;
+		border-radius: 0;
+		background-color: #FFFFFF;
+	}
+	
+	.bottom-back-text {
+		font-size: 33rpx;
 	}
 </style>

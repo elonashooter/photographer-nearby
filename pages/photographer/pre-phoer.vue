@@ -62,6 +62,7 @@
 								<view class="uni-uploader__files">
 									<block v-for="(image,index) in phoerInfo.phoerShow" :key="index">
 										<view class="uni-uploader__file">
+											<uni-icons type="closeempty" class="close" size="20" @click="DelPShow()"></uni-icons>
 											<image class="uni-uploader__img" :src="image" mode="aspectFill" :data-src="image" @tap="previewPhoerShow"></image>
 										</view>
 									</block>
@@ -138,7 +139,7 @@
 					type="primary"
 					:text="phoerId==''?'提交加入':'提交修改'"
 					customStyle="margin-top: 30px"
-					@click="submit('enter')"
+					@click="submit()"
 				></u-button>
 			</view>
 			
@@ -179,32 +180,7 @@
 							</view>
 						</view>
 					</view>
-					<view class="u-demo-block">
-						<text class="u-demo-block__title">可使用头像</text>
-						<!-- 若已同步为头像，则返回true 否则返回false 1/3-->
-						<view class="u-demo-block__content" v-if="AvatarSet()">
-							<view class="text-item">
-								<u--text 
-								text="已将个人形象照设为头像"
-								type="success"
-								></u--text>
-							</view>
-						</view>
-						<!-- 若已同步为头像，则返回true 否则返回false 2/3 -->
-						<view class="u-demo-block__content" v-else>
-							<view class="text-item">
-								<u--text text="若已将个人形象照设为头像"></u--text>
-								<u--text text="可直接点击"></u--text>
-								<u-button
-									text="同步头像"
-									type="success"
-									size="normal"
-									@click="SynAvatar()"
-								></u-button>
-							</view>
-						</view>
 
-					</view>
 					<view class="u-demo-block">
 						<text class="u-demo-block__title">肖像权</text>
 						<view class="u-demo-block__content">
@@ -244,7 +220,13 @@
 </template>
 
 <script>
+	let pdb=uniCloud.database().collection('photographer')
 	let ppdb=uniCloud.database().collection('pre-photographer')
+	let symbolsUploadMsg=[]
+	let initAvatar=''
+	let symbols_online=[]//读取到的已存在云端的图，用于给DELIMG方法识别
+	let phoerShowHistory=[]
+	let symbolsHistory=[]
 	export default {
 		data() {
 			return {
@@ -259,13 +241,11 @@
 					symbolsTag:'',//作品名称
 					symbolsUrl:[],
 					phoerShow:[],//摄影师形象对象  本来可以直接用字符串的，但uni.preview的预览参数格式为uni.chooseimage返回的数组请求体格式
-					phoerShowUrl:"",//摄影师形象连接
 					userId:this.$store.state.user.info._id,
+					push_clientid:''
 				},
 				phoerShowName:'',
-				symbolsUploadMsg:[],
 				symbols:[],//作品对象
-				symbols_online:[],//读取到的已存在云端的图，用于给DELIMG方法识别
 				phoerId:'',//从phoerList点进来传来的参数
 				rules: {
 					'name': [{
@@ -287,6 +267,7 @@
 		onReady() {
 			// 如果需要兼容微信小程序，并且校验规则中含有方法等，只能通过setRules方法设置规则
 			this.$refs.form1.setRules(this.rules)
+			
 		},
 		onLoad(e) {		//根据传来的参数确定是什么角色点进来的
 			// 只有摄影师与新摄影师
@@ -300,12 +281,19 @@
 					console.log(res.result.data);
 					this.phoerInfo=res.result.data[res.result.data.length-1] //最新数据
 					this.symbols=this.phoerInfo.symbolsUrl
-					this.symbols_online=this.phoerInfo.symbolsUrl
+					symbols_online=this.phoerInfo.symbolsUrl
+					initAvatar=this.phoerInfo.phoerShow[0]
 					delete this.phoerInfo._id  //删除_id用于新增
+					phoerShowHistory=this.phoerInfo.phoerShowHistory
+					symbolsHistory=this.phoerInfo.symbolsHistory
+					if(this.phoerInfo.AuditStatus!==0){
+						this.inputDisable=false
+						this.getPushClientId()
+					}else{
+						this.showWaitingPage=true
+					}
 				})
-				if(this.phoerInfo.AuditStatus!==0){
-					this.inputDisable=false
-				}
+
 			}else{
 				//新摄影师申请
 				this.inputDisable=false
@@ -323,13 +311,17 @@
 							//库里有已通过或已驳回数据  则页面可编辑
 							this.phoerId=e.phoerId 
 							this.symbols=this.phoerInfo.symbolsUrl
+							initAvatar=this.phoerInfo.phoerShow[0]
 							delete this.phoerInfo._id  //删除_id用于新增
+							this.getPushClientId()
 						}
 					}else{
 						this.setDefaultValue()
+						this.getPushClientId()
 					}
 				})
 			}
+
 		},
 		methods: {
 			popupOpen() {
@@ -353,44 +345,25 @@
 				// 		this.push_NewImg_Edit()
 				// 		break
 				// }
+				// console.log("phoerInfo");
+				// console.log(this.phoerInfo);
 				this.getImgUrlAndUpload();
-			},
-			//同步头像
-			SynAvatar(){
-				// console.log(this.$store.state.user.info.avatar_file.url);
-				if(this.$store.state.user.info.avatar_file.url!==undefined){
-					// let AvatarUrl=Afile.url
-					this.phoerInfo.phoerShow.push(this.$store.state.user.info.avatar_file.url)
-					this.phoerShowName="avatar of "+this.$store.state.user.info._id
-				}
-			},
-			AvatarSet(){
-				if(this.phoerInfo.phoerShow.includes(this.$store.state.user.info.avatar_file.url)){
-					return true
-				}else{
-					return false
-				}
 			},
 			setDefaultValue(){
 				this.phoerInfo.name=this.$store.state.user.info.nickname,
 				this.phoerInfo.phoneNumber=this.$store.state.user.info.mobile
-				
 			},
-			submit(action) {
-				// 校验表单  如果有错误，会在catch中返回报错信息数组，校验通过则在then中返回true
-				if(this.symbols[0]!==undefined){
-					this.$refs.form1.validate().then(res => {
-						uni.$u.toast('信息填写校验通过')
-					}).catch(errors => {
-						uni.$u.toast('请完整填写数据')
+			getPushClientId(){
+				uni.getPushClientId({
+						success: (res) => {
+							console.log('获取手机识别码成功')
+							console.log(res.cid);
+							this.phoerInfo.push_clientid=res.cid
+						},
+						fail(err) {
+							console.log('获取手机识别码失败')
+						}
 					})
-				}else{
-					uni.$u.toast('还没上传代表作哦')
-				}
-				this.openModal()
-			},
-			hideKeyboard() {
-				uni.hideKeyboard()
 			},
 			// 代表作导入并预览  start
 			previewPhoerShow: function(e) {
@@ -425,13 +398,16 @@
 				}
 				return status;
 			},
+			// 头像上传 1
 			choosePShow(){
+				sizeType:'compressed',
 				uni.chooseImage({
 					count:1,
 					success: (res) => {
+						 
 						this.phoerInfo.phoerShow=this.phoerInfo.phoerShow.concat(res.tempFilePaths)
-						this.phoerShowName=res.tempFiles[0].name
-						// console.log(res.tempFiles[0].name);
+						this.phoerShowName="phoerShowNameOf "+this.$store.state.user.info._id
+						// console.log(res);
 					},
 					fail: (err) => {
 						console.log("err: ",err);
@@ -446,7 +422,6 @@
 							success: (res) => {
 								let authStatus = false;
 								authStatus = res.authSetting['scope.album'];
-								}
 								if (!authStatus) {
 									uni.showModal({
 										title: '授权失败',
@@ -462,38 +437,48 @@
 						})
 						// #endif
 					}
-				})
+				}),
+				console.log(this.phoerInfo.phoerShow);
 			},
 			chooseSymbols(){
 				uni.chooseImage({
+					sizeType:'compressed',
 					count: 9,
 					// sourceType: 'album',
 					// sizeType: 'original',
 					success: (res) => {
-						// console.log(res);
+						console.log(res);
 						this.symbols=this.symbols.concat(res.tempFilePaths)
+						 
 						//这样写有个好处  摄影师修改信息时只会上传symbolsUploadMsg新增的照片
 						for(let i=0;i<res.tempFilePaths.length;i++){
-							this.symbolsUploadMsg.push({
-								name:res.tempFiles[i].name,
+							symbolsUploadMsg.push({
+								name:"symbolsOf "+this.$store.state.user.info._id+" "+symbolsUploadMsg.length.toString(),
 								url:res.tempFilePaths[i]
 							})
 						}
 					},
 				})
+				console.log(this.symbolsUploadMsg);
 			},// 代表作导入并预览  end
 			DelImg(index){
 				//判断要删的对象是本地新上传的还是online已有的
-				if(this.symbols[index] in this.symbols_online){
-					this.symbols_online=this.symbols_online.filter((x)=>x!==this.symbols[index])
+				if(this.symbols[index] in symbols_online){
+					this.phoerInfo.symbolsUrl=this.phoerInfo.symbolsUrl.filter((x)=>x!=this.symbols[index])
 				}else{
-					this.symbolsUploadMsg.filter((x)=>x.url!==this.symbols[index])
+					symbolsUploadMsg.filter((x)=>x.url!=this.symbols[index])
 				}
 				this.symbols.splice(index,1)
 
 			},
+			// 头像改动 1
+			DelPShow(){
+				this.phoerInfo.phoerShow=[]
+			},
 			
 			phoneCall(){
+				console.log(this.phoerInfo.phoerShow);
+				console.log(symbolsUploadMsg);
 				console.log("phoneCall");
 				// console.log(typeof(this.phoerInfo.phoneNumber));
 				// #ifdef APP-PLUS
@@ -502,66 +487,88 @@
 				})
 				// #endif
 			},
+			submit() {
+				// 校验表单  如果有错误，会在catch中返回报错信息数组，校验通过则在then中返回true
+				if(this.phoerInfo.phoerShow[0]!=undefined&&this.symbols[0]!=undefined){
+					this.$refs.form1.validate().then(res => {
+						uni.$u.toast('信息填写校验通过')
+						this.openModal()
+					}).catch(errors => {
+						uni.$u.toast('请完整填写数据')
+					})
+				}else{
+					uni.$u.toast('还没上传个人形象或代表作哦')
+				}
+
+			},
 			uploadMsg(){
-				this.phoerInfo.AuditStatus=0
 					//用户申请一般流程
-				ppdb.add(this.phoerInfo).then((res) => {
-				  uni.showToast({
-				    icon: 'none',
-				    title: '提交成功'
-				  })
-				  // debugger
-				  this.getOpenerEventChannel().emit('refreshData')
-				  location.reload()
-				  // setTimeout(() => uni.navigateBack(), 500)
-				}).catch((err) => {
-				  uni.showModal({
-				    content: err.message || '请求服务失败',
-				    showCancel: false
-				  })
-				})
+				ppdb.add({...this.phoerInfo,
+					AuditStatus:0,
+					symbolsHistory:symbolsHistory,
+					phoerShowHistory:phoerShowHistory}).then((res) => {
+							uni.showToast({
+								icon: 'none',
+								title: '提交成功'
+							})
+							setTimeout(() => uni.reLaunch({
+								url:"/pages/home/home"
+							}), 500)
+						}).catch((err) => {
+								uni.showModal({
+									content: err.message || '请求服务失败',
+									showCancel: false
+								})
+							})
 				
 			},
 			getImgUrlAndUpload(){
 				//上传个人形象
-				let that = this
-				if (this.phoerInfo.phoerShow[0]!==undefined) {
+				if (this.phoerInfo.phoerShow[0]!=initAvatar || initAvatar=='') {
 					uniCloud.uploadFile({
 					filePath: this.phoerInfo.phoerShow[0],
 					cloudPath: this.phoerShowName,
-					success(res){
-						console.log("success");
+					success:(res)=>{
+						console.log("phoerShow upload success");
 						console.log(res);
-						that.phoerInfo.phoerShowUrl=res.fileID
-						}
+						this.phoerInfo.phoerShow[0]=res.fileID
+						phoerShowHistory=phoerShowHistory.concat(res.fileID)
+						//上传代表作
+						this.uploadSymbols()
+						},
+					fail(e) {
+						console.log("img upload fail");
+						 console.log(e);
+					},
 					});
 				}else{
-					return this.$u.toast("请上传个人形象照")
+					this.uploadSymbols()
 				}
-				//上传代表作
-				if(this.symbols){
-					//无法一次性上传多张  只能循环上传了
-					// debugger
-					if(this.symbolsUploadMsg.length>0){
-						for(var i of this.symbolsUploadMsg){
-							uniCloud.uploadFile({
-								filePath:i.url,
-								cloudPath:i.name,
-								success(res) {
-									that.phoerInfo.symbolsUrl.push(res.fileID)
-									// 上传的图片连接等于返回的代表作链接  意味着图片上传完毕 url获取完毕 可以上传了
-									if(that.phoerInfo.symbolsUrl.length==that.symbols.length){
-										that.uploadMsg()
-									}
-								}
-							})		
-						}
-					}else{
-						this.uploadMsg()
-					}
-				}
-				
+
 			},
+			uploadSymbols(){
+				 
+				if(symbolsUploadMsg.length>0){
+					for(var i of symbolsUploadMsg){
+						uniCloud.uploadFile({
+							filePath:i.url,
+							cloudPath:i.name,
+							success:(res)=> {
+								this.phoerInfo.symbolsUrl.push(res.fileID)
+								symbolsHistory=symbolsHistory.concat(res.fileID)
+								console.log("res.fileID");
+								console.log(res.fileID);
+								// 上传的图片连接等于返回的代表作链接  意味着图片上传完毕 url获取完毕 可以上传了
+								if(this.phoerInfo.symbolsUrl.length==this.symbols.length){
+									this.uploadMsg()
+								}
+							}
+						})		
+					}
+				}else{
+					this.uploadMsg()
+				}
+			}
 		},
 	}
 </script>

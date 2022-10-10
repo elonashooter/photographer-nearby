@@ -2,7 +2,7 @@
 	"bsonType": "object",
 	"required": [],
 	"permission": {
-		"read": true,
+		"read": "doc.userId == auth.uid ||'photographer' in auth.role",
 		"create": true,
 		//下单者自己可以改and在职摄影师可以改
 		"update": "doc.userId == auth.uid ||'photographer' in auth.role",
@@ -75,6 +75,10 @@
 			"bsonType": "string",
 			"description": "用户拒绝摄影师的理由"
 		},
+		"rejectIds": {
+			"bsonType": "array",
+			"description": "拒绝过的摄影师id"
+		},
 		"userId": {
 			"bsonType": "string",
 			"description": "下单用户的id"
@@ -105,7 +109,15 @@
 			"forceDefaultValue": {
 			"$env": "now"
 			}
-		}
+		},
+		"order_push_clientid":{
+			"bsonType": "string",
+			"description": "下单者被推送设备识别码"
+		},
+		"phoer_push_clientid":{
+			"bsonType": "string",
+			"description": "此单摄影师被推送设备识别码"
+		},
 
 
 		// "pay_type": {

@@ -4,7 +4,7 @@
 	"permission": {
 		"read": true,
 		"create": true,
-		"update": "doc._id==auth.uid || 'photographer' in auth.role",
+		"update": "doc._id==auth.uid || 'WP_manager' in auth.role",
 		"delete": "doc._id==auth.uid || 'WP_manager' in auth.role"
 	},
 	"fieldRules": [{
@@ -68,6 +68,10 @@
 			"defaultValue": {
 				"$env": "now"
 			}
+		},
+		"push_clientid":{
+			"bsonType": "string",
+			"description": "摄影师被推送设备识别码"
 		}
 		// "pay_type": {
 		// 	"bsonType": "string",

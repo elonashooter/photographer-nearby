@@ -1,29 +1,9 @@
 <template>
 	<view class="u-page">
 		<view class="u-demo-block">
-			<text class="u-demo-block__title" v-if="agreed.orderStatus===''">完善预约信息</text>
-			<text class="u-demo-block__title" v-else>订单信息</text>
-			<u--text
-				text='订单状态:已发布,待摄影师接收'
-				type="warning"
-				v-if="orderStatus===0"
-			></u--text>
-			<u--text
-				text='订单状态:等待下单方同意约拍'
-				type="primary"
-				v-if="orderStatus===1"
-			></u--text>
-			<u--text
-				text='订单状态:等待摄影方同意约拍'
-				type="primary"
-				v-if="orderStatus===101"
-			></u--text>
-			<text style="color: lightsalmon" v-if="orderStatus===2">订单进行中,记得按时到场昂</text>
-			<u--text
-				text='订单状态:已完成'
-				type="success"
-				v-if="orderStatus===3"
-			></u--text>
+			<uni-steps :options="stepList" :active="stepActive" activeIcon="download" v-if="stepActive!=3"/>
+			<uni-steps :options="stepList" :active="stepActive" activeIcon="checkbox" activeColor='DarkSeaGreen'  v-else/>
+			
 			<view class="u-demo-block__content">
 				<!-- 注意，如果需要兼容微信小程序，最好通过setRules方法设置rules规则 -->
 				<u--form labelPosition="left" :model="agreed" ref="form1">
@@ -54,7 +34,6 @@
 							v-model="agreed.userInfo.phoneNumber"
 							border="none"
 							placeholder="联系电话"
-							prop="userInfo.phoneNumber"
 							prefixIcon="phone"
 							prefixIconStyle="font-size: 22px;color: #909399"
 						></u--input>
@@ -154,67 +133,13 @@
 				</u--form>
 				<!-- 提交按钮 -->
 				<u-button
-					v-if="!phoerMsg._id&&!agreed._id"
 					type="primary"
-					text="提交"
+					:text="ButtonText"
 					customStyle="margin-top: 50px"
-					@click="submit"
-				></u-button>
-				<!-- 用户从在线摄影师预约跳过来的 -->
-				<u-button
-					v-else-if="phoerMsg._id&&!agreed._id"
-					type="primary"
-					text="预约"
-					customStyle="margin-top: 50px"
-					@click="yuyue"
+					@click="clickButton(ButtonAction)"
 				></u-button>
 				<u-button
-					v-else-if="phoerMsg._id&&agreed.orderStatus===0"
-					type="success"
-					text="接单"
-					customStyle="margin-top: 50px"
-					@click="takeOrder"
-				></u-button>
-				<u-button
-					v-else-if="agreed.orderStatus===1"
-					type="success"
-					text="等待下单方同意"
-					customStyle="margin-top: 50px"
-				></u-button>
-				<u-button
-					v-else-if="agreed.orderStatus===101"
-					type="success"
-					text="等待摄影师同意"
-					customStyle="margin-top: 50px"
-				></u-button>
-				<u-button
-					v-else-if="phoerMsg._id&&agreed.orderStatus===2"
-					type="success"
-					text="记得如约到场拍摄昂"
-					customStyle="margin-top: 50px"
-				></u-button>
-				<u-button
-					v-if="!phoerMsg._id&&agreed.orderStatus===2"
-					type="success"
-					text="拍摄完毕后点此完成"
-					customStyle="margin-top: 50px"
-					@click="completeOrder"
-				></u-button>
-				<u-button
-					v-if="agreed._id&&agreed.orderStatus===0&&!phoerMsg._id"
-					type="success"
-					text="修改"
-					customStyle="margin-top: 50px"
-					@click="editOrder"
-				></u-button>
-				<u-button
-					v-if="agreed.orderStatus===3"
-					type="success"
-					text="已完成"
-					customStyle="margin-top: 50px"
-				></u-button>
-				<u-button
-					v-if="agreed._id&&agreed.orderStatus===0&&!phoerMsg._id"
+					v-if="ButtonText=='修改'"
 					type="error"
 					text="删除"
 					customStyle="margin-top: 20px"
@@ -321,10 +246,11 @@
 			return {
 				disabled:false,
 				orderId:'',
-				orderStatus:'',
 				fileList1: [],
 				showTime: false,
 				showPopup:false,
+				ButtonText:'',
+				ButtonAction:'',
 				agreed: {  //约定拍摄的时间、地点等信息
 					userInfo: {
 						name: '',
@@ -337,12 +263,7 @@
 					time:'',
 					userId:this.$store.state.user.info._id,
 					phoerId:'',
-				},
-				phoerMsg:{
-					phoerShow:'',
-					name:'',
-					intro:'',
-					phoerNumber:'',
+					order_push_clientid:''
 				},
 				radiolist1: [{
 						name: '个人照',
@@ -357,6 +278,16 @@
 						disabled: false
 					}
 				],
+				stepList:[{
+					title: 'A方发起预约'
+				}, {
+					title: 'B方接受'
+				}, {
+					title: '到场拍摄'
+				}, {
+					title: '完成'
+				}],
+				stepActive:0,
 				rules: {
 					'userInfo.name': [{
 						type: 'string',
@@ -374,6 +305,12 @@
 						trigger: ["change", "blur"],
 					}],
 					"intro": {
+						type: 'string',
+						required: false,
+						message: '',
+						trigger: ['change']
+					},
+					"place": {
 						type: 'string',
 						required: false,
 						message: '',
@@ -418,38 +355,90 @@
 			// 如果需要兼容微信小程序，并且校验规则中含有方法等，只能通过setRules方法设置规则
 			this.$refs.form1.setRules(this.rules)
 		},
+		created() {
+			let inQinZhou=uni.getStorage({
+				key:"inQinZhou"
+			})
+			if(inQinZhou){
+				return;
+			}else{
+				uni.$u.toast('只有钦州的同学下单有效')
+			}
+		},
 		onLoad(e) {
-			//用户下单过来的
+			//用户点列表过来的
 			if(e.orderMsg){
-				console.log("orderMsg get success");
-				console.log(e.orderMsg);
 				this.agreed=JSON.parse(decodeURIComponent(e.orderMsg))
-				this.orderStatus=this.agreed.orderStatus
+				if(this.agreed.orderStatus===0){
+					this.ButtonText='修改'
+					this.ButtonAction='editOrder'
+				}
+				else if(this.agreed.orderStatus==101){
+					this.ButtonText='等待摄影师同意'
+					this.ButtonAction=''
+					this.disabled=true
+				}else if(this.agreed.orderStatus==2){
+					this.ButtonText='拍摄完毕后点此完成'
+					this.ButtonAction='completeOrder'
+					this.disabled=true
+				}else if(this.agreed.orderStatus==3){
+					this.ButtonText='已完成'
+					this.ButtonAction=''
+					this.disabled=true
+				}
 			}
 			//摄影师接单点过来的
 			else if(e.phoerChoiceOrder){
-				console.log("PCO");
-				console.log(JSON.parse(decodeURIComponent(e.phoerChoiceOrder)));
+				this.ButtonText='接单'
+				this.ButtonAction='takeOrder'
 				this.agreed=JSON.parse(decodeURIComponent(e.phoerChoiceOrder))
-				this.getDataByPhoerId(pCO.phoerId)
+				this.getDataByPhoerId(this.agreed.phoerId)
 				this.disabled=true
+				if(this.agreed.rejectIds.includes(this.$store.state.user.info._id)){
+					this.ButtonText='近期被此订单拒绝过'
+					this.ButtonAction=''
+				}else if(this.agreed.orderStatus===1){
+					this.ButtonText='等待下单方同意'
+					this.ButtonAction=''
+				}else if(this.agreed.orderStatus===101){
+					this.ButtonText='返回'
+					this.ButtonAction='back'
+				}else if(this.agreed.orderStatus==2){
+					this.ButtonText='记得如约到场拍摄昂'
+					this.ButtonAction=''
+				}else if(this.agreed.orderStatus==3){
+					this.ButtonText='已完成'
+					this.ButtonAction=''
+				}
+				console.log(this.agreed);
 			}
 			else if(e.orderChoicePhoer){
 				//用户预约跳转填写订单信息
-				this.phoerMsg=JSON.parse(decodeURIComponent(e.orderChoicePhoer))
+				this.ButtonText='预约'
+				this.ButtonAction='yuyue'
+				let phoerMsg=JSON.parse(decodeURIComponent(e.orderChoicePhoer))
 				this.agreed={
 					...this.agreed,
-					phoerId:this.phoerMsg.userId,
-					phoerPhoneNumber:this.phoerMsg.phoneNumber,
-					phoerName:this.phoerMsg.name,
-					phoerShowUrl:this.phoerMsg.phoerShow[0],
-					phoerIntro:this.phoerMsg.intro
+					phoerId:phoerMsg.userId,
+					phoerPhoneNumber:phoerMsg.phoneNumber,
+					phoerName:phoerMsg.name,
+					phoerShowUrl:phoerMsg.phoerShow[0],
+					phoerIntro:phoerMsg.intro,
+					phoer_push_clientid:phoerMsg.push_clientid
 				}
 				this.setDefaultValue()
 			}else{
 				//用户新建
+				this.ButtonText='提交'
+				this.ButtonAction='submit'
 				this.setDefaultValue()
 			}
+			if(this.agreed.orderStatus!=''){
+				this.agreed.orderStatus==101?this.stepActive=1:this.stepActive=this.agreed.orderStatus
+			}else{
+				this.stepActive=0
+			}
+			
 			
 		},
 		methods: {
@@ -482,36 +471,53 @@
 				this.showPopup = false
 				// console.log('close');
 			},
+			clickButton(action){
+				if(action=='submit'){
+					this.submit()
+				}else if(action=='yuyue'){
+					this.yuyue()
+				}else if(action=='takeOrder'){
+					this.takeOrder()
+				}else if(action=='completeOrder'){
+					this.completeOrder()
+				}else if(action=='editOrder'){
+					this.editOrder()
+				}else if(action=='back'){
+					uni.navigateBack()
+				}else{
+					return;
+				}
+				
+			},
 			submit() {
 				// 校验表单  如果有错误，会在catch中返回报错信息数组，校验通过则在then中返回true
 				this.$refs.form1.validate().then(res => {
 					uni.$u.toast('校验通过')
 					//有传来订单id则为修改  否则为上传
-					this.odb.add(this.agreed).then((res) => {
+					odb.add(this.agreed).then((res) => {
 						// console.log("res here");
 						// console.log(res);
 					  uni.showToast({
 					    icon: 'none',
 					    title: '提交成功'
 					  })
-					  // debugger
-					  this.getOpenerEventChannel().emit('refreshData')
+					  // // debugger
+					  // this.getOpenerEventChannel().emit('refreshData')
 					  setTimeout(() => uni.reLaunch({
 					  	url:"/pages/home/home"
 					  }), 500)
 					  
 					  //提交成功后跳转至订单列表页面
-					}).catch((err) => {
-					  uni.showModal({
-					    content: err.message || '请求服务失败',
-					    showCancel: false
-					  })
+					}).catch(e=>{
+						console.log( "odb上传失败");
+						console.log(e);
 					})
 					
 				}).catch(errors => {
+					console.log("error here")
+					console.log(errors);
 					uni.$u.toast('请完整填写数据')
 				})
-				// console.log(typeof(this.agreed.price));
 				
 				
 			},
@@ -523,21 +529,32 @@
 					name:this.$store.state.user.info.nickname,
 					phoneNumber:this.$store.state.user.info.mobile
 				}
+				this.stepActive=-1
+				uni.getPushClientId({
+						success: (res) => {
+							this.agreed.order_push_clientid=res.cid
+						},
+						fail(err) {
+							console.log('获取手机识别码失败')
+						}
+					})
 			},
 			getDataByPhoerId(id){
 				uniCloud.database().collection('photographer').where({
 					userId:id
 				}).get().then(res=>{
 					if(res.result.data.length>0){
-						this.agreed.phoerId=res.result.data[0].userId
-						this.phoerMsg=res.result.data[0]
+						let phoerMsg=res.result.data[0]
+						console.log("pMG here");
+						console.log(this.phoerMsg);
 						this.agreed={
 							...this.agreed,
-							phoerId:this.phoerMsg.userId,
-							phoerPhoneNumber:this.phoerMsg.phoneNumber,
-							phoerName:this.phoerMsg.name,
-							phoerShowUrl:this.phoerMsg.phoerShow[0],
-							phoerIntro:this.phoerMsg.intro
+							phoerId:phoerMsg.userId,
+							phoerPhoneNumber:phoerMsg.phoneNumber,
+							phoerName:phoerMsg.name,
+							phoerShowUrl:phoerMsg.phoerShow[0],
+							phoerIntro:phoerMsg.intro,
+							phoer_push_clientid:phoerMsg.push_clientid
 						}
 					}
 					else{
@@ -547,36 +564,47 @@
 			},
 			//接单
 			takeOrder(){
-				odb.doc(this.agreed._id).update({
-					phoerId:this.phoerMsg.userId,
-					phoerPhoneNumber:this.phoerMsg.phoneNumber,
-					phoerName:this.phoerMsg.name,
-					phoerShowUrl:this.phoerMsg.phoerShow[0],
-					phoerIntro:this.phoerMsg.intro,
-					orderStatus:1
-				}).then(res=>{
+				if(this.agreed.userId==this.$store.state.user.info._id){
+					return uni.$u.toast('不能自己接自己单，人不能左脚踩右脚上天')
+				}
+				let id = this.agreed._id
+				let updatedAgreed={...this.agreed,
+					phoerId:this.agreed.phoerId,
+					phoerPhoneNumber:this.agreed.phoerPhoneNumber,
+					phoerName:this.agreed.phoerName,
+					phoerShowUrl:this.agreed.phoerShowUrl,
+					phoerIntro:this.agreed.phoerIntro,
+					orderStatus:1,
+					phoer_push_clientid:this.agreed.phoer_push_clientid}
+				delete updatedAgreed._id
+				
+				odb.doc(id).update(updatedAgreed).then(res=>{
 					console.log("takeOrder success");
 					console.log(res);
-					// #ifdef APP
+					// #ifde APP
 					uniCloud.callFunction({
 						name:"push2",
 						data:{
-							uid:this.agreed.userId,
+							cid:this.agreed.order_push_clientid,
 							title:"预约有响应",
 							content:"有摄影师接了响应了您的预约",
 							payload:{
-								fabShowText:"摄影师"+this.phoerMsg.name+"响应了你的订单",
-								url:'/pages/order/verifyOrder?orderWaitPhoerMsg='+encodeURIComponent(JSON.stringify({orderWaitPhoer:true,...this.agreed}))
+								fabShowText:"摄影师"+this.agreed.phoerName+"响应了你的订单",
+								url:'/pages/order/verifyOrder?orderWaitPhoerMsg=',
+								msg:{orderWaitPhoer:true,...updatedAgreed,_id:id}
 							}
 						}
 					})
-					// #endif
+					// #endi
 					uni.showModal({
 						content:"接单操作完成，等待对方同意即可"
 					})
 					setTimeout(() => uni.navigateBack({
 						delta: 2
 					}), 1500)
+				}).catch(res=>{
+					console.log("update fail");
+					console.log(res);
 				})
 			},
 			editOrder(){
@@ -621,31 +649,38 @@
 				})
 			},
 			yuyue(){
+				console.log("yuyue agreed here");
+				console.log(this.agreed);
 				this.$refs.form1.validate().then(res => {
 					// uni.$u.toast('校验通过')
 					this.agreed.orderStatus=101
 					odb.add(this.agreed).then((res) => {
-					  uni.showToast({icon: 'none',title: '预约发起成功'})
-					// #ifdef APP
+					// #ifde APP
 					//用户预约摄影师
 					uniCloud.callFunction({
 						name:"push2",
 						data:{
-						uid:this.agreed.phoerId,
-						title:"有新的预约订单",
-						content:"有用户找你约拍啦",
-						payload:{
-							fabShowText:"用户"+this.agreed.userInfo.name+"找你预约了以下订单",
-							url:'/pages/order/verifyOrder?phoerWaitOrderMsg='+encodeURIComponent(JSON.stringify({phoerWaitOrder:true,...this.agreed}))
+							cid:this.agreed.phoer_push_clientid,
+							title:"有新的预约",
+							content:"有用户找你约拍",
+							payload:{
+								fabShowText:"用户"+this.agreed.userInfo.name+"找你预约了以下订单",
+								url:'/pages/order/verifyOrder?phoerWaitOrderMsg=',
+								msg:{phoerWaitOrder:true,...this.agreed,_id:res.result.id},
+							}
 						}
-					}
+					}).then(()=>{
+						uni.showToast({
+							title:"已发起预约"
+						})
+						setTimeout(() => uni.reLaunch({
+							url:"/pages/home/home"
+						}), 1000)
+					}).catch(e=>{
+						console.log("yuyue fail");
+						console.log(e);
 					})
-					// #endif
-					setTimeout(() => uni.reLaunch({
-						url:"/pages/home/home"
-					}), 500)
-
-
+					// #endi
 					}).catch((err) => {
 					  uni.showModal({
 					    content: err.message || '请求服务失败',

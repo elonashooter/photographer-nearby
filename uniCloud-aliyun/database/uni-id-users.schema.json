@@ -2,7 +2,7 @@
 	"bsonType": "object",
 	"permission": {
 		"read": true,
-		"update": "'WP_manager' in auth.role"
+		"update": "doc._id == auth.uid||'WP_manager' in auth.role"
 	},
 	"required": [],
 	"properties": {

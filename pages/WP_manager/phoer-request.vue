@@ -2,12 +2,12 @@
 	<view class="u-page">
 		<view class="u-demo-block">
 			<u--text
-				v-if="phoerInfo.rejectReason&&phoerInfo.rejectReason!==''"
+				v-if="phoerInfo.rejectReason&&phoerInfo.rejectReason!==''&&showReject"
 				:text="'申请已被驳回,理由为:\n'+phoerInfo.rejectReason"
 				type="warning"
 			></u--text>
 			<u--text
-				v-else-if="phoerInfo.rejectReason&&phoerInfo.rejectReason==''"
+				v-else-if="phoerInfo.rejectReason&&phoerInfo.rejectReason==''&&showReject"
 				text="申请已通过"
 				type="success"
 			></u--text>
@@ -34,14 +34,12 @@
 							placeholder="联系电话"
 							:disabled="inputDisable"
 						>
-							<template slot="suffix">
-								<u-icon
-									size="28"
-									name='phone'
-									@click="phoneCall()"
-								></u-icon>
-							</template>
 						</u--input>
+						<u-icon
+							size="28"
+							name='phone'
+							@click="phoneCall()"
+						></u-icon>
 					</u-form-item>
 					<u-form-item
 						label=""
@@ -54,9 +52,9 @@
 							</view>
 							<view class="uni-uploader-body">
 								<view class="uni-uploader__files">
-									<block v-for="(image,index) in phoerInfo.phoerShow" :key="index">
+									<block>
 										<view class="uni-uploader__file">
-											<image class="uni-uploader__img" :src="image" mode="aspectFill" :data-src="image" @tap="previewPhoerShow"></image>
+											<image class="uni-uploader__img" :src="phoerInfo.phoerShow[0]" mode="aspectFill" @tap="previewPhoerShow"></image>
 										</view>
 									</block>
 								</view>
@@ -94,7 +92,7 @@
 								<block v-for="(image,index) in symbols" :key="index">
 									<view class="uni-uploader__file">
 										<!-- 注：uni.preview函数写在这只能是不加括号的，不然会报错 -->
-										<image class="uni-uploader__img" mode="aspectFill" :src="image" :data-src="image" @tap="previewSymbols"></image>
+										<image class="uni-uploader__img" mode="aspectFill" :src="image" @tap="previewSymbols"></image>
 									</view>
 								</block>
 							</view>
@@ -176,6 +174,7 @@
 				showModal:false,//提交确认框
 				showPopup:false,//驳回信息弹出框
 				showButton:true,
+				showReject:true,
 				inputDisable:'',
 				phoerInfo: {
 					name: '',
@@ -184,14 +183,11 @@
 					symbolsTag:'',//作品名称
 					symbolsUrl:[],
 					phoerShow:[],//摄影师形象对象  本来可以直接用字符串的，但uni.preview的预览参数格式为uni.chooseimage返回的数组请求体格式
-					phoerShowUrl:"",//摄影师形象连接
 					userId:this.$store.state.user.info._id,
 				},
 				rejectReason:'',
-				phoerShowName:'',
 				symbolsUploadMsg:[],
 				symbols:[],//作品对象
-				phoerId:'',//从phoerList点进来传来的参数
 				rules: {
 					'name': [{
 						type: 'string',
@@ -215,15 +211,17 @@
 		},
 		onLoad(e) {		//根据传来的参数确定是什么角色点进来的
 			// 只有管理员
-			// console.log("onload get an e");
-			// console.log(e);
+			console.log("onload get an e");
+			console.log(e);
 			if(e.compMsg){
 				this.showButton=false
 				this.phoerInfo=JSON.parse(decodeURIComponent(e.compMsg))
 				this.symbols=this.phoerInfo.symbolsUrl
 			}else if(e.dealMsg){
+				this.showReject=false
 				this.phoerInfo=JSON.parse(decodeURIComponent(e.dealMsg))
 				this.symbols=this.phoerInfo.symbolsUrl
+				debugger
 			}
 		},
 		methods: {
@@ -245,23 +243,54 @@
 			navigateBack() {
 				uni.navigateBack()
 			},
-			async submit() {
+			submit() {
+				console.log(this.phoerInfo);
+				let requestTimes=this.phoerInfo.requestTimes
 				//pre-phoer状态为已完成  新增一个摄影师
-				await ppdb.doc(this.phoerId).update({
+				ppdb.doc(this.phoerInfo._id).update({
 					AuditStatus:1 ,//1即为通过
 					rejectReason:'',
 					requestTimes:this.phoerInfo.requestTimes+1
+				}).catch(e=>{
+					console.log("ppdb修改报错");
+					console.log(e);
 				})
 				let pdbMsg=this.phoerInfo
 				// 删除审核状态字段和拒绝理由字段
 				delete pdbMsg._id
 				delete pdbMsg.AuditStatus
 				delete pdbMsg.rejectReason
-				if(this.phoerInfo.requestTimes>0){
-					await pdb.doc(this.phoerId).update(pdbMsg)
+				delete pdbMsg.requestTimes
+				delete pdbMsg.phoerShowHistory
+				delete pdbMsg.symbolsHistory
+				// console.log(this.phoerInfo);this.phoerInfo里的这四个字段也被删了
+				if(requestTimes>0){
+					pdb.where({userId:this.phoerInfo.userId}).update(pdbMsg).then(res=>{
+						console.log('update success');
+						console.log(res);
+					}).catch(e=>{
+						console.log("pdb修改报错");
+						console.log(e);
+					})
 				}else{
-					await pdb.add(pdbMsg)
-					if(this.$store.state.user.info.role.includes("WP_manager")){
+					pdb.add(pdbMsg).then(()=>{
+						uniCloud.callFunction({
+							name:"push2",
+							data:{
+								cid:this.phoerInfo.push_clientid,
+								title:"申请通过",
+								content:"你现在是简拍的摄影师了！",
+								payload:{
+									fabShowText:"加入湾拍申请通过,重新登陆一次你就是简拍的摄影师了",
+									CharacterChange:1
+								}
+							}
+						})
+					}).catch(e=>{
+						console.log("pdb新增报错");
+						console.log(e);
+					})
+					if(this.$store.state.user.info.role.includes("WP_manager")&&this.$store.state.user.info._id==this.phoerInfo.userId){
 						uniCloud.database().collection('uni-id-users').where({
 							_id:this.phoerInfo.userId
 						}).update({
@@ -297,15 +326,15 @@
 						uni.navigateBack()
 					},1000)
 				}).catch(e=>{
-					console.log("reject fail");
+					console.log("驳回操作报错");
 					console.log(e);
 				})
 			},
 			// 代表作导入并预览  start
-			previewPhoerShow: function(e) {
-				var current = e.target.dataset.src
+			previewPhoerShow: function() {
+				
 				uni.previewImage({
-					current: current,
+					current: 0,
 					urls: this.phoerInfo.phoerShow
 				})
 			},

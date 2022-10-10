@@ -26,7 +26,7 @@
 						slot="icon"
 						shape="square"
 						size="70"
-						:src="item.phoerShowUrl"
+						:src="item.phoerShow[0]"
 						customStyle="margin: -3px 5px -3px 0"
 						mode="aspectFill"
 					></u-avatar>
@@ -50,7 +50,7 @@
 						slot="icon"
 						shape="square"
 						size="70"
-						:src="item.phoerShowUrl"
+						:src="item.phoerShow[0]"
 						customStyle="margin: -3px 5px -3px 0"
 						mode="aspectFill"
 					></u-avatar>
@@ -102,6 +102,7 @@
 				this.pendingData=[]
 				this.solvedData=[]
 				ppdb.get().then(res=>{
+					
 					if(res.result.data.length>0){
 						for(var i of res.result.data){
 							if (i.AuditStatus==0){
@@ -115,6 +116,8 @@
 					}
 
 				})
+				console.log("pddd");
+				console.log(this.pendingData);
 			}
 		},
 	}

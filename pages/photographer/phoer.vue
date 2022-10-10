@@ -127,6 +127,7 @@
 </template>
 
 <script>
+	let pdb = uniCloud.database().collection('photographer')
 	export default {
 		data() {
 			return {
@@ -140,11 +141,10 @@
 					symbolsTag:'',//作品名称
 					symbolsUrl:[],
 					phoerShow:[],//摄影师形象对象  本来可以直接用字符串的，但uni.preview的预览参数格式为uni.chooseimage返回的数组请求体格式
-					phoerShowUrl:"",//摄影师形象连接
+					
 					userId:this.$store.state.user.info._id,
 				},
 				phoerShowName:'',
-				symbolsUploadMsg:[],
 				symbols:[],//作品对象
 				phoerId:'',//从phoerList点进来传来的参数
 				presentCharacter:'',
@@ -175,7 +175,7 @@
 			// console.log(e.phoerId);  //???不知道为什么会执行两次
 			if(e.phoerId){
 				this.phoerId=e.phoerId  //其他页面传过来的
-				this.pdb.where({userId:this.phoerId}).get().then(res=>{
+				pdb.where({userId:this.phoerId}).get().then(res=>{
 					this.phoerInfo={...res.result.data[0]}
 					this.symbols=this.phoerInfo.symbolsUrl
 				})
@@ -227,28 +227,20 @@
 				})
 				// #endif
 			},
-			uploadMsg(){
-				this.pdb.add(this.phoerInfo).then((res) => {
-				  uni.showToast({
-				    icon: 'none',
-				    title: '提交成功'
-				  })
-				  // debugger
-				  this.getOpenerEventChannel().emit('refreshData')
-				  // setTimeout(() => uni.navigateBack(), 500)
-				}).catch((err) => {
-				  uni.showModal({
-				    content: err.message || '请求服务失败',
-				    showCancel: false
-				  })
-				})
-			},
 			
 			navYuyue(){
-				console.log("yuyue");
-				uni.navigateTo({
-					url:"/pages/order/order?orderChoicePhoer="+encodeURIComponent(JSON.stringify(this.phoerInfo)) 
-				})
+				if(this.$store.state.user.info._id==this.phoerInfo.userId){
+					uni.showToast({
+						title:"不能约自己，三次元没有小号",
+						icon:"none"
+					})
+				}else{
+					console.log("yuyue");
+					uni.navigateTo({
+						url:"/pages/order/order?orderChoicePhoer="+encodeURIComponent(JSON.stringify(this.phoerInfo)) 
+					})
+				}
+
 			}
 		},
 	}

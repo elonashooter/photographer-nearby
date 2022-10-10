@@ -30,7 +30,11 @@
 		},
 		"symbolsUrl": {
 			"bsonType": "array",
-			"description": "代表作图片链接"
+			"description": "当前设置的代表作图片链接"
+		},
+		"symbolsHistory":{
+			"bsonType": "array",
+			"description": "所有上传过的代表作记录"
 		},
 		"userId": {
 			"bsonType": "string",
@@ -40,9 +44,9 @@
 			"bsonType": "array",
 			"description": "摄影师形象"
 		},
-		"phoerShowUrl": {
-			"bsonType": "string",
-			"description": "摄影师形象连接"
+		"phoerShowHistory":{
+			"bsonType": "array",
+			"description": "所有上传过的个人形象记录"
 		},
 		"AuditStatus": {
 			"bsonType": "int",
@@ -75,6 +79,10 @@
 			"defaultValue": {
 				"$env": "now"
 			}
+		},
+		"push_clientid":{
+			"bsonType": "string",
+			"description": "摄影师被推送设备识别码"
 		}
 	}
 }

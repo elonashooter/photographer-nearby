@@ -3,28 +3,28 @@
 			"path": "pages/home/home",
 			"style": {
 				// "navigationBarTitleText":"我的大学，北大，这是两所学校"
-				// // #ifndef APP-PLUS
-				// "enablePullDownRefresh": true,
-				// // #endif
+				// #ifdef MP 
+				"navigationBarTitleText": "湾大简拍",
+				//"navigationStyle": "custom",
+				// #endif 
 				// "navigationStyle": "custom",
-
 				"app-plus": {
 					"titleNView": { //鼠标悬停有提示
 						"type": "transparent",
 						"searchInput": {
 							"backgroundColor": "rgba(231, 231, 231,.7)",
 							"borderRadius": "16px",
-							"placeholder": "可能删除的搜索栏",
+							"placeholder": "查看预约中的订单",
 							"disabled": true,
 							"placeholderColor": "#606266"
 						},
 						"buttons": [{
 								"fontSrc": "/static/yticon.ttf",
-								"text": "\ue60d",
+								"text": "\ue60c",
 								"fontSize": "26",
-								"color": "#303133",
+								"color": "#aa0000",
 								"float": "left",
-								"background": "rgba(0,0,0,0)"
+								"background": "rgba(170, 0, 0, 0.0)"
 							},
 							{
 								"fontSrc": "/static/yticon.ttf",
@@ -64,6 +64,12 @@
 			}
 		}, 
 		{
+			"path": "pages/photographer/phoer-quit",
+			"style": {
+			
+			}
+		}, 
+		{
 			"path": "pages/photographer/pre-phoer",
 			"style": {
 			"navigationBarTitleText": "编辑摄影师信息"
@@ -75,6 +81,7 @@
 			
 			}
 		}, 
+		// ifd
 		{
 			"path": "pages/WP_manager/business-request",
 			"style": {
@@ -94,13 +101,19 @@
 			}
 		}, 
 		{
-			"path": "pages/grid/grid",
+			"path": "pages/WP_manager/Wpage",
 			"style": {
-				//#ifndef MP
-				"navigationStyle": "custom"
-				//#endif
+
 			}
-		}, {
+		}, 
+		{
+			"path": "pages/WP_manager/phoer-quit-request",
+			"style": {
+		
+			}
+		}, 
+		// endi
+		{
 			"path": "pages/ucenter/login-page/index/index",
 			"style": {
 				"navigationBarTitleText": "",
@@ -114,25 +127,7 @@
 			"style": {
 				"navigationBarTitleText":"搜索"
 			}
-		}, {
-			"path": "pages/home/detail",
-			"style": {
-				"app-plus": {
-					"titleNView": {
-						"buttons": [{
-							"type": "share"
-						}],
-						"type": "transparent"
-					}
-				},
-				"h5": {
-					"titleNView": {
-						"type": "transparent"
-					}
-				},
-				"navigationBarTitleText": "文章详情"
-			}
-		}, {
+		},  {
 			"path": "pages/ucenter/userinfo/bind-mobile/bind-mobile",
 			"style": {
 				"navigationBarTitleText": "绑定手机号码"
@@ -188,6 +183,7 @@
 			"style": {
 				"navigationBarTitleText": "设置"
 			}
+			
 
 		}, {
 			"path": "pages/ucenter/userinfo/userinfo",
@@ -202,7 +198,9 @@
 		}, {
 			"path": "pages/ucenter/login-page/pwd-login/pwd-login",
 			"style": {
-				"navigationBarTitleText": ""
+				"navigationBarTitleText": "",
+				"rightWindow":false,
+				"topWindow": false
 			}
 		}, {
 			"path": "pages/ucenter/login-page/pwd-retrieve/pwd-retrieve",
@@ -256,7 +254,9 @@
 			}
 		}
     
-    ,{
+	// #ifndef MP
+    ,
+		{
             "path" : "pages/order/fab",
 			"style": {
 				"navigationStyle": "custom",
@@ -269,6 +269,7 @@
 			}
             
         }
+	// #endif
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
@@ -301,13 +302,6 @@
 			"selectedIconPath": "static/tabbar/list_active.png",
 			"text": "首页"
 		}, 
- 
-		{
-			"pagePath": "pages/grid/grid",
-			"iconPath": "static/tabbar/grid.png",
-			"selectedIconPath": "static/tabbar/grid_active.png",
-			"text": "管理员"
-		}, 
 		
 		{
 			"pagePath": "pages/ucenter/ucenter",
@@ -315,5 +309,24 @@
 			"selectedIconPath": "static/tabbar/me_active.png",
 			"text": "我的"
 		}]
+	},
+	"rightWindow": {
+	  "path": "responsive/right-window",
+	  "style": {
+	    "width": "calc(100vw - 450px)"
+	  },
+	  "matchMedia": {
+	    "minWidth": 768,
+		"minHeight":44
+	  }
+	},
+	"topWindow": {
+	  "path": "responsive/top-window", // 指定 topWindow 页面文件
+	  "style": {
+	    "height": "44px"
+	  },
+	  "matchMedia": {
+	    "minWidth": 768
+	  }
 	}
 }

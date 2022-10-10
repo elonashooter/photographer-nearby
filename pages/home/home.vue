@@ -6,16 +6,18 @@
 			customStyle="padding-top:200px"
 		></u-empty>
 	</view>
-	<view class="container" v-else>
+	<view class="container" :style="containerStyle" v-else id="guide-container">
 		<!-- 小程序头部兼容 -->
 		<!-- #ifdef MP -->
 		<view class="mp-search-box">
 			<input class="ser-input" type="text" value="输入关键字搜索" disabled />
 		</view>
 		<!-- #endif -->
+		<!-- 引导插件 1/4 -->
+		<cms-easy-guide ref="easyGuide" />
 		
 		<!-- 头部轮播 -->
-		<view class="carousel-section">
+		<view class="carousel-section" id="guide_0">
 			<!-- 标题栏和状态栏占位符 -->
 			<view class="titleNview-placing"></view>
 			<!-- 背景色区域 -->
@@ -29,7 +31,7 @@
 			
 		</view>
 		<!-- 分类 -->
-		<view class="cate-section">
+		<view class="cate-section" >
 <!-- 			<view class="cate-item">
 				<image src="/static/temp/c3.png"></image>
 				<text>环球美食</text>
@@ -39,35 +41,40 @@
 				<text>个护美妆</text>
 			</view> -->
 			<view class="cate-item">
-				<image src="/static/temp/c6.png" @tap="toOrder()"></image>
+				<image src="/static/temp/fbyy.png" @tap="toOrder()"></image>
 				<text>发布预约</text>
 			</view>
 			<!-- 摄影师同时也是用户 -->
-			<view class="cate-item" v-if="character=='phoer'">
-				<image src="/static/temp/c7.png" @tap="toPhoer(phoerId)"></image>
-				<text>编辑自己</text>
-			</view>
-			<!-- 用户有三种状态：游客 普通 摄影师 -->
-			<view class="cate-item" v-else-if="character=='order'">
-				<image src="/static/temp/c7.png" @tap="toBePhoer()"></image>
-				<text>加入湾拍 </text>
-			</view>
+		
+			
 			<view class="cate-item">
-				<image src="/static/temp/c1.png" @tap="getPhoer()"></image>
+				<image src="/static/temp/zxsys.png" @tap="getPhoer()"></image>
 				<text>在线摄影师 </text>
 			</view>
 			<view class="cate-item">
-				<image src="/static/temp/c8.png" @tap="toMyOrderList()"></image>
+				<image src="/static/temp/wdyy.png" @tap="toMyOrderList()"></image>
 				<text>我的预约</text>
 			</view>
 			
+			<view class="cate-item" v-if="phoerId">
+				<image src="/static/temp/jrwp2.png" @tap="toPhoer(phoerId)"></image>
+				<text>编辑自己</text>
+			</view>
+			<!-- 用户有三种状态：游客 普通 摄影师 -->
+			<view class="cate-item" v-else>
+				<image src="/static/temp/jrwp1.png" @tap="toBePhoer"></image>
+				<text>加入湾拍 </text>
+			</view>
 		</view>
 		
 <!-- 		<view class="ad-1">
 			<image src="/static/temp/ad2.jpg" mode="scaleToFill"></image>
 		</view> -->
 		
+		
+		
 		<view class="ltsAnd2hand" @click="AFunctionWillBeDeleteSoon()">
+			<image src="../../static/bg.png" mode="aspectFill"></image>
 			<view class="ltsItem">
 				<text>匿名聊天室</text>
 			</view>
@@ -75,14 +82,14 @@
 				<text>校内二手</text>
 			</view>
 		</view>
-
+		<!-- #ifde -->
 		<!-- 摄影师操作部分 -->
 		<view class="phoerCard" v-if="phoerId">
 			<u--text
 				text='以下为摄影师操作项'
 				type='primary'
 			></u--text>
-			<view class="f-header m-t">
+			<view class="f-header">
 				<u-switch v-model="OnlineStatus" @change="OnlineStatusChange" ></u-switch>
 				<view class="tit-box">
 					<text class="tit" v-if="!OnlineStatus">点击上线</text>
@@ -98,14 +105,13 @@
 			></u-button>
 			<u-button
 				type="primary"
-				text="查看我接的单"
+				text="查看我接的单" 
 				customStyle="margin-top: 50px;width:400upx"
 				color="linear-gradient(to right, rgb(255, 170, 0), rgb(4, 151, 99))"
 				@click="getPhoerReceiveList()"
 			></u-button>
 		</view>
-		
-		
+		<!-- #endi -->
 		
 		
 		<!-- 加载组件  onshow触发一秒，用于防止恶意高频率访问 -->
@@ -121,11 +127,15 @@
 </template>
 
 <script>
+	let inQinZhou=false
+	let haveProcess=false
 	export default {
 		data() {
 			return {
 				loading:true,//加载组件的加载状态
 				OnlineStatus:false, //摄影师上线状态
+				_isWidescreen:false,
+				containerStyle:'',
 				orderId:'',
 				phoerId:'',
 				carouselList:[{
@@ -140,32 +150,51 @@
 						src: "/static/temp/cyx.png",
 						background: "rgb(143, 145, 162)",
 					}],
-				titleNViewBackground: '',
-				swiperCurrent: 0,
-				swiperLength: 0,
+				titleNViewBackground: "rgb(109, 120, 78)",
 				goodsList: [],
 				loadTime:'', //避免被恶意频繁刷访问造成服务器负担  1/4
-				character:'',
-				WP_manager:false,
+				// WP_manager:false,
 				haveNoNet:false
 			};
+		},
+		created() {
+		  // 动态宽屏检测与宽屏适配
+		  // #ifdef H5
+		  var mediaQueryOb = uni.createMediaQueryObserver(this)
+		  mediaQueryOb.observe({
+		    minWidth: 768
+		  }, matches => {
+		    this._isWidescreen = matches;
+			this.showTabbarAndSearch()
+		  })
+		  // #endif
+		  //引导 2/4
+			
+		  
+
 		},
 		onLoad() {
 			//检测网络状态
 			// this.haveNoNet=true
-			uni.setTabBarItem({
-				index:1,
-				visible:false
-			})
+			// #ifdef APP-PLUS
+			let pages = getCurrentPages();
+			let page = pages[pages.length - 1];
+			let currentWebview = page.$getAppWebview();
+			currentWebview.setTitleNViewButtonStyle(0,{color:'#aa0000'});
+			// #endif
 			uni.getNetworkType({
 				success: res=> {
 					// debugger
 					console.log("net status:"+res.networkType);
-					if(res.networkType!=="none"){
-						this.loadData();
-					}else{
+					if(res.networkType=="none"){
 						this.haveNoNet=true
 					}
+				},
+				fail: (res) => {
+					uni.showToast({
+						title: '手机网络异常',
+						icon: 'none'
+					});
 				}
 			});
 			//测试全局弹窗组件
@@ -174,18 +203,81 @@
 			// })
 		},
 		onShow() {
-			
+			this.checkPhoer()
 			//避免被恶意频繁刷访问造成服务器负担  2/4
 			// this.loadTime=setTimeout(()=>{
 			// 	this.showLoading(),
-				this.checkPhoer()
+				// this.checkPhoer()
 			// },3000)
-
+			// 静态宽屏检测  与动态二选一即可
+			// uni.getSystemInfo({
+			// 	success(res) {
+			// 		console.log("windowW");
+			// 		console.log(res.windowWidth);
+			// 		if(res.windowWidth>768){
+			// 			console.log("WTF?????");
+			// 			this._isWidescreen=true
+			// 			uni.hideTabBar()
+			// 		}else{
+			// 			this._isWidescreen=false
+			// 			uni.showTabBar()
+			// 		}
+			// 	}
+			// })
 			
 		},
 		onHide() {
 			//避免被恶意频繁刷访问造成服务器负担  3/4
 			clearTimeout(this.loadTime)
+		},
+		onReady() {
+			//公共模块加密返回数据测试
+			// uniCloud.callFunction({
+			// 	name:'AESRequest',
+			// 	data:{},
+			// 	success: (res) => {
+			// 		console.log("aes get");
+			// 		console.log(res);
+			// 	},
+			// 	fail(e) {
+			// 		console.log('aes get fail');
+			// 		console.log(e);
+			// 	}
+			// })
+			
+			if(this._isWidescreen&&this.$store.state.user.hasLogin){
+				uni.$emit('updateHead',{username:this.$store.state.user.info.username,
+										uAvatar:this.$store.state.user.info.avatar_file.url+this.$store.state.user.info.avatar_file.extname})
+			}
+			uni.getStorage({
+				key:"inQinZhou",
+				success: (res) => {
+					inQinZhou=res.data
+				}
+			})
+			uni.getStorage({
+				key:"haveProcess",
+				success: (res) => {
+					haveProcess=res.data
+				},
+				complete: () => {
+					this.startProcess()
+				}
+			})
+			// #ifdef APP-PLUS
+			uni.getStorage({
+				key:"GPSColor",
+				success: (res) => {
+					//没set过就是红色  set过就是白色
+					let pages = getCurrentPages();
+					let page = pages[pages.length - 1];
+					let currentWebview = page.$getAppWebview();
+					currentWebview.setTitleNViewButtonStyle(0,{color:res.data});
+				}
+			})
+
+			// #endif
+			
 		},
 		// mounted() {
 		// 	this.loadData()
@@ -195,22 +287,52 @@
 			AFunctionWillBeDeleteSoon(){
 				uni.$u.toast("未开放")
 			},
+			// #ifdef H5
+			showTabbarAndSearch(){
+				if(this._isWidescreen){
+					this.containerStyle="overflow:scroll"
+					uni.hideTabBar()
+				}else{
+					this.containerStyle=""
+					uni.showTabBar()
+				}
+			},
+			// #endif
 			toOrder(){
-				uni.navigateTo({
-					url: '/pages/order/order'
-				});
+				if(this._isWidescreen){
+					uni.$emit('updatePage', {  
+					    Page: 'order'
+					})  
+				}else{
+					uni.navigateTo({
+						url: '/pages/order/order'
+					});
+				}
+
 			},
 			//我的预约
 			toMyOrderList(){
-				uni.navigateTo({
-					url: '/pages/order/orderList?orderId='+this.orderId
-				});
+				if(this._isWidescreen){
+					uni.$emit('updatePage', {  
+					    Page: 'order'
+					})  
+				}else{
+					uni.navigateTo({
+						url: '/pages/order/orderList?orderId='+this.orderId
+					});
+				}
 			},
 			//摄影师查看所有用户已发布的预约列表
 			getAllOrder(){
-				uni.navigateTo({
-					url: '/pages/order/orderList?phoerChoiceOrder=1'
-				});
+				if(this._isWidescreen){
+					uni.$emit('updatePage', {  
+					    Page: 'order'
+					})  
+				}else{
+					uni.navigateTo({
+						url: '/pages/order/orderList?phoerChoiceOrder=1'
+					});
+				}
 				// this.odb.get().then(res=>{
 				// 	console.log("getOrder");
 				// 	console.log(res);
@@ -218,9 +340,15 @@
 			},
 			//摄影师查看自己接的单
 			getPhoerReceiveList(){
-				uni.navigateTo({
-					url: '/pages/order/orderList?phoerId='+this.phoerId
-				});
+				if(this._isWidescreen){
+					uni.$emit('updatePage', {  
+					    Page: 'order'
+					})  
+				}else{
+					uni.navigateTo({
+						url: '/pages/order/orderList?phoerId='+this.phoerId
+					});
+				}
 				// this.odb.where({
 				// 	phoerId:this.phoerId
 				// }).get().then(res=>{
@@ -230,22 +358,40 @@
 			},
 			//加入湾拍
 			toBePhoer(){
-				uni.navigateTo({
-					url: '/pages/photographer/pre-phoer'
-				});
+				if(this._isWidescreen){
+					uni.$emit('updatePage', {  
+					    Page: 'order'
+					})  
+				}else{
+					uni.navigateTo({
+						url: '/pages/photographer/pre-phoer'
+					});
+				}
 			},
 			//编辑自己
 			toPhoer(e){
 				// console.log(e);
-				uni.navigateTo({
-					url: '/pages/photographer/pre-phoer?phoerId='+e
-				});
+				if(this._isWidescreen){
+					uni.$emit('updatePage', {  
+					    Page: 'order'
+					})  
+				}else{
+					uni.navigateTo({
+						url: '/pages/photographer/pre-phoer?phoerId='+e
+					});
+				}
 			},
 			//查询在线摄影师 用户用于预约摄影师
 			getPhoer(){
-				uni.navigateTo({
-					url: '/pages/photographer/phoerList?orderId='+this.orderId
-				});
+				if(this._isWidescreen){
+					uni.$emit('updatePage', {  
+					    Page: 'order'
+					})  
+				}else{
+					uni.navigateTo({
+						url: '/pages/photographer/phoerList?orderId='+this.orderId
+					});
+				}
 				// this.pdb.where('OnlineStatus == true').get().then(res=>
 				// 	console.log(res)
 				// )
@@ -259,58 +405,178 @@
 					console.log(this.$store.state.user.OnlineStatus);
 				})
 			},
-			
-			/**
-			 * 请求静态数据只是为了代码不那么乱
-			 * 分次请求未作整合
-			 */
-			loadData() {
-				let carouselList = this.carouselList
-				this.titleNViewBackground = carouselList[0].background;
-				this.swiperLength = carouselList.length;
-				this.carouselList = carouselList;
-			},
+
 			//避免被恶意频繁刷访问造成服务器负担  4/4
 			// showLoading(){
 			// 	this.loading = false
 			// 	// console.log("showLoading");
 			// },
 			checkPhoer(){
-				// console.log("this.info 用户信息");
+				console.log("checkphoer");
 				//检测当前用户是摄影师还是普通用户
 				if(this.$store.state.user.hasLogin){
 					let userInfo=this.$store.state.user.info
-					console.log(userInfo);
-					if(userInfo.role.includes("WP_manager")){
-						this.$store.commit('user/WP_manager',true)
-						this.WP_manager=true
-						uni.setTabBarItem({
-							index:1,
-							visible:true
-						})
-					}
-					if(userInfo.role.includes("photographer")){
-						this.$store.commit('user/character','phoer')
-						this.phoerId=userInfo._id
-						// console.log('now character is :'+this.$store.state.user.character);
-						this.character='phoer'
+					if(userInfo.role){
+						if(userInfo.role.includes("WP_manager")){
+							this.$store.commit('user/WP_manager',true)
+							// this.WP_manager=true
+						}else{
+							this.$store.commit('user/WP_manager',false)//切换账号时调回来
+						}
+						if(userInfo.role.includes("photographer")){
+							this.setPhoer()
+						}else{
+							this.setOrder()
+						}
 					}else{
-						this.character='order'
+						this.setOrder()
 					}
-					this.orderId=userInfo._id
+				}else{
+					this.orderId='';
+					this.phoerId='';
+					this.$store.commit('user/WP_manager',false)
+					this.$store.commit('user/character','')
 				}
 				
 
 			},
+			setPhoer(){
+				this.$store.commit('user/character','phoer')
+				this.phoerId=this.$store.state.user.info._id
+				this.orderId=this.$store.state.user.info._id
+			},
+			setOrder(){
+				this.$store.commit('user/character','order')
+				this.orderId=this.$store.state.user.info._id
+				this.phoerId=''
+			},
 			//轮播图切换修改背景色
 			swiperChange(e) {
-				const index = e.detail.current;
-				this.swiperCurrent = index;
-				this.titleNViewBackground = this.carouselList[index].background;
+				this.titleNViewBackground = this.carouselList[e.detail.current].background;
 			},
+			// 引导 3/4
+			startProcess() {
+				if(haveProcess){
+					return;
+				}else{
+					uni.setStorage({
+						key:"haveProcess",
+						data:true
+					})
+				}
+				this.$refs.easyGuide.startGuide([
+					// 引导元素1
+					{
+						// that: this, // 必填that为当前this
+						queryClass: '.guide1', // 针对那块元素进行引导
+						// canMaskJump: true, // 是否可以通过点击mask遮罩下一步
+						imgs: [{ // imgs 引导图片
+							width: '569rpx',				// 图片宽
+							height: '183rpx',				// 图片高
+							left: '20rpx',					// 以引导元素左上角定位
+							top: '100rpx',					// 以引导元素左上角定位
+							src: '/static/process.png',		// 图片连接
+							clickEvent:()=>{				// 点击事件
+								console.log('clickEvent')
+							}
+						}, {
+							width: '223rpx',				// 图片宽
+							height: '116rpx',				// 图片高
+							left: '200rpx',					// 以引导元素左上角定位
+							top: '230rpx',					// 以引导元素左上角定位
+							src: '/static/process-btn.png',	// 图片连接
+							isNextButton: true,				// 是否需点击元素进行下一个引导
+							clickEvent:()=>{				// 点击事件
+								this.getLocation()
+							}
+						}]
+					},
+					// 引导元素2
+					// {
+					// 	// that: this, // 必填that为当前this
+					// 	queryClass: '.guide2', // 针对那块元素进行引导
+					// 	// canMaskJump: true, // 是否可以通过点击mask遮罩下一步
+					// 	imgs: [{ // imgs 引导文本
+					// 		width: '569rpx',				// 图片宽
+					// 		height: '183rpx',				// 图片高
+					// 		left: '-60rpx',					// 以引导元素左上角定位
+					// 		top: '-100rpx',					// 以引导元素左上角定位
+					// 		src: '/static/select.png',		// 图片连接
+					// 		clickEvent:()=>{				// 点击事件
+					// 			console.log('clickEvent')
+					// 		}
+					// 	}, {//"下一步"的按钮图片
+					// 		width: '223rpx',				// 图片宽
+					// 		height: '116rpx',				// 图片高
+					// 		left: '200rpx',					// 以引导元素左上角定位
+					// 		top: '200rpx',					// 以引导元素左上角定位
+					// 		src: '/static/select.png',	// 图片连接
+					// 		isNextButton: true,				// 是否需点击元素进行下一个引导
+					// 		clickEvent:()=>{				// 点击事件
+					// 			console.log('clickEvent')
+					// 		}
+					// 	}]
+					// },
+				])
+			},
+			getLocation(){
+				// console.log(inQinZhou);
+				if(inQinZhou){
+					uni.showToast({
+						title:"已在钦州",
+						icon:"success"
+					})
+					return;
+				}
+					
+				// #ifdef APP-PLUS || MP
+				//获取定位  记得上线小程序时写另一套 因为小程序地图免费
+				uni.getLocation({
+					type:'gcj02',
+					geocode:true,
+					success: (res) => {
+						console.log("adress here");
+						console.log(res.address);
+						if(res.address.city=='钦州市'){
+							uni.showToast({
+								title:"确认在钦州",
+								icon:"success"
+							})
+							uni.setStorage({
+								key:"inQinZhou",
+								data:true
+							})
+							uni.setStorage({
+								key:"GPSColor",
+								data:'#ffffff'
+							})
+							// #ifdef APP-PLUS
+							let pages = getCurrentPages();
+							let page = pages[pages.length - 1];
+							let currentWebview = page.$getAppWebview();
+							currentWebview.setTitleNViewButtonStyle(0,{color:'#ffffff'});
+							// #endif
+						}else{
+							uni.showToast({
+								title:"不在钦州",
+								icon:"error"
+							})
+						}
+						
+					},
+					fail: (res) => {
+						uni.showToast({
+							title:"请开启gps重试",
+							icon:"error"
+						})
+					}
+				})
+				// #endif
+			}
 			
 			
 		},
+		
 		// #ifndef MP
 		// 标题栏input搜索框点击
 		onNavigationBarSearchInputClicked: async function(e) {
@@ -324,29 +590,26 @@
 			const index = e.index;
 			if (index === 0) {
 				uni.showToast({
-					title:"点击了扫描",
+					title:"记得手动打开gps",
 					icon:"none"
 				})
+				this.getLocation()
 			} else if (index === 1) {
 				// #ifdef APP-PLUS
-				const pages = getCurrentPages();
-				const page = pages[pages.length - 1];
-				const currentWebview = page.$getAppWebview();
-				currentWebview.hideTitleNViewButtonRedDot({
-					index
-				});
+
 				// #endif
 				// uni.navigateTo({
 				// 	url: ''
 				// })
 			}
-		}
+		},
+		
 		// #endif
 	}
 </script>
 
 <style lang="scss">
-	/* #ifdef MP */
+	/*#ifdef MP */
 	.mp-search-box{
 		position:absolute;
 		left: 0;
@@ -395,17 +658,16 @@
 	page {
 		background: #f5f5f5;
 	}
-	.m-t{
-		margin-top: 40upx;
-	}
-	/* 头部 轮播图 */
+	/* 头部 view */
 	.carousel-section {
 		position: relative;
-		padding-top: 10px;
-
+		padding-top: 10upx;
+		// height: 500upx;
 		.titleNview-placing {
+			/* #ifdef APP */
 			height: var(--status-bar-height);
-			padding-top: 44px;
+			/* #endif */
+			padding-top: 75upx;
 			box-sizing: content-box;
 		}
 
@@ -414,56 +676,33 @@
 			top: 0;
 			left: 0;
 			width: 100%;
-			height: 470upx;
-			transition: .4s;
+			/* #ifdef APP */
+			height: 620upx;
+			/* #endif */
+			/* #ifdef H5 */
+			height: 570upx;
+			/* #endif */
+			transition: .6s;
 		}
 	}
+	// swiper 元素
 	.carousel {
 		display:block;
-		margin: 0 auto;
+		margin: 5% auto;
 		width: 92%;
-		height: 350upx;
-
+		height: 400upx;
+		// swiper item元素
 		.carousel-item {
 			width: 100%;
 			height: 100%;
-			padding: 0;
-			overflow: hidden;
+			// padding-top: 0;
+			// overflow: hidden;
 		}
 
 		image {
 			width: 100%;
 			height: 100%;
 			border-radius: 10upx;
-		}
-	}
-	.swiper-dots {
-		display: flex;
-		position: absolute;
-		left: 60upx;
-		bottom: 15upx;
-		width: 72upx;
-		height: 36upx;
-		background-size: 100% 100%;
-
-		.num {
-			width: 36upx;
-			height: 36upx;
-			border-radius: 50px;
-			font-size: 24upx;
-			color: #fff;
-			text-align: center;
-			line-height: 36upx;
-		}
-
-		.sign {
-			position: absolute;
-			top: 0;
-			left: 50%;
-			line-height: 36upx;
-			font-size: 12upx;
-			color: #fff;
-			transform: translateX(-50%);
 		}
 	}
 	/* 分类 */
@@ -487,7 +726,7 @@
 			margin-bottom: 14upx;
 			border-radius: 50%;
 			opacity: .7;
-			box-shadow: 4upx 4upx 20upx rgba(250, 67, 106, 0.3);
+			// box-shadow: 4upx 4upx 20upx rgba(250, 67, 106, 0.3);
 		}
 	}
 	.ad-1{
@@ -528,10 +767,6 @@
 			font-size: $font-sm;
 			color: $font-color-light;
 		}
-		.icon-you{
-			font-size: 28upx;
-			color: $font-color-light;
-		}
 	}
 
 	.phoerCard{
@@ -544,15 +779,19 @@
 	.ltsAnd2hand{
 		display: flex;margin-top: 60upx;
 		height: 500upx;
-		background:url('@/static/bg.png') no-repeat center;
-		background-size:cover;
 		.ltsItem{
 			border-radius: 20upx;
 			background-color:antiquewhite;
 			color:rgba(138, 109, 108, 1.0);
-			height:100upx;flex: 1;margin: 20upx;
+			height:130upx;flex: 1;margin: 20upx;
 			border-color:white;
 			border-style: solid;text-align: center;
+		}
+		image{
+			position: absolute;
+			margin: 0 auto;
+			left:0; right:0; 
+			//position: absolute;居中连击
 		}
 	}
 	

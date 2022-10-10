@@ -12,11 +12,13 @@
 			$t: {}
 		},
 		onLaunch: function() {
-			// #ifdef APP-PLUS
+			// #ifde APP-PLUS
 			uni.onPushMessage((res) => {
 				//4种情况  摄影师接单 摄影师接单得到确认  用户预约  用户预约得到确认
+				console.log("push rec123");
+				console.log(res);
 				uni.navigateTo({
-					url:"pages/order/fab?bothMsg="+encodeURIComponent(JSON.stringify(res.data))
+					url:"/pages/order/fab?bothMsg="+encodeURIComponent(JSON.stringify(res.data))
 				})
 				// uni.createPushMessage({
 				// 	title:res.data.title,
@@ -24,7 +26,8 @@
 				// 	sound:'system'
 				// })
 			});
-			// #endif
+
+			// #endi
 			console.log('App Launch')
 			this.globalData.$i18n = this.$i18n
 			this.globalData.$t = str => this.$t(str)
@@ -39,8 +42,17 @@
 		},
 		onShow: function() {
 			console.log('App Show')
-			//推送监听
-
+			//遮罩效果测试
+			// uni.navigateTo({
+			// 	url:"/pages/order/fab?bothMsg="+encodeURIComponent(JSON.stringify({
+			// 					cid:this.$store.state.user.info._id,
+			// 					title:"申请通过",
+			// 					content:"你现在是简拍的摄影师了！",
+			// 					payload:{
+			// 						fabShowText:"申请通过,重新登陆一次你就是简拍的摄影师了",
+			// 						CharacterChange:1
+			// 					}}))
+			// })
 			//推送监听end
 		},
 		onHide: function() {

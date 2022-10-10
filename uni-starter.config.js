@@ -32,7 +32,6 @@ export default {
 		 	// {pattern:/^\/pages\/home.*/},	//支持正则表达式
 			{pattern:/^\/pages\/order.*/},
 			{pattern:/^\/pages\/photographer.*/},
-				"/pages/photographer/pre-phoer",
 				"/pages/ucenter/ucenter",
 				"/uni_modules/uni-news-favorite/pages/uni-news-favorite/list",
 				"/uni_modules/uni-feedback/pages/uni-feedback/add"
@@ -54,7 +53,11 @@ export default {
 			根据数组的第0项，决定登录方式的第一优先级。
 		*/
 		// "login": ["username","weixin","univerify", "smsCode", "apple"],
+		//#ifdef MP
+		"login": ["univerify","weixin","username"]
+		// #endif
 		"login": ["univerify","username"]
+		
 	},
 	//关于应用
 	"about": {

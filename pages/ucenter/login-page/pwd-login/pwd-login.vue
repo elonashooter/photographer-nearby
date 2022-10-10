@@ -1,8 +1,11 @@
 <template>
 	<view class="content">
-		<!-- 顶部文字 -->
+		<!-- 顶部文字  ps颜文字小程序会出错 -->
+		<!-- #ifndef MP -->
 		<text class="title" v-if="eyes">(ﾉ•̀ㅂ•́)ﾉ 欢迎来到湾大简拍 (≖ ω ≖)✧</text>
 		<text class="title" v-else>(ﾉ>_<)ﾉ 欢迎来到湾大简拍 (- ω -)★</text>
+		<!-- #endif -->
+
 		<input class="input-box" :inputBorder="false" v-model="username" :placeholder="$t('pwdLogin.placeholder')"/>
 		<input @blur="turnEyes()" @focus="turnEyes()"  type="password" class="input-box" :inputBorder="false" v-model="password" :placeholder="$t('pwdLogin.passwordPlaceholder')"/>
 		<view class="captcha-box" v-if="captchaBase64">
