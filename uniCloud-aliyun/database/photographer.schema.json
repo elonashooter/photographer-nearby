@@ -2,7 +2,7 @@
 	"bsonType": "object",
 	"required": [],
 	"permission": {
-		"read": true,
+		"read": "'filterLowVersion' in action",
 		"create": true,
 		"update": "doc._id==auth.uid || 'WP_manager' in auth.role",
 		"delete": "doc._id==auth.uid || 'WP_manager' in auth.role"

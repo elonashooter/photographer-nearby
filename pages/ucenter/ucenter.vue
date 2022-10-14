@@ -9,7 +9,20 @@
 				<text class="uer-name" v-else>{{$t('mine.notLogged')}}</text>
 			</view>
 		</view>
-		<uni-grid class="grid" :column="4" :showBorder="false" :square="true">
+		
+		<view class="cate-section" >
+			<view class="cate-item"  v-if="character=='phoer'">
+				<image src="/static/temp/jrwp2.png" @tap="toPhoer()"></image>
+				<text>编辑自己</text>
+				<u-switch v-model="OnlineStatus" @change="OnlineStatusChange" ></u-switch>
+			</view>
+			<!-- 用户有三种状态：游客 普通 摄影师 -->
+			<view class="cate-item" v-else>
+				<image src="/static/temp/jrwp1.png" @tap="toBePhoer"></image>
+				<text>加入湾拍 </text>
+			</view>
+		</view>
+		<uni-grid class="grid" :column="4" :showBorder="false" :square="true" v-if="character=='phoer'">
 			<uni-grid-item class="item" v-for="(item,index) in gridList" @click.native="tapGrid(index)" :key="index">
 				<uni-icons class="icon" color="#007AFF" :type="item.icon" size="26"></uni-icons>
 				<text class="text">{{item.text}}</text>
@@ -65,22 +78,23 @@
 		// #endif
 		data() {
 			return {
+				OnlineStatus:false,
 				gridList: [{
-						"text": this.$t('mine.showText'),
-						"icon": "chat"
+						"text": '收入',
+						"icon": "wallet"
 					},
 					{
-						"text": this.$t('mine.showText'),
-						"icon": "cloud-upload"
+						"text": '订单',
+						"icon": "notification"
 					},
 					{
-						"text": this.$t('mine.showText'),
-						"icon": "contact"
+						"text": '在约',
+						"icon": "camera"
 					},
 					{
-						"text": this.$t('mine.showText'),
-						"icon": "download"
-					}
+						"text": '润',
+						"icon": "closeempty"
+					},
 				],
 				ucenterList: [
 					[
@@ -166,7 +180,8 @@
 			...mapGetters({
 				userInfo: 'user/info',
 				hasLogin: 'user/hasLogin',
-				WP_manager:'user/WP_manager'
+				WP_manager:'user/WP_manager',
+				character:'user/character'
 			})
 			// #ifdef APP-PLUS
 			,
@@ -187,6 +202,33 @@
 			...mapActions({
 				logout: 'user/logout'
 			}),
+			OnlineStatusChange(){
+				uniCloud.database().collection('photographer').where({userId:this.phoerId}).update({
+					OnlineStatus:this.OnlineStatus
+				}).then(()=>{
+					if(this.OnlineStatus){
+						uni.showToast({
+							title:'已进入准备接单状态'
+						})
+					}else{
+						uni.$u.toast('已离开准备接单状态')
+					}
+					this.$store.commit('user/OnlineStatus',this.OnlineStatus)
+					console.log(this.$store.state.user.OnlineStatus);
+				})
+			},
+			//加入湾拍
+			toBePhoer(){
+				uni.navigateTo({
+					url: '/pages/photographer/pre-phoer'
+				});
+			},
+			//编辑自己
+			toPhoer(){
+				uni.navigateTo({
+					url: '/pages/photographer/pre-phoer?phoerId='+this.userInfo._id
+				});
+			},
 			// clickLogout() {
 			// 	if (this.hasLogin) {
 			// 		uni.showModal({
@@ -246,11 +288,28 @@
 				})
 			},
 			tapGrid(index) {
-				uni.showToast({
-					// title: '你点击了，第' + (index + 1) + '个',
-					title: this.$t('mine.clicked') + " " + (index + 1) ,
-					icon: 'none'
-				});
+				if(index===0){
+					console.log('收益结算');
+				}
+				else if(index===1){
+					//摄影师查看所有用户已发布的预约列表
+					uni.navigateTo({
+						url: '/pages/order/orderList?phoerChoiceOrder=1'
+					});
+				}
+				else if(index==2){
+					//摄影师查看自己接的单
+					uni.navigateTo({
+						url: '/pages/order/orderList?phoerId='+this.userInfo._id
+					});
+				}
+				else if(index==3){
+					uni.navigateTo({
+						url:'/pages/photographer/phoer-quit'
+					})
+				}
+				
+				
 			},
 			/**
 			 * 去应用市场评分
@@ -515,5 +574,29 @@
 	
 	.bottom-back-text {
 		font-size: 33rpx;
+	}
+	
+	.cate-section {
+		display: flex;
+		justify-content: space-around;
+		align-items: center;
+		flex-wrap:wrap;
+		padding: 30upx 22upx; 
+		background: #fff;
+		.cate-item {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			font-size: $font-sm + 2upx;
+			color: $font-color-dark;
+		}
+		image {
+			width: 88upx;
+			height: 88upx;
+			margin-bottom: 14upx;
+			border-radius: 50%;
+			opacity: .7;
+			// box-shadow: 4upx 4upx 20upx rgba(250, 67, 106, 0.3);
+		}
 	}
 </style>

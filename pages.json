@@ -112,6 +112,12 @@
 		
 			}
 		}, 
+		{
+			"path": "pages/WP_manager/feedBack",
+			"style": {
+		
+			}
+		}, 
 		// endi
 		{
 			"path": "pages/ucenter/login-page/index/index",

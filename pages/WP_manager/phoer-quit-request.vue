@@ -1,17 +1,24 @@
 <template>
-	<view>
-		<view class="cate-section">
-		辞职须知：
-		1.感谢陪伴
+	<view class="u-page">
 		
-		2.记得交接
+<!-- 		<u-cell
+			:title="agreed.phoerName"
+			:value="agreed.phoerIntro"
+			center
+			:label="agreed.phoerPhoneNumber"
+		>
+			<u-avatar
+				slot="icon"
+				shape="square"
+				size="70"
+				:src="agreed.phoerShowUrl"
+				customStyle="margin: -3px 5px -3px 0"
+				mode="aspectFill"
+			></u-avatar>
+		</u-cell> -->
 		
-		查询是否有在预约的订单，无则可删。
-		有，则提示先完成或交接再删
-		删除摄影师离职的在预约订单
 		
-		
-		<button @click="popupOpen()">辞职</button>
+		<button @click="popupOpen()" style="margin-top: 200px;">let him\her go</button>
 		<u-popup
 			mode="bottom"
 			:show="showPopup"
@@ -23,6 +30,7 @@
 				<button @click="quitPhoer()">确认辞职</button>
 			</view>
 		</u-popup>
+		
 			
 		</view>
 	</view>

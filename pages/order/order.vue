@@ -70,7 +70,7 @@
 							prefixIconStyle="font-size: 22px;color: #909399"
 						></u--input>
 						<u-button
-							text="参考价位"
+							:text="agreed.price<5000?'参考价位':'冷冷冷冷静!'"
 							type="warning"
 							size="small"
 							customStyle="width:200rpx"
@@ -236,6 +236,15 @@
 			</view>
 						
 		</view>
+				<u-loading-page
+				    loadingText="加崽中..."
+					image='/static/11layCircle.png'
+					iconSize='200'
+				    bgColor="#ffffff"
+				    :loading="showLoading"
+				    color="#ff5500"
+				>
+				</u-loading-page>
 	</view>
 </template>
 
@@ -249,6 +258,7 @@
 				fileList1: [],
 				showTime: false,
 				showPopup:false,
+				showLoading:false,
 				ButtonText:'',
 				ButtonAction:'',
 				agreed: {  //约定拍摄的时间、地点等信息
@@ -483,20 +493,28 @@
 				}else if(action=='editOrder'){
 					this.editOrder()
 				}else if(action=='back'){
+					this.HideLoading()
 					uni.navigateBack()
 				}else{
 					return;
 				}
 				
 			},
+			loading(){
+				this.showLoading=true
+			},
+			HideLoading(){
+				this.showLoading=false
+			},
 			submit() {
 				// 校验表单  如果有错误，会在catch中返回报错信息数组，校验通过则在then中返回true
 				this.$refs.form1.validate().then(res => {
-					uni.$u.toast('校验通过')
+					this.loading()
 					//有传来订单id则为修改  否则为上传
 					odb.add(this.agreed).then((res) => {
 						// console.log("res here");
 						// console.log(res);
+					  this.HideLoading()
 					  uni.showToast({
 					    icon: 'none',
 					    title: '提交成功'
@@ -567,6 +585,7 @@
 				if(this.agreed.userId==this.$store.state.user.info._id){
 					return uni.$u.toast('不能自己接自己单，人不能左脚踩右脚上天')
 				}
+				this.loading()
 				let id = this.agreed._id
 				let updatedAgreed={...this.agreed,
 					phoerId:this.agreed.phoerId,
@@ -595,6 +614,7 @@
 							}
 						}
 					})
+					this.HideLoading()
 					// #endi
 					uni.showModal({
 						content:"接单操作完成，等待对方同意即可"
@@ -608,6 +628,7 @@
 				})
 			},
 			editOrder(){
+				this.loading()
 				odb.doc(this.agreed._id).update({
 					userInfo:this.agreed.userInfo,
 					type:this.agreed.type,
@@ -616,6 +637,7 @@
 					intro:this.agreed.intro,
 					time:this.agreed.time
 				}).then(res=>{
+					this.HideLoading()
 					uni.showToast({
 						title:"修改成功"
 					})
@@ -626,7 +648,9 @@
 				})
 			},
 			deleteOrder(){
+				this.loading()
 				odb.doc(this.agreed._id).remove().then(res=>{
+					this.HideLoading()
 					uni.showToast({
 						title:"删除完成"
 					}),
@@ -636,9 +660,11 @@
 				})
 			},
 			completeOrder(){
+				this.loading()
 				odb.doc(this.agreed._id).update({
 					orderStatus:3
 				}).then(res=>{
+					this.HideLoading()
 					uni.showToast({
 						title:"操作完成，感谢支持！"
 					})
@@ -651,6 +677,7 @@
 			yuyue(){
 				console.log("yuyue agreed here");
 				console.log(this.agreed);
+				this.loading()
 				this.$refs.form1.validate().then(res => {
 					// uni.$u.toast('校验通过')
 					this.agreed.orderStatus=101
@@ -670,6 +697,7 @@
 							}
 						}
 					}).then(()=>{
+						this.HideLoading()
 						uni.showToast({
 							title:"已发起预约"
 						})

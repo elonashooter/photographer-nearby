@@ -5,10 +5,10 @@
 				<textarea @input="binddata('content', $event.detail.value)" class="uni-textarea-border"
 					v-model="formData.content" trim="right"></textarea>
 			</uni-forms-item>
-			<uni-forms-item name="imgs" label="图片列表">
+<!-- 			<uni-forms-item name="imgs" label="图片列表">
 				<uni-file-picker file-mediatype="image" :limit="6" return-type="array" v-model="formData.imgs">
 				</uni-file-picker>
-			</uni-forms-item>
+			</uni-forms-item> -->
 			<uni-forms-item name="contact" label="联系人">
 				<uni-easyinput v-model="formData.contact" trim="both"></uni-easyinput>
 			</uni-forms-item>

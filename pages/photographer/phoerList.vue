@@ -74,6 +74,8 @@
 					OnlineStatus:true,
 					version:version
 				}).get().then((res)=>{
+					console.log('phoerList');
+					console.log(res);
 					res.result.data=AES.AES.decrypt(res.result.data,'1234567891234567','1234567891234567')
 					res.result.data=JSON.parse(decodeURIComponent(res.result.data))
 					if(res.result.data.length>0){

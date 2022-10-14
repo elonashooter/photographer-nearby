@@ -14,6 +14,10 @@
 				<image src="/static/temp/c8.png" @tap="toBusiness()"></image>
 				<text>商家管理</text>
 			</view>
+			<view class="cate-item">
+				<image src="/static/temp/c8.png" @tap="getFeedBack()"></image>
+				<text>问题反馈</text>
+			</view>
 		</view>
 		
 		<button @click="clearData()">清空当前用户数据</button>
@@ -55,6 +59,11 @@
 				// 	console.log("getOrder");
 				// 	console.log(res);
 				// })
+			},
+			getFeedBack(){
+				uni.navigateTo({
+					url:'/pages/WP_manager/feedBack'
+				})
 			},
 			toPhoerRList(){
 				uni.navigateTo({

@@ -2,10 +2,16 @@
 	<view class="webPage">
 		<!-- <newDetail ref="detailPage"></newDetail> -->
 		<img class="img" src="../static/11NoBgNoCut.png" alt="图片丢失那这app应该是寄了">
+		<image src="../static/temp/11layWebTip.png" mode="aspectFit" class="webTip"></image>
+		<text style="margin: 5vh;font-size: 20px;color: #ff5500;" >qq群 273467930</text>
+		<br>
+		<text style="margin: 5vh;font-size: 20px;color: #005500;" >联系电话 18277709303 </text>
 		<view class="OrderCard">
-			<view class="OrderCardItem" v-for="(item,index) in cardItem" :key="index">
-				<img src="../unpackage/res/icons/192x192.png" class="OCImg">
-				<text :style="'color:'+item.textColor+';font-size:30px'" >{{item.text}}</text>
+			<view class="OrderCardItem">
+				<image src="../static/temp/vol-after.png" mode="heightFix"></image>
+			</view>
+			<view class="OrderCardItem">
+				<image src="../static/temp/greenWall.png" mode="heightFix"></image>
 			</view>
 		</view>
 <!-- 		<view class="" style="position: absolute;bottom: 0px; height: 10vh;width: 100vh; border-style: groove;border-width: 7px;margin: 3vh;">
@@ -22,24 +28,7 @@
 		},
 		data() {
 			return {
-				title: 'Hello',
-				cardItem:[{
-					imgUrl:"../unpackage/res/icons/192x192.png",
-					text:"个人照",
-					textColor:"rgb(170, 170, 255)",
-				},{
-					imgUrl:"../unpackage/res/icons/192x192.png",
-					text:"宿舍照",
-					textColor:"rgb(255, 85, 0)",
-				},{
-					imgUrl:"../unpackage/res/icons/192x192.png",
-					text:"情侣照",
-					textColor:"rgb(0, 255, 255)",
-				},{
-					imgUrl:"../unpackage/res/icons/192x192.png",
-					text:"毕业照",
-					textColor:"rgb(85, 85, 0)",
-				},]
+				title: 'Hello'
 			}
 		},
 		created(e) {
@@ -54,7 +43,7 @@
 	}
 </script>
 
-<style>
+<style lang="scss">
 	.webPage{
 		position: relative;
 		padding: 5% 5% 5% 5%;
@@ -68,19 +57,32 @@
 	.img{
 		position: absolute;
 		z-index: -1;
+		//模糊效果
 		-webkit-filter: blur(3px);
 		filter: blur(15px);
 	}
 	.OrderCard{
+		background-color: rgba(255, 250, 232, 0.3);
+		margin-top: 15vh;
+		// display: flex;
+		// justify-items: flex-start;
 		display: grid;
 		grid-template-columns: auto auto;
-		grid-gap: 5vh;
+		// border-style: inset;
+		// border-width: 20px;
 	}
 	.OrderCardItem{
-		
+		// background-color: red;
+		position: relative;
+		right:5vw;
+		image{
+			height: 55vh;
+		}
 	}
-	.OCImg{
-		height: 15;
-		border-radius: 15rpx;
+	.webTip{
+		position: absolute;
+		right:0;
+		top: 0;
+		width: 40vw;
 	}
 </style>

@@ -1,17 +1,26 @@
 <template>
 	<view>
-		<view class="cate-section">
+		<view class="u-page">
+			
 		辞职须知：
-		1.感谢陪伴
+		<u--text
+			text='1.感谢陪伴'
+			size='28'
+			color='rgb(170, 0, 255)'
+		></u--text>
 		
+		<text style="margin-top: 20px;">
 		2.记得交接
+		查询是否有在预约的订单，没有就可以润了。
 		
-		查询是否有在预约的订单，无则可删。
-		有，则提示先完成或交接再删
-		删除摄影师离职的在预约订单
+		有的话交接完，对用户负责喔
+		
+		3.辞职申请通过后，到时会需要重新登陆一次，
+		就像你当时成为摄影师 要重新登陆一次一样</text>
 		
 		
-		<button @click="popupOpen()">辞职</button>
+		
+		<button @click="popupOpen()" style="margin-top: 200px;">辞职</button>
 		<u-popup
 			mode="bottom"
 			:show="showPopup"
@@ -59,19 +68,9 @@
 				}).update({
 					WorkState:false
 				}).then(res=>{
-					uniCloud.database().collection('uni-id-users').doc(this.phoerId).update({
-						role:[]
-					}).then(res=>{
-						uni.showToast({
-							title:"完成",
-							icon:"none"
-						})
-						setTimeout(() => uni.reLaunch({
-							url:"/pages/home/home"
-						}), 500)
-					})
+					
+					this.$store.commit(['user/character'],'order')
 				})
-				this.$store.commit(['user/character'],'order')
 			},
 			popupOpen(){
 				this.showPopup=true
@@ -85,28 +84,6 @@
 </script>
 
 <style lang="scss">
-.cate-section {
-		display: flex;
-		justify-content: space-around;
-		align-items: center;
-		flex-wrap:wrap;
-		padding: 30upx 22upx; 
-		background: #fff;
-		.cate-item {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			font-size: $font-sm + 2upx;
-			color: $font-color-dark;
-		}
-		/* 原图标颜色太深,不想改图了,所以加了透明度 */
-		image {
-			width: 88upx;
-			height: 88upx;
-			margin-bottom: 14upx;
-			border-radius: 50%;
-			opacity: .7;
-		}
-	}
+
 
 </style>

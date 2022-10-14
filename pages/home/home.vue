@@ -55,16 +55,7 @@
 				<image src="/static/temp/wdyy.png" @tap="toMyOrderList()"></image>
 				<text>我的预约</text>
 			</view>
-			
-			<view class="cate-item" v-if="phoerId">
-				<image src="/static/temp/jrwp2.png" @tap="toPhoer(phoerId)"></image>
-				<text>编辑自己</text>
-			</view>
-			<!-- 用户有三种状态：游客 普通 摄影师 -->
-			<view class="cate-item" v-else>
-				<image src="/static/temp/jrwp1.png" @tap="toBePhoer"></image>
-				<text>加入湾拍 </text>
-			</view>
+		
 		</view>
 		
 <!-- 		<view class="ad-1">
@@ -82,36 +73,6 @@
 				<text>校内二手</text>
 			</view>
 		</view>
-		<!-- #ifde -->
-		<!-- 摄影师操作部分 -->
-		<view class="phoerCard" v-if="phoerId">
-			<u--text
-				text='以下为摄影师操作项'
-				type='primary'
-			></u--text>
-			<view class="f-header">
-				<u-switch v-model="OnlineStatus" @change="OnlineStatusChange" ></u-switch>
-				<view class="tit-box">
-					<text class="tit" v-if="!OnlineStatus">点击上线</text>
-					<text class="tit" v-else>已处于上线状态</text>
-					<text class="tit2">上线后其他同学就可以搜到你并找你下单</text>
-				</view>
-			</view>
-			<u-button
-				type="primary"
-				text="查看用户已发布的预约列表"
-				customStyle="margin-top: 50px;width:400upx"
-				@click="getAllOrder()"
-			></u-button>
-			<u-button
-				type="primary"
-				text="查看我接的单" 
-				customStyle="margin-top: 50px;width:400upx"
-				color="linear-gradient(to right, rgb(255, 170, 0), rgb(4, 151, 99))"
-				@click="getPhoerReceiveList()"
-			></u-button>
-		</view>
-		<!-- #endi -->
 		
 		
 		<!-- 加载组件  onshow触发一秒，用于防止恶意高频率访问 -->
@@ -139,16 +100,16 @@
 				orderId:'',
 				phoerId:'',
 				carouselList:[{
-						src: "/static/temp/yl.png",
+						src: "/static/temp/green.jpg",
 						background: "rgb(109, 120, 78)",
 					},
 					{
-						src: "/static/temp/phoer-female.png",
-						background: "rgb(242, 166, 90)",
+						src: "/static/temp/fromLYY4.jpg",
+						background: "rgb(196, 222, 246)",
 					},
 					{
-						src: "/static/temp/cyx.png",
-						background: "rgb(143, 145, 162)",
+						src: "/static/temp/fromLYY3.jpg",
+						background: "rgb(115, 153, 181)",
 					}],
 				titleNViewBackground: "rgb(109, 120, 78)",
 				goodsList: [],
@@ -168,7 +129,6 @@
 			this.showTabbarAndSearch()
 		  })
 		  // #endif
-		  //引导 2/4
 			
 		  
 
@@ -244,17 +204,19 @@
 			// 		console.log(e);
 			// 	}
 			// })
-			
+
 			if(this._isWidescreen&&this.$store.state.user.hasLogin){
 				uni.$emit('updateHead',{username:this.$store.state.user.info.username,
 										uAvatar:this.$store.state.user.info.avatar_file.url+this.$store.state.user.info.avatar_file.extname})
 			}
+			
 			uni.getStorage({
 				key:"inQinZhou",
 				success: (res) => {
 					inQinZhou=res.data
 				}
 			})
+			//引导 2/4
 			uni.getStorage({
 				key:"haveProcess",
 				success: (res) => {
@@ -287,6 +249,7 @@
 			AFunctionWillBeDeleteSoon(){
 				uni.$u.toast("未开放")
 			},
+			//宽屏适配
 			// #ifdef H5
 			showTabbarAndSearch(){
 				if(this._isWidescreen){
@@ -299,112 +262,28 @@
 			},
 			// #endif
 			toOrder(){
-				if(this._isWidescreen){
-					uni.$emit('updatePage', {  
-					    Page: 'order'
-					})  
-				}else{
-					uni.navigateTo({
-						url: '/pages/order/order'
-					});
-				}
-
+				uni.navigateTo({
+					url: '/pages/order/order'
+				});
 			},
 			//我的预约
 			toMyOrderList(){
-				if(this._isWidescreen){
-					uni.$emit('updatePage', {  
-					    Page: 'order'
-					})  
-				}else{
-					uni.navigateTo({
-						url: '/pages/order/orderList?orderId='+this.orderId
-					});
-				}
+				uni.navigateTo({
+					url: '/pages/order/orderList?orderId='+this.orderId
+				});
 			},
-			//摄影师查看所有用户已发布的预约列表
-			getAllOrder(){
-				if(this._isWidescreen){
-					uni.$emit('updatePage', {  
-					    Page: 'order'
-					})  
-				}else{
-					uni.navigateTo({
-						url: '/pages/order/orderList?phoerChoiceOrder=1'
-					});
-				}
-				// this.odb.get().then(res=>{
-				// 	console.log("getOrder");
-				// 	console.log(res);
-				// })
-			},
-			//摄影师查看自己接的单
-			getPhoerReceiveList(){
-				if(this._isWidescreen){
-					uni.$emit('updatePage', {  
-					    Page: 'order'
-					})  
-				}else{
-					uni.navigateTo({
-						url: '/pages/order/orderList?phoerId='+this.phoerId
-					});
-				}
-				// this.odb.where({
-				// 	phoerId:this.phoerId
-				// }).get().then(res=>{
-				// 	console.log("getOrder");
-				// 	console.log(res);
-				// })
-			},
-			//加入湾拍
-			toBePhoer(){
-				if(this._isWidescreen){
-					uni.$emit('updatePage', {  
-					    Page: 'order'
-					})  
-				}else{
-					uni.navigateTo({
-						url: '/pages/photographer/pre-phoer'
-					});
-				}
-			},
-			//编辑自己
-			toPhoer(e){
-				// console.log(e);
-				if(this._isWidescreen){
-					uni.$emit('updatePage', {  
-					    Page: 'order'
-					})  
-				}else{
-					uni.navigateTo({
-						url: '/pages/photographer/pre-phoer?phoerId='+e
-					});
-				}
-			},
+
+
 			//查询在线摄影师 用户用于预约摄影师
 			getPhoer(){
-				if(this._isWidescreen){
-					uni.$emit('updatePage', {  
-					    Page: 'order'
-					})  
-				}else{
-					uni.navigateTo({
-						url: '/pages/photographer/phoerList?orderId='+this.orderId
-					});
-				}
+				uni.navigateTo({
+					url: '/pages/photographer/phoerList?orderId='+this.orderId
+				});
 				// this.pdb.where('OnlineStatus == true').get().then(res=>
 				// 	console.log(res)
 				// )
 			},
-			// 摄影师点击上线时上传数据  只有摄影师可见
-			OnlineStatusChange(){
-				uniCloud.database().collection('photographer').where({userId:this.phoerId}).update({
-					OnlineStatus:this.OnlineStatus
-				}).then(()=>{
-					this.$store.commit('user/OnlineStatus',this.OnlineStatus)
-					console.log(this.$store.state.user.OnlineStatus);
-				})
-			},
+
 
 			//避免被恶意频繁刷访问造成服务器负担  4/4
 			// showLoading(){

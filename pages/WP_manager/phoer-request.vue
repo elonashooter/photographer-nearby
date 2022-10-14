@@ -123,17 +123,7 @@
 			</view>
 			
 			
-		
-			<!-- 提交提示弹出框 -->
-			<u-modal
-				:show="showModal"
-				title="确认信息填写无误"
-				content="提交成功后,直到审核通过或驳回之前无法修改"
-				showCancelButton
-				closeOnClickOverlay
-				@confirm="modalConfirm()"
-				@cancel="() => showModal = false"
-			></u-modal>
+	
 			<!-- 驳回信息弹出框 -->
 			<u-popup
 				mode="bottom"
@@ -232,13 +222,6 @@
 			popupClose() {
 				this.showPopup = false
 				// console.log('close');
-			},
-			openModal(){
-				this.showModal=true
-			},
-			modalConfirm(){
-				this.showModal=false
-				this.getImgUrlAndUpload()
 			},
 			navigateBack() {
 				uni.navigateBack()

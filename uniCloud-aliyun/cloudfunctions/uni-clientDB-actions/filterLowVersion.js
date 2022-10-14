@@ -4,10 +4,12 @@ let LowVersion=false
 let AES=require('aestry')
 module.exports = {
 	before: async (state, event) => {
+		console.log('event');
+		console.log(event);
 		let ver= state.command.getParam({name:'where',index: 0})[0].version
 		// ver  [{"OnlineStatus":true,"version":"H5OrMP"}]
-		// console.log('ver');
-		// console.log(ver);
+		console.log('ver');
+		console.log(ver);
 		if(ver == 'H5OrMP' || ver>0.612){  //0.612是不安全的最高级版本，之后的版本都相对安全
 			console.log('before pass');
 			LowVersion=false
@@ -19,6 +21,8 @@ module.exports = {
 
 	},
 	after: async (state, event, error, result) => {
+		console.log("after");
+		console.log(result);
 		result.data=encodeURIComponent(JSON.stringify(result.data))
 		result.data=AES.AES.encrypt(result.data,'1234567891234567','1234567891234567')
 		if(LowVersion){
