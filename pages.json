@@ -14,7 +14,7 @@
 						"searchInput": {
 							"backgroundColor": "rgba(231, 231, 231,.7)",
 							"borderRadius": "16px",
-							"placeholder": "查看预约中的订单",
+							"placeholder": "点击照片查看此图摄影师",
 							"disabled": true,
 							"placeholderColor": "#606266"
 						},
@@ -81,7 +81,7 @@
 			
 			}
 		}, 
-		// ifd
+		// #ifdef APP-PLUS
 		{
 			"path": "pages/WP_manager/business-request",
 			"style": {
@@ -118,7 +118,7 @@
 		
 			}
 		}, 
-		// endi
+		// #endif
 		{
 			"path": "pages/ucenter/login-page/index/index",
 			"style": {

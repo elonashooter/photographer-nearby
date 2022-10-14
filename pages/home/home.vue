@@ -24,7 +24,7 @@
 			<view class="titleNview-background" :style="{backgroundColor:titleNViewBackground}"></view>
 			<swiper class="carousel" indicator-color="rgba(255, 170, 127, 0.3)" indicator-active-color="rgba(85, 255, 127, 0.3)" autoplay="true" interval="5000" indicator-dots="true" circular  duration="200" @change="swiperChange">
 				<swiper-item v-for="(item, index) in carouselList" :key="index" class="carousel-item" @click="">
-					<image :src="item.src" mode="aspectFill"/>
+					<image :src="item.src" mode="aspectFill" @click="getSwiperPhoer(item.phoerId)" />
 				</swiper-item>
 			</swiper>
 			<!-- 自定义swiper指示器 -->
@@ -90,6 +90,7 @@
 <script>
 	let inQinZhou=false
 	let haveProcess=false
+	import AES from '@/js_sdk/ar-aes/ar-aes.js'
 	export default {
 		data() {
 			return {
@@ -102,14 +103,17 @@
 				carouselList:[{
 						src: "/static/temp/green.jpg",
 						background: "rgb(109, 120, 78)",
+						phoerId:'629779368c195b0001e2f55c',
 					},
 					{
 						src: "/static/temp/fromLYY4.jpg",
 						background: "rgb(196, 222, 246)",
+						phoerId:'629779368c195b0001e2f55c',
 					},
 					{
 						src: "/static/temp/fromLYY3.jpg",
 						background: "rgb(115, 153, 181)",
+						phoerId:'629779368c195b0001e2f55c',
 					}],
 				titleNViewBackground: "rgb(109, 120, 78)",
 				goodsList: [],
@@ -136,12 +140,6 @@
 		onLoad() {
 			//检测网络状态
 			// this.haveNoNet=true
-			// #ifdef APP-PLUS
-			let pages = getCurrentPages();
-			let page = pages[pages.length - 1];
-			let currentWebview = page.$getAppWebview();
-			currentWebview.setTitleNViewButtonStyle(0,{color:'#aa0000'});
-			// #endif
 			uni.getNetworkType({
 				success: res=> {
 					// debugger
@@ -273,7 +271,11 @@
 				});
 			},
 
-
+			getSwiperPhoer(phoerId){
+				uni.navigateTo({
+					url: '/pages/photographer/phoer?phoerId='+phoerId
+				});
+			},
 			//查询在线摄影师 用户用于预约摄影师
 			getPhoer(){
 				uni.navigateTo({
@@ -459,10 +461,7 @@
 		// #ifndef MP
 		// 标题栏input搜索框点击
 		onNavigationBarSearchInputClicked: async function(e) {
-			uni.showToast({
-				title:"点击了搜索框",
-				icon:"none"
-			})
+			// this.getSwiperPhoer()
 		},
 		//点击导航栏 buttons 时触发
 		onNavigationBarButtonTap(e) {

@@ -6,8 +6,9 @@ module.exports = {
 	before: async (state, event) => {
 		console.log('event');
 		console.log(event);
-		let ver= state.command.getParam({name:'where',index: 0})[0].version
-		// ver  [{"OnlineStatus":true,"version":"H5OrMP"}]
+		let param=state.command.getParam({name:'where',index: 0})
+		// param  [{"OnlineStatus":true,"version":"H5OrMP"}]
+		let ver= param[0].version
 		console.log('ver');
 		console.log(ver);
 		if(ver == 'H5OrMP' || ver>0.612){  //0.612是不安全的最高级版本，之后的版本都相对安全
@@ -17,7 +18,10 @@ module.exports = {
 			console.log('before fail');
 			LowVersion=true
 		}
-		state.command.setParam({name:'where',index: 0, param: [{OnlineStatus:true}]})
+		
+		delete param[0].version
+
+		state.command.setParam({name:'where',index: 0, param: param})
 
 	},
 	after: async (state, event, error, result) => {

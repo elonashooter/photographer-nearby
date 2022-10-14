@@ -127,7 +127,8 @@
 </template>
 
 <script>
-	let pdb = uniCloud.database().collection('photographer')
+	let pdb = uniCloud.database().action('filterLowVersion').collection('photographer')
+	import AES from '@/js_sdk/ar-aes/ar-aes.js'
 	export default {
 		data() {
 			return {
@@ -171,11 +172,21 @@
 			this.$refs.form1.setRules(this.rules)
 		},
 		onLoad(e) {		//根据传来的参数确定是什么角色点进来的
-			// 已是摄影师if(e.phoerId&&phoerId==this.phoerInfo.userId)=true  新申请摄影师if(e)=false  预约用户if(e.phoerId)=true
-			// console.log(e.phoerId);  //???不知道为什么会执行两次
+			// verifyOrder界面传过来  或  首页点击传过来
 			if(e.phoerId){
 				this.phoerId=e.phoerId  //其他页面传过来的
-				pdb.where({userId:this.phoerId}).get().then(res=>{
+				// #ifdef APP-PLUS
+				let version=plus.runtime.version
+				// #endif
+				// #ifdef H5 || MP
+				let version='H5OrMP'
+				// #endif
+				pdb.where({
+					version,
+					userId:this.phoerId}).get().then(res=>{
+					res.result.data=AES.AES.decrypt(res.result.data,'1234567891234567','1234567891234567')
+					res.result.data=JSON.parse(decodeURIComponent(res.result.data))
+					console.log(res.result.data);
 					this.phoerInfo={...res.result.data[0]}
 					this.symbols=this.phoerInfo.symbolsUrl
 				})

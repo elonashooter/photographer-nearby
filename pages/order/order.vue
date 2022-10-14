@@ -170,15 +170,15 @@
 							<text class="u-demo-block__title">个人照</text>
 							<view class="u-demo-block__content">
 								<view class="text-item">
-									<u--text text="25元每组，每组10张"></u--text>
+									<u--text text="128元,9张精修,底片全送"></u--text>
 								</view>
 							</view>
 						</view>
 						<view class="u-demo-block">
-							<text class="u-demo-block__title">宿舍集体照</text>
+							<text class="u-demo-block__title">多人照</text>
 							<view class="u-demo-block__content">
 								<view class="text-item">
-									<u--text text="150元每组，每组10张"></u--text>
+									<u--text text="4人428元,15张精修,底片全送"></u--text>
 								</view>
 							</view>
 						</view>
@@ -186,15 +186,7 @@
 							<text class="u-demo-block__title">情侣照</text>
 							<view class="u-demo-block__content">
 								<view class="text-item">
-									<u--text text="60元每组，每组10张">60元每组，每组10张</u--text>
-								</view>
-							</view>
-						</view>
-						<view class="u-demo-block">
-							<text class="u-demo-block__title">班级集体照</text>
-							<view class="u-demo-block__content">
-								<view class="text-item">
-									<u--text text="500元每组，每组5张"></u--text>
+									<u--text text="188元,9张精修,底片全送"></u--text>
 								</view>
 							</view>
 						</view>
@@ -237,7 +229,7 @@
 						
 		</view>
 				<u-loading-page
-				    loadingText="加崽中..."
+				    loadingText="夹崽中..."
 					image='/static/11layCircle.png'
 					iconSize='200'
 				    bgColor="#ffffff"
@@ -514,7 +506,7 @@
 					odb.add(this.agreed).then((res) => {
 						// console.log("res here");
 						// console.log(res);
-					  this.HideLoading()
+					  
 					  uni.showToast({
 					    icon: 'none',
 					    title: '提交成功'
@@ -524,7 +516,7 @@
 					  setTimeout(() => uni.reLaunch({
 					  	url:"/pages/home/home"
 					  }), 500)
-					  
+					  this.HideLoading()
 					  //提交成功后跳转至订单列表页面
 					}).catch(e=>{
 						console.log( "odb上传失败");
