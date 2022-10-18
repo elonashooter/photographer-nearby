@@ -1,11 +1,11 @@
 <template>
 	<view class="about">
 		<view class="box">
-			<image class="logoImg" :src="about.logo"></image>
+			<image class="logoImg" src="/static/11NoBgNoCut.png"></image>
 			<text class="tip appName">{{about.appName}}</text>
 			<text class="tip">Version {{version}}</text>
 			<!--Sansnn-uQRCode组件来源，插件市场：https://ext.dcloud.net.cn/plugin?id=1287 微调后-->
-			<Sansnn-uQRCode :text="about.download" :makeOnLoad="true" class="qrcode"></Sansnn-uQRCode>
+			<uqrcode ref="uqrcode" canvas-id="qrcode" :value="apkUrl" :options="{ margin: 20 }" @click='remakescan()' :start="false"></uqrcode>
 			<text class="tip">{{$t('about.sacnQR')}} {{about.appName}} {{$t('about.client')}}</text>
 		</view>
 		<view class="copyright">
@@ -38,6 +38,7 @@
 			// #ifdef APP-PLUS
 			this.version = plus.runtime.version
 			// #endif
+			this.getApkUrl()
 		},
 		computed: {
 			uniStarterConfig() {
@@ -49,7 +50,8 @@
 			return {
 				version: "V1.0.0",
 				year: "2020",
-				about: {}
+				about: {},
+				apkUrl:'',
 			};
 		},
 		created() {
@@ -131,6 +133,26 @@
 					fail: () => {},
 					complete: () => {}
 				});
+			},
+			getApkUrl(){
+				uniCloud.database().collection('opendb-app-versions').where({appid:'__UNI__B2F4D33'})
+				.orderBy('version').get().then(e=>{
+					if(e.result.data.length>0){
+						this.apkUrl=e.result.data[e.result.data.length-1].url
+						this.$refs.uqrcode.make()
+					}
+					
+				})
+			},
+			remakescan(){
+				this.$refs.uqrcode.remake({
+				  success: () => {
+				    console.log('生成成功');
+				  },
+				  fail: err => {
+				    console.log(err)
+				  }
+				});
 			}
 		}
 	}
@@ -149,6 +171,7 @@
 	}
 
 	.box {
+		background-color: #2285ff;
 		margin-top: 60px;
 		flex-direction: column;
 		justify-content: center;
@@ -170,13 +193,9 @@
 	}
 
 	.appName {
-		margin-top: 20px;
+		margin-top: 0px;
 		font-size: 42rpx;
 		font-weight: 500;
-	}
-
-	.qrcode {
-		margin-top: 60rpx;
 	}
 
 	.copyright {

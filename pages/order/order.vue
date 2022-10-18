@@ -371,6 +371,7 @@
 			//用户点列表过来的
 			if(e.orderMsg){
 				this.agreed=JSON.parse(decodeURIComponent(e.orderMsg))
+
 				if(this.agreed.orderStatus===0){
 					this.ButtonText='修改'
 					this.ButtonAction='editOrder'

@@ -206,6 +206,7 @@
 			if(this._isWidescreen&&this.$store.state.user.hasLogin){
 				uni.$emit('updateHead',{username:this.$store.state.user.info.username,
 										uAvatar:this.$store.state.user.info.avatar_file.url+this.$store.state.user.info.avatar_file.extname})
+				uni.$emit('updateRightPage',{hasLogin:true})
 			}
 			
 			uni.getStorage({

@@ -1,6 +1,8 @@
 <template>
 	<view class="u-page">
 		<view class="u-demo-block">
+			<!-- 引导插件 1/4 -->
+			<cms-easy-guide ref="easyGuide" />
 			<text class="u-demo-block__title">摄影师信息编辑</text>
 			<view class="u-demo-block__content">
 				<!-- 注意，如果需要兼容微信小程序，最好通过setRules方法设置rules规则 -->
@@ -25,11 +27,7 @@
 							:disabled="inputDisable"
 						>
 						</u--input>
-						<u-icon
-							size="28"
-							name='phone'
-							@click="phoneCall()"
-						></u-icon>
+					<uni-icons type='phone' size='30' color="#55aa00" @click="phoneCall(phoerInfo.phoneNumber)"></uni-icons>
 					</u-form-item>
 					<u-form-item
 						label=""
@@ -128,6 +126,7 @@
 
 <script>
 	let pdb = uniCloud.database().action('filterLowVersion').collection('photographer')
+	let phoerPageProcess=false
 	import AES from '@/js_sdk/ar-aes/ar-aes.js'
 	export default {
 		data() {
@@ -170,6 +169,16 @@
 		onReady() {
 			// 如果需要兼容微信小程序，并且校验规则中含有方法等，只能通过setRules方法设置规则
 			this.$refs.form1.setRules(this.rules)
+			//引导 2/4
+			uni.getStorage({
+				key:"phoerPageProcess",
+				success: (res) => {
+					phoerPageProcess=res.data
+				},
+				complete: () => {
+					this.startProcess()
+				}
+			})
 		},
 		onLoad(e) {		//根据传来的参数确定是什么角色点进来的
 			// verifyOrder界面传过来  或  首页点击传过来
@@ -230,12 +239,16 @@
 			},
 
 
-			phoneCall(){
+			phoneCall(phoneNumber){
 				console.log("phoneCall");
-				// #ifdef APP-PLUS
+				// #ifdef H5 || MP
 				uni.makePhoneCall({
-					phoneNumber:this.phoerInfo.phoneNumber
+					phoneNumber:phoneNumber
 				})
+				// #endif
+				//#ifdef APP-PLUS
+				plus.device.dial(phoneNumber,true)
+				console.log('plus');
 				// #endif
 			},
 			
@@ -252,6 +265,44 @@
 					})
 				}
 
+			},
+			startProcess() {
+				if(phoerPageProcess){
+					return;
+				}else{
+					uni.setStorage({
+						key:"phoerPageProcess",
+						data:true
+					})
+				}
+				this.$refs.easyGuide.startGuide([
+					// 引导元素1
+					{
+						// that: this, // 必填that为当前this
+						queryClass: '.guide1', // 针对那块元素进行引导
+						// canMaskJump: true, // 是否可以通过点击mask遮罩下一步
+						imgs: [{ // imgs 引导图片
+							width: '569rpx',				// 图片宽
+							height: '183rpx',				// 图片高
+							left: '170rpx',					// 以引导元素左上角定位
+							top: '90rpx',					// 以引导元素左上角定位
+							src: '/static/process-phoerpage.png',		// 图片连接
+							clickEvent:()=>{				// 点击事件
+								console.log('clickEvent')
+							}
+						}, {
+							width: '223rpx',				// 图片宽
+							height: '116rpx',				// 图片高
+							left: '200rpx',					// 以引导元素左上角定位
+							top: '230rpx',					// 以引导元素左上角定位
+							src: '/static/process-phoerpage-btn.png',	// 图片连接
+							isNextButton: true,				// 是否需点击元素进行下一个引导
+							clickEvent:()=>{				// 点击事件
+								
+							}
+						}]
+					},
+				])
 			}
 		},
 	}

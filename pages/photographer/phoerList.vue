@@ -70,12 +70,12 @@
 				// #ifdef H5 || MP
 				let version='H5OrMP'
 				// #endif
+				//真机调试暂用  
+				// let version='H5OrMP'
 				uniCloud.database().action('filterLowVersion').collection('photographer').where({
 					OnlineStatus:true,
 					version:version
 				}).get().then((res)=>{
-					console.log('phoerList');
-					console.log(res);
 					res.result.data=AES.AES.decrypt(res.result.data,'1234567891234567','1234567891234567')
 					res.result.data=JSON.parse(decodeURIComponent(res.result.data))
 					if(res.result.data.length>0){
@@ -86,6 +86,9 @@
 					if(this.phoerList.length==0){
 						this.empty=true
 					}
+				}).catch(e=>{
+					console.log('phoerlist catch');
+					console.log(e);
 				})
 			}
 		},

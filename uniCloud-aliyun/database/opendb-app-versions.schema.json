@@ -2,7 +2,7 @@
 	"bsonType": "object",
 	"required": ["appid", "platform", "version", "url", "contents", "type"],
 	"permission": {
-		"read": false,
+		"read": "'WP_manager' in auth.role",
 		"create": false,
 		"update": false,
 		"delete": false

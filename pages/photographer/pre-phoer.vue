@@ -36,11 +36,8 @@
 							placeholder="联系电话"
 							:disabled="inputDisable"
 						></u--input>
-						<u-icon
-							size="28"
-							name='phone'
-							@click="phoneCall"
-						></u-icon>
+
+						<uni-icons type='phone' size='30' color="#55aa00" @click="phoneCall"></uni-icons>
 					</u-form-item>
 					<u-form-item
 						label=""
@@ -215,6 +212,16 @@
 				@confirm="modalConfirm()"
 				@cancel="() => showModal = false"
 			></u-modal>
+			
+			<u-loading-page
+			    loadingText="夹崽中..."
+				image='/static/11layCircle.png'
+				iconSize='200'
+			    bgColor="#ffffff"
+			    :loading="showLoading"
+			    color="#ff5500"
+			>
+			</u-loading-page>
 		</view>
 	</view>
 </template>
@@ -233,6 +240,7 @@
 				showPopup:false,//个人形象说明框
 				showModal:false,//提交确认框
 				showWaitingPage:false,//提交信息在审核中的显示页面参数
+				showLoading:false,
 				inputDisable:false,
 				phoerInfo: {
 					name: '',
@@ -324,6 +332,12 @@
 
 		},
 		methods: {
+			loading(){
+				this.showLoading=true
+			},
+			HideLoading(){
+				this.showLoading=false
+			},
 			popupOpen() {
 				// console.log('open');
 				this.showPopup = true
@@ -452,7 +466,7 @@
 						 
 						//这样写有个好处  摄影师修改信息时只会上传symbolsUploadMsg新增的照片
 						for(let i=0;i<res.tempFilePaths.length;i++){
-							symbolsUploadMsg.push({
+							symbolsUploadMsg.push({  //增删新图
 								name:"symbolsOf "+this.$store.state.user.info._id+" "+symbolsUploadMsg.length.toString(),
 								url:res.tempFilePaths[i]
 							})
@@ -463,10 +477,13 @@
 			},// 代表作导入并预览  end
 			DelImg(index){
 				//判断要删的对象是本地新上传的还是online已有的
-				if(this.symbols[index] in symbols_online){
+				if(symbols_online.includes(this.symbols[index])){
+					console.log('symbols deleted');
 					this.phoerInfo.symbolsUrl=this.phoerInfo.symbolsUrl.filter((x)=>x!=this.symbols[index])
 				}else{
-					symbolsUploadMsg.filter((x)=>x.url!=this.symbols[index])
+					console.log('symbolsUploadMsg deleted');
+					symbolsUploadMsg.filter((x)=>x.url!=this.symbols[index])//增删新图
+					console.log(symbolsUploadMsg);
 				}
 				this.symbols.splice(index,1)
 
@@ -477,14 +494,16 @@
 			},
 			
 			phoneCall(){
-				console.log(this.phoerInfo.phoerShow);
-				console.log(symbolsUploadMsg);
 				console.log("phoneCall");
 				// console.log(typeof(this.phoerInfo.phoneNumber));
-				// #ifdef APP-PLUS
+				// #ifdef H5 || MP
 				uni.makePhoneCall({
-					phoneNumber:this.phoerInfo.phoneNumber
+					phoneNumber:phoneNumber
 				})
+				// #endif
+				//#ifdef APP-PLUS
+				plus.device.dial(phoneNumber,true)
+				console.log('plus');
 				// #endif
 			},
 			submit() {
@@ -507,6 +526,9 @@
 					AuditStatus:0,
 					symbolsHistory:symbolsHistory,
 					phoerShowHistory:phoerShowHistory}).then((res) => {
+
+							this.HideLoading()
+
 							uni.showToast({
 								icon: 'none',
 								title: '提交成功'
@@ -523,6 +545,7 @@
 				
 			},
 			getImgUrlAndUpload(){
+				this.loading()
 				//上传个人形象
 				if (this.phoerInfo.phoerShow[0]!=initAvatar || initAvatar=='') {
 					uniCloud.uploadFile({

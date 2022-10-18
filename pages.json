@@ -81,7 +81,13 @@
 			
 			}
 		}, 
-		// #ifdef APP-PLUS
+		{
+			"path": "pages/home/supportWP",
+			"style": {
+				"navigationBarTitleText": "manager界面"
+			}
+		}, 
+		// #ifde APP-PLUS
 		{
 			"path": "pages/WP_manager/business-request",
 			"style": {
@@ -118,7 +124,7 @@
 		
 			}
 		}, 
-		// #endif
+		// #endi
 		{
 			"path": "pages/ucenter/login-page/index/index",
 			"style": {

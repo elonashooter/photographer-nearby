@@ -2,21 +2,22 @@
 	<view v-if="WP_manager">
 		<view class="cate-section" >
 			<view class="cate-item">
-				<image src="/static/temp/c6.png" @tap="getAllOrder()"></image>
+				<u-icon name='file-text' size="40" @tap="getAllOrder()"></u-icon>
 				<text>检查订单</text>
 			</view>
 			<!-- 摄影师同时也是用户 -->
 			<view class="cate-item">
-				<image src="/static/temp/c1.png" @tap="toPhoerRList()"></image>
+				<u-icon name='man-add' size="40" @tap="toPhoerRList()"></u-icon>
 				<text>摄影师管理 </text>
 			</view>
 			<view class="cate-item">
-				<image src="/static/temp/c8.png" @tap="toBusiness()"></image>
-				<text>商家管理</text>
+				<u-icon name='scan' size="40" @tap="toBusiness()"></u-icon>
+				<text>二维码</text>
 			</view>
 			<view class="cate-item">
-				<image src="/static/temp/c8.png" @tap="getFeedBack()"></image>
-				<text>问题反馈</text>
+				<u-icon name='thumb-up' size="20" @tap="getFeedBack()"></u-icon>
+				<u-icon name='thumb-down' size="20" @tap="getFeedBack()"></u-icon>
+				<text>反馈收集</text>
 			</view>
 		</view>
 		
@@ -72,7 +73,7 @@
 			},
 			toBusiness(){
 				uni.navigateTo({
-					url: '/pages/WP_manager/business-request'
+					url: '/pages/ucenter/about/about'
 				});
 			},
 			clearData(){

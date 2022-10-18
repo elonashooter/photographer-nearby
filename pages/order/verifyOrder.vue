@@ -261,9 +261,15 @@
 				})
 			},
 			phoneCall(phoneNumber){
+				// #ifdef H5 || MP
 				uni.makePhoneCall({
 					phoneNumber:phoneNumber
 				})
+				// #endif
+				//#ifdef APP-PLUS
+				plus.device.dial(phoneNumber,true)
+				console.log('plus');
+				// #endif
 			},
 			takeOrder(id){
 				odb.doc(id).update({
