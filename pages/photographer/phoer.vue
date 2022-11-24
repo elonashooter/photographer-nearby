@@ -1,112 +1,67 @@
 <template>
-	<view class="u-page">
-		<view class="u-demo-block">
-			<!-- 引导插件 1/4 -->
-			<cms-easy-guide ref="easyGuide" />
-			<text class="u-demo-block__title">摄影师信息编辑</text>
+	<view>
+		<view class='nav-bar' >
+			<uni-icons type="back" size="23" color="white" @click="backVOrder()"></uni-icons>
+			<uni-icons type="phone" size="23" color="white" @click="phoneCall()"></uni-icons>
+			<!-- #ifde APP-PLUS -->
+			<!-- 考虑到cid只有在app端稳定不变，发布后聊天功能只拱app端用，营业执照到手后再加个小程序端 2022/11/14 -->
+			<uni-icons type="chat" size="23" color="white" @click="goChat()"></uni-icons>
+			<!-- #endi -->
+		</view>
+				
+		<!-- 顶部 -->
+		<view class="tn-strip-bottom">
+		  <!-- <image style="position: absolute;z-index:3; left: 10rpx;bottom: 10rpx;" class="uni-uploader__img" mode="aspectFill" :src="phoerInfo.phoerShow[0]"></image> -->
+		  <view class="slideshow">
+				<view class="slideshow-image" :style="'background-image: url('+phoerInfo.phoerShow[0]+')'" @tap="previewPhoerShow">
+				</view>
+				
+		  </view>
+		  <view style="">
+		    <view style="display: flex;flex-direction: column;align-items: center;">
+		      <text style="font-weight: bold;font-size: 40rpx;color: brown;">摄影 {{phoerInfo.name}}</text>
+		      <text style="font-size: 32rpx;color:rgba(175, 163, 169, 1.0);margin: 10rpx;">{{phoerInfo.intro}}</text>
+			  <u-button
+			  	v-if="SubmitButtonText=='返回'"
+			  	type="primary"
+			  	text="返回"
+			  	customStyle="width:30%;position:absolute;left:40rpx"
+			  	@click="backVOrder()"
+			  ></u-button>
+			  <u-button
+			  	v-else
+			  	type="success"
+				size="small"
+			  	text="预约"
+			  	customStyle="width:20%;position:absolute;left:40rpx"
+			  	@click="navYuyue()"
+			  ></u-button>
+			</view>
+		  </view>
+				
+		</view>
+		<view class="u-demo-block u-page" style="background: linear-gradient(to right, rgba(255, 115, 113, 0.25),rgba(0, 170, 255,0.25) );">
 			<view class="u-demo-block__content">
 				<!-- 注意，如果需要兼容微信小程序，最好通过setRules方法设置rules规则 -->
-				<u--form labelPosition="left" :model="phoerInfo" ref="form1">
-					<u-form-item
-						label="姓名"
-						prop="name"
-						borderBottom
-						ref="item1"
-					>
-						<u--input
-							v-model="phoerInfo.name"
-							border="none"
-							placeholder="中文姓名"
-							:disabled="inputDisable"
-						></u--input>
-						<span style="margin:0ch 1ch;">电话</span>
-						<u--input
-							v-model="phoerInfo.phoneNumber"
-							border="none"
-							placeholder="联系电话"
-							:disabled="inputDisable"
-						>
-						</u--input>
-					<uni-icons type='phone' size='30' color="#55aa00" @click="phoneCall(phoerInfo.phoneNumber)"></uni-icons>
-					</u-form-item>
-					<u-form-item
-						label=""
-						borderBottom
-						ref="item2"
-					>
-						<view class="uni-uploader">
-							<view class="uni-uploader-head">
-								<view class="uni-uploader-title">人像</view>
-							</view>
-							<view class="uni-uploader-body">
-								<view class="uni-uploader__files">
-									<block v-for="(image,index) in phoerInfo.phoerShow" :key="index">
-										<view class="uni-uploader__file">
-											<image class="uni-uploader__img" :src="image" mode="aspectFill" :data-src="image" @tap="previewPhoerShow"></image>
-										</view>
-									</block>
-								</view>
-							</view>
-						</view>
-					</u-form-item>
-
-					<u-form-item
-						label="自荐"
-						prop="intro"
-						borderBottom
-						ref="item3"
-					>
-						<u--textarea
-							placeholder="填写擅长的内容，也可当个性签名使用"
-							v-model="phoerInfo.intro"
-							count
-							confirmType="done"
-							:disabled="inputDisable"
-						></u--textarea>
-					</u-form-item>
-					<u-form-item
-						label="作品"
-						prop="symbols"
-						ref="item5"
-					>
-					</u-form-item>
-					<view class="uni-uploader" v-if="phoerInfo.phoerShow[0]!==undefined">
-						<view class="uni-uploader-head">
-							<view class="uni-uploader-title">点击可预览图片</view>
-						</view>
-						<view class="uni-uploader-body">
-							<view class="uni-uploader__files">
-								<block v-for="(image,index) in symbols" :key="index">
-									<view class="uni-uploader__file">
-										<!-- 注：uni.preview函数写在这只能是不加括号的，不然会报错 -->
-										<image class="uni-uploader__img" mode="aspectFill" :src="image" :data-src="image" @tap="previewSymbols"></image>
-									</view>
-								</block>
-							</view>
-						</view>
-					</view>
-					<view style="margin: 20rpx 10rpx;" >
+				<view class="uni-uploader" v-if="phoerInfo.phoerShow[0]!==undefined">
+					<view style="margin: 20rpx 10rpx;display: flex;flex-direction: row;" >
+						<image src="/static/36x36.png" style="width: 50rpx;height: 50rpx; ">
 						<u--text
-							:text="'作品名:  '+phoerInfo.symbolsTag"
-							type="warning"
+							:text="'作品:  '+phoerInfo.symbolsTag"
+							customStyle='color:rgb(1, 120, 204);'
 						></u--text>
 					</view>
-					<u-line></u-line>
-				</u--form>
-				<u-button
-					v-if="SubmitButtonText=='返回'"
-					type="primary"
-					text="返回"
-					customStyle="margin-top: 30px"
-					@click="backVOrder()"
-				></u-button>
-				<u-button
-					v-else
-					type="primary"
-					text="预约"
-					customStyle="margin-top: 30px"
-					@click="navYuyue()"
-				></u-button>
+					<view class="uni-uploader-body">
+						<view class="uni-uploader__files">
+							<block v-for="(image,index) in symbols" :key="index">
+								<view class="uni-uploader__file">
+									<!-- 注：uni.preview函数写在这只能是不加括号的，不然会报错 -->
+									<image class="uni-uploader__img" mode="aspectFill" :src="image" :data-src="image" @tap="previewSymbols"></image>
+								</view>
+							</block>
+						</view>
+					</view>
+				</view>
 			</view>
 			
 
@@ -120,14 +75,28 @@
 				@confirm="modalConfirm()"
 				@cancel="() => showModal = false"
 			></u-modal>
+			<!-- 加载提示框 -->
+			<u-loading-page
+			    :loadingText="'即将与'+phoerInfo.name+'交流'"
+			    bgColor="#ffffff"
+			    :loading="loading"
+			    color="#C8C8C8"
+			    loadingColor="#C8C8C8"
+			>
+			</u-loading-page>
 		</view>
 	</view>
 </template>
 
 <script>
 	let pdb = uniCloud.database().action('filterLowVersion').collection('photographer')
-	let phoerPageProcess=false
+	let cdb = uniCloud.database().collection('chatMatch')
+	let haveChatMatch=false
+	let userPushId=''
+	//第一次与摄影师聊天，gochat方法创建的聊天配对chatMatch表的Id
+	let newMatchId=''
 	import AES from '@/js_sdk/ar-aes/ar-aes.js'
+import user from '../../store/modules/user'
 	export default {
 		data() {
 			return {
@@ -148,7 +117,6 @@
 				symbols:[],//作品对象
 				phoerId:'',//从phoerList点进来传来的参数
 				presentCharacter:'',
-				testV:"123",
 				rules: {
 					'name': [{
 						type: 'string',
@@ -164,21 +132,11 @@
 						trigger: ['change']
 					},
 				},
+				loading:false
 			}
 		},
 		onReady() {
-			// 如果需要兼容微信小程序，并且校验规则中含有方法等，只能通过setRules方法设置规则
-			this.$refs.form1.setRules(this.rules)
-			//引导 2/4
-			uni.getStorage({
-				key:"phoerPageProcess",
-				success: (res) => {
-					phoerPageProcess=res.data
-				},
-				complete: () => {
-					this.startProcess()
-				}
-			})
+
 		},
 		onLoad(e) {		//根据传来的参数确定是什么角色点进来的
 			// verifyOrder界面传过来  或  首页点击传过来
@@ -207,8 +165,110 @@
 			}else{
 
 			}
+			//查询当前用户与该摄影师是否有聊天配对记录 没有则在跳转聊天时新建
+			if(this.phoerInfo.workedUserId.includes(this.$store.state.user.info._id)){
+				haveChatMatch=true
+			}else{
+				// 获取设备识别码用于聊天
+				uni.getPushClientId({
+					success: (e) => {
+						userPushId=e.cid
+					}
+				})
+				haveChatMatch=false
+				this.phoerInfo.workedUserId.push(this.$store.state.user.info._id)
+			}
 		},
 		methods: {
+			goChat(){
+				// 跳转时如果没有聊天配对即haveChatMatch=false则创建聊天配对
+				if(this.phoerInfo.userId==this.$store.state.user.info._id){
+					uni.$u.toast('不能跟自己聊天')
+					return 
+				}
+				this.loading=true
+				if(!haveChatMatch && this.phoerInfo.userId!=this.$store.state.user.info._id){
+				// if(this.phoerInfo.userId!=this.$store.state.user.info._id){ //测试阶段用
+					let phoer=this.phoerInfo
+					let user=this.$store.state.user.info
+					let chatMatchMsg={
+						phoerId:phoer.userId,
+						phoerAvatar:phoer.phoerShow[0],
+						phoerName:phoer.name,
+						phoerPushId:phoer.push_clientid,
+						userName:user.nickname,
+						userId:user._id,
+						userAvatar:user.avatar_file.url,//可能会报错 因为头像可能没设置
+						userPushId:userPushId
+					}
+					// 添加聊天配对记录 以确保!haveChatMatch===false下次此if不执行
+					console.log(this.phoerInfo.workedUserId);
+					uniCloud.database().collection('photographer').doc(this.phoerInfo._id).update({
+						workedUserId:this.phoerInfo.workedUserId
+					}).then(e=>{
+						console.log('pdb seccess');
+						console.log(e);
+					}).catch(e=>{
+						console.log('pdb fail');
+						console.log(e);
+					})
+					// 创建聊天配对
+					cdb.add(chatMatchMsg).then(e=>{
+						console.log('cdb add success');
+						console.log(e);
+						this.loading=false
+						let chatMatchId=e.result.id
+						// console.log(e.result.id);// 新建数据的id
+						uni.navigateTo({
+							url:'/pages/chat/person-chat?chattingUserCid='+this.phoerInfo.push_clientid+'&chattingUserAvatar='+this.phoerInfo.phoerShow[0]+'&chattingUserName='+this.phoerInfo.name+'&chatMatchId='+e.result.id,
+						})
+						//
+						uniCloud.callFunction({
+							name:'push-chatMsg',
+							data:{
+								cid:this.phoerInfo.push_clientid,
+								title:'addChatMatch',
+								content:'测试',
+								payload:{
+									chatMatchId:chatMatchId,
+									...chatMatchMsg,
+									chatMsg:[],
+									unReadNum:0
+								}
+							}
+						}).then(e=>{
+							//发起聊天成功  创建本地缓存记录
+							let chatHistory = uni.getStorageSync('chatHistory') || [];
+							chatHistory.push({
+									chatMatchId:chatMatchId,
+									...chatMatchMsg,
+									chatMsg:[],
+									unReadNum:0
+								})
+							uni.setStorageSync("chatHistory",chatHistory)
+							console.log('push chat succcess');
+						}).catch(e=>{
+							console.log("push chat fail");
+							console.log(e);
+						})
+					}).catch(e=>{
+						console.log("cdb fail");
+						console.log(e);
+					})
+				}else if(haveChatMatch){
+					uniCloud.database().collection('chatMatch').where({
+						userId:this.$store.state.user.info._id,
+						phoerId:this.phoerInfo.userId
+					}).get().then(res=>{
+						console.log(res);
+						this.loading=false
+						uni.navigateTo({
+							url:'/pages/chat/person-chat?chattingUserCid='+this.phoerInfo.push_clientid+'&chattingUserAvatar='+this.phoerInfo.phoerShow[0]+'&chattingUserName='+this.phoerInfo.name+'&chatMatchId='+res.result.data[0]._id,
+						})
+					})
+					
+				}
+			},
 			backVOrder(){
 				uni.navigateBack()
 			},
@@ -239,15 +299,15 @@
 			},
 
 
-			phoneCall(phoneNumber){
+			phoneCall(){
 				console.log("phoneCall");
 				// #ifdef H5 || MP
 				uni.makePhoneCall({
-					phoneNumber:phoneNumber
+					phoneNumber:this.phoerInfo.phoneNumber
 				})
 				// #endif
 				//#ifdef APP-PLUS
-				plus.device.dial(phoneNumber,true)
+				plus.device.dial(this.phoerInfo.phoneNumber,true)
 				console.log('plus');
 				// #endif
 			},
@@ -265,50 +325,16 @@
 					})
 				}
 
-			},
-			startProcess() {
-				if(phoerPageProcess){
-					return;
-				}else{
-					uni.setStorage({
-						key:"phoerPageProcess",
-						data:true
-					})
-				}
-				this.$refs.easyGuide.startGuide([
-					// 引导元素1
-					{
-						// that: this, // 必填that为当前this
-						queryClass: '.guide1', // 针对那块元素进行引导
-						// canMaskJump: true, // 是否可以通过点击mask遮罩下一步
-						imgs: [{ // imgs 引导图片
-							width: '569rpx',				// 图片宽
-							height: '183rpx',				// 图片高
-							left: '170rpx',					// 以引导元素左上角定位
-							top: '90rpx',					// 以引导元素左上角定位
-							src: '/static/process-phoerpage.png',		// 图片连接
-							clickEvent:()=>{				// 点击事件
-								console.log('clickEvent')
-							}
-						}, {
-							width: '223rpx',				// 图片宽
-							height: '116rpx',				// 图片高
-							left: '200rpx',					// 以引导元素左上角定位
-							top: '230rpx',					// 以引导元素左上角定位
-							src: '/static/process-phoerpage-btn.png',	// 图片连接
-							isNextButton: true,				// 是否需点击元素进行下一个引导
-							clickEvent:()=>{				// 点击事件
-								
-							}
-						}]
-					},
-				])
 			}
+			
 		},
 	}
 </script>
 
 <style lang="scss">
+.u-demo-block{
+	margin-top: 750upx;
+}
 .uni-uploader {
 	flex: 1;
 	flex-direction: column;
@@ -331,14 +357,15 @@
 }
 .uni-uploader__file {
 	position: relative;
-	margin: 10rpx;
+	margin: 11rpx;
 	width: 210rpx;
 	height: 210rpx;
 }
 .uni-uploader__img{
 	display: block;
-	width: 210rpx;
-	height: 210rpx;
+	width: 200rpx;
+	height: 200rpx;
+	border-radius: 10rpx;
 }
 .uni-uploader__input-box {
 	position: relative;
@@ -395,4 +422,47 @@
 	color:#fff;
 	z-index:10
 }	
+	/* 胶囊*/
+	 .nav-bar {
+	 top: 13rpx;
+	  z-index:2;
+	  margin-left: 5%;
+	  /* #ifdef APP-PLUS */
+	  
+	  margin-top: 40rpx;
+	  /* #endif */
+	  height: 60rpx;
+	  width: 30%;
+	  position: relative;
+	  display: flex;
+	  justify-content: space-evenly;
+	  align-items: center;
+	  background-color: rgba(0, 0, 0, 0.25);
+	  border-radius: 1000rpx;
+	  border: 1rpx solid rgba(255, 255, 255, 0.5);
+	}
+  /* 间隔线 start*/
+  .tn-strip-bottom {
+	top: 0;
+	position: absolute;
+    width: 100%;
+    border-bottom: 20rpx solid rgba(241, 241, 241, 0.8);
+  }
+   /* 间隔线 end*/
+   
+  /* 相册 */
+  .slideshow {
+    width: 100vw;
+    height: 700upx;
+    overflow: hidden;
+  }
+
+  .slideshow-image {
+    width: 100%;
+    height: 100%;
+    background: no-repeat 50% 50%;
+    background-size: cover;
+    opacity: 1;
+    transform: scale(1.2);
+  }
 </style>

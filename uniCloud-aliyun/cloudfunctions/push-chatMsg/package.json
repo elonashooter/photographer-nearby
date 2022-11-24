@@ -1,0 +1,7 @@
+{
+  "name": "push-chatMsg",
+  "dependencies": {},
+  "extensions": {
+    "uni-cloud-push": {}
+  }
+}

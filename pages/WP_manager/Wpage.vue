@@ -99,6 +99,7 @@
 				// uniCloud.database().collection('pre-photographer').where({
 				// 	create_time:dbCmd.gt(1664273248)
 				// }).remove()
+				// uniCloud.database().collection('pre-photographer').where("create_time>1664273248").remove()
 
 				
 			},
@@ -119,6 +120,7 @@
 <style lang="scss">
 .cate-section {
 		display: flex;
+		flex-direction: row;
 		justify-content: space-around;
 		align-items: center;
 		flex-wrap:wrap;

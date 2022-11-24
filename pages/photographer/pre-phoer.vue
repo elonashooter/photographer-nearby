@@ -279,6 +279,7 @@
 		},
 		onLoad(e) {		//根据传来的参数确定是什么角色点进来的
 			// 只有摄影师与新摄影师
+			console.log(this.$store.state.user.info);
 			if(e.phoerId){
 				// 摄影师提交修改
 				console.log("onload get an e");
@@ -417,7 +418,7 @@
 				sizeType:'compressed',
 				uni.chooseImage({
 					count:1,
-					success: (res) => {
+					success: (res) => {//H5端和app端的返回res是不一样的
 						 
 						this.phoerInfo.phoerShow=this.phoerInfo.phoerShow.concat(res.tempFilePaths)
 						this.phoerShowName="phoerShowNameOf "+this.$store.state.user.info._id

@@ -71,6 +71,7 @@ let state = {
 			state.info = {};
 			state.hasLogin = false;
 			uni.setStorageSync('userInfo', {});
+			uni.setStorageSync('chatHistory', []);
 			uni.removeStorageSync('uni_id_token');
 			uni.setStorageSync('uni_id_token_expired', 0)
 		}

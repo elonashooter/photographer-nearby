@@ -9,25 +9,30 @@
 				<text class="uer-name" v-else>{{$t('mine.notLogged')}}</text>
 			</view>
 		</view>
-		
-		<view class="cate-section" >
-			<view class="cate-item"  v-if="character=='phoer'">
-				<image src="/static/temp/jrwp2.png" @tap="toPhoer()"></image>
-				<text>编辑自己</text>
-				<u-switch v-model="OnlineStatus" @change="OnlineStatusChange" ></u-switch>
+		<view class="" v-if="character=='phoer'">
+			<view class="cate-section" >
+				<view class="cate-item" >
+					<image src="/static/temp/jrwp2.png" @tap="toPhoer()"></image>
+					<text>编辑自己</text>
+					<u-switch v-model="OnlineStatus" @change="OnlineStatusChange" ></u-switch>
+				</view>
 			</view>
+			<uni-grid class="grid" :column="4" :showBorder="false" :square="true">
+				<uni-grid-item class="item" v-for="(item,index) in gridList" @click.native="tapGrid(index)" :key="index">
+					<uni-icons class="icon" color="#ff5500" :type="item.icon" size="30"></uni-icons>
+					<text class="text">{{item.text}}</text>
+				</uni-grid-item>
+			</uni-grid>
+		</view>
+		
+		<view class="cate-section" v-else>
 			<!-- 用户有三种状态：游客 普通 摄影师 -->
-			<view class="cate-item" v-else>
+			<view class="cate-item" >
 				<image src="/static/temp/jrwp1.png" @tap="toBePhoer"></image>
 				<text>加入湾拍 </text>
 			</view>
 		</view>
-		<uni-grid class="grid" :column="4" :showBorder="false" :square="true" v-if="character=='phoer'">
-			<uni-grid-item class="item" v-for="(item,index) in gridList" @click.native="tapGrid(index)" :key="index">
-				<uni-icons class="icon" color="#ff5500" :type="item.icon" size="30"></uni-icons>
-				<text class="text">{{item.text}}</text>
-			</uni-grid-item>
-		</uni-grid>
+		
 		<uni-list class="center-list" v-for="(sublist , index) in ucenterList" :key="index">
 			<uni-list-item v-for="(item,i) in sublist" :title="item.title" link :rightText="item.rightText" :key="i"
 				:clickable="true" :to="item.to" @click="ucenterListClick(item)" :show-extra-icon="true"
@@ -79,7 +84,12 @@
 		data() {
 			return {
 				OnlineStatus:false,
-				gridList: [{
+				gridList: [
+					// {
+					// 	"text":'reget cid',
+					// 	"icon":"map-pin"
+					// },
+					{  //没有场地 没法申请营业执照 没法使用支付相关功能
 						"text": '收入',
 						"icon": "wallet"
 					},
@@ -293,7 +303,21 @@
 			},
 			tapGrid(index) {
 				if(index===0){
-					console.log('收益结算');
+					// uni.getPushClientId({
+					// 	success: (e) => {
+					// 		// console.log(e);
+					// 		uniCloud.database().collection('photographer').where({
+					// 			userId:this.$store.state.user.info._id
+					// 		}).update({
+					// 			push_clientid:e.cid
+					// 		}).then(e=>{
+					// 			uni.$u.toast('成功更新识别码');
+					// 		}).catch(e=>{
+					// 			console.log(e);
+					// 		})
+					// 	}
+					// })
+					console.log('暂未开放');
 				}
 				else if(index===1){
 					//摄影师查看所有用户已发布的预约列表
@@ -582,14 +606,13 @@
 	
 	.cate-section {
 		display: flex;
+		flex-direction: row;
 		justify-content: space-around;
 		align-items: center;
 		flex-wrap:wrap;
 		padding: 30upx 22upx; 
 		background: #fff;
 		.cate-item {
-			display: flex;
-			flex-direction: column;
 			align-items: center;
 			font-size: $font-sm + 2upx;
 			color: $font-color-dark;

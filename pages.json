@@ -3,11 +3,12 @@
 			"path": "pages/home/home",
 			"style": {
 				// "navigationBarTitleText":"我的大学，北大，这是两所学校"
-				// #ifdef MP 
+				// #ifdef MP
 				"navigationBarTitleText": "湾大简拍",
 				//"navigationStyle": "custom",
-				// #endif 
+				 // #endif
 				// "navigationStyle": "custom",
+				// #ifdef APP-PLUS||H5
 				"app-plus": {
 					"titleNView": { //鼠标悬停有提示
 						"type": "transparent",
@@ -31,12 +32,12 @@
 								"text": "\ue744",
 								"fontSize": "27",
 								"color": "#303133",
-								"background": "rgba(0,0,0,0)",
-								"redDot": true
+								"background": "rgba(0,0,0,0)"
 							}
 						]
 					}
 				}
+				// #endif
 			}
 		},
 		{
@@ -60,7 +61,19 @@
 		{
 			"path": "pages/photographer/phoer",
 			"style": {
-			
+				"navigationStyle": "custom",
+				"app-plus": {
+					"titleNView":false
+				}
+			}
+		}, 
+		{
+			"path": "pages/photographer/phoer-test",
+			"style": {
+				"navigationStyle": "custom",
+				"app-plus": {
+					"titleNView":false
+				}
 			}
 		}, 
 		{
@@ -87,6 +100,24 @@
 				"navigationBarTitleText": "manager界面"
 			}
 		}, 
+		{
+			"path": "pages/chat/chat",
+			"style": {
+				"navigationBarTitleText": "消息"
+			}
+		},
+		{
+			"path": "pages/chat/person-chat",
+			"style": {
+				"navigationBarTitleText": "动态标题"
+			}
+		},
+		{
+			"path": "pages/chat/group-chat",
+			"style": {
+				"navigationBarTitleText": "动态标题"
+			}
+		},
 		// #ifde APP-PLUS
 		{
 			"path": "pages/WP_manager/business-request",
@@ -264,6 +295,7 @@
 				"navigationBarTitleText": "意见反馈",
 				"enablePullDownRefresh": false
 			}
+
 		}
     
 	// #ifndef MP

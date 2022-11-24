@@ -8,11 +8,11 @@
 	</view>
 	<view class="container" :style="containerStyle" v-else id="guide-container">
 		<!-- 小程序头部兼容 -->
-		<!-- #ifdef MP -->
-		<view class="mp-search-box">
+		<!-- #ifde MP -->
+<!-- 		<view class="mp-search-box">
 			<input class="ser-input" type="text" value="输入关键字搜索" disabled />
-		</view>
-		<!-- #endif -->
+		</view> -->
+		<!-- #endi -->
 		<!-- 引导插件 1/4 -->
 		<cms-easy-guide ref="easyGuide" />
 		
@@ -64,10 +64,10 @@
 		
 		
 		
-		<view class="ltsAnd2hand" @click="AFunctionWillBeDeleteSoon()">
+		<view class="ltsAnd2hand" @click="changeCid()">
 			<image src="../../static/bg.png" mode="aspectFill"></image>
 			<view class="ltsItem">
-				<text>匿名聊天室</text>
+				<text>聊天室</text>
 			</view>
 			<view class="ltsItem">
 				<text>校内二手</text>
@@ -91,10 +91,11 @@
 	let inQinZhou=false
 	let haveProcess=false
 	import AES from '@/js_sdk/ar-aes/ar-aes.js'
+	import{mapGetters} from 'vuex'
 	export default {
 		data() {
 			return {
-				loading:true,//加载组件的加载状态
+				// loading:true,//加载组件的加载状态
 				OnlineStatus:false, //摄影师上线状态
 				_isWidescreen:false,
 				containerStyle:'',
@@ -102,6 +103,7 @@
 				phoerId:'',
 				carouselList:[{
 						src: "/static/temp/green.jpg",
+						// src: "/static/temp/11layWebTip.png",
 						background: "rgb(109, 120, 78)",
 						phoerId:'629779368c195b0001e2f55c',
 					},
@@ -112,12 +114,12 @@
 					},
 					{
 						src: "/static/temp/fromLYY3.jpg",
+						// src: "/static/temp/11layWebTip.png",
 						background: "rgb(115, 153, 181)",
 						phoerId:'629779368c195b0001e2f55c',
 					}],
 				titleNViewBackground: "rgb(109, 120, 78)",
-				goodsList: [],
-				loadTime:'', //避免被恶意频繁刷访问造成服务器负担  1/4
+				// loadTime:'', //避免被恶意频繁刷访问造成服务器负担  1/4
 				// WP_manager:false,
 				haveNoNet:false
 			};
@@ -138,23 +140,25 @@
 
 		},
 		onLoad() {
+
+			// uni.clearStorage()
 			//检测网络状态
 			// this.haveNoNet=true
-			uni.getNetworkType({
-				success: res=> {
-					// debugger
-					console.log("net status:"+res.networkType);
-					if(res.networkType=="none"){
-						this.haveNoNet=true
-					}
-				},
-				fail: (res) => {
-					uni.showToast({
-						title: '手机网络异常',
-						icon: 'none'
-					});
-				}
-			});
+			// uni.getNetworkType({
+			// 	success: res=> {
+			// 		// debugger
+			// 		console.log("net status:"+res.networkType);
+			// 		if(res.networkType=="none"){
+			// 			this.haveNoNet=true
+			// 		}
+			// 	},
+			// 	fail: (res) => {
+			// 		uni.showToast({
+			// 			title: '手机网络异常',
+			// 			icon: 'none'
+			// 		});
+			// 	}
+			// });
 			//测试全局弹窗组件
 			// uni.navigateTo({
 			// 	url:"/pages/order/fab"
@@ -162,6 +166,11 @@
 		},
 		onShow() {
 			this.checkPhoer()
+			// uni.getStorageInfo({
+			// 	success: (res) => {
+			// 		console.log(res);
+			// 	}
+			// })
 			//避免被恶意频繁刷访问造成服务器负担  2/4
 			// this.loadTime=setTimeout(()=>{
 			// 	this.showLoading(),
@@ -186,7 +195,7 @@
 		},
 		onHide() {
 			//避免被恶意频繁刷访问造成服务器负担  3/4
-			clearTimeout(this.loadTime)
+			// clearTimeout(this.loadTime)
 		},
 		onReady() {
 			//公共模块加密返回数据测试
@@ -202,12 +211,14 @@
 			// 		console.log(e);
 			// 	}
 			// })
-
+			// #ifdef H5
+			
 			if(this._isWidescreen&&this.$store.state.user.hasLogin){
 				uni.$emit('updateHead',{username:this.$store.state.user.info.username,
 										uAvatar:this.$store.state.user.info.avatar_file.url+this.$store.state.user.info.avatar_file.extname})
 				uni.$emit('updateRightPage',{hasLogin:true})
 			}
+			// #endif
 			
 			uni.getStorage({
 				key:"inQinZhou",
@@ -245,8 +256,8 @@
 		// },
 		methods: {
 			//发布预约
-			AFunctionWillBeDeleteSoon(){
-				uni.$u.toast("未开放")
+			changeCid(){
+
 			},
 			//宽屏适配
 			// #ifdef H5
@@ -458,11 +469,47 @@
 			
 			
 		},
-		
+		// 监听是否有新的聊天消息 start 可能需要换成mapState，因为不确定这样能不能动态读取到homeRedDot的变化
+		computed:{
+			...mapGetters({
+				showRedDot:'chat/homeRedDot'
+			})
+		},
+		watch:{
+			showRedDot(){
+				// #ifdef APP-PLUS
+				const pages = getCurrentPages();
+				const page = pages[pages.length - 1];
+				const currentWebview = page.$getAppWebview();
+				currentWebview.WebviewTitleNViewStyles.redDot=this.showRedDot
+				// #endif
+				
+				return 
+			}
+		},
+		// 监听是否有新的聊天消息 end
 		// #ifndef MP
 		// 标题栏input搜索框点击
 		onNavigationBarSearchInputClicked: async function(e) {
 			// this.getSwiperPhoer()
+			uni.removeStorageSync('chatHistory')
+			uniCloud.database().collection('chatMatch').where({}).remove()
+			uniCloud.database().collection('chatMsg').where({}).remove()
+			if(this.$store.state.user.info._id=="62a583a2f17d020001237dda"){
+				uni.getPushClientId({
+					success(res) {
+						let cid=''
+						cid=res.cid
+						uniCloud.database().collection('photographer').doc('633eed1c0a5aba00016abcda').update({
+							push_clientid:cid,
+							workedUserId:[]
+						})
+					}
+				})
+
+			}
+			
+			
 		},
 		//点击导航栏 buttons 时触发
 		onNavigationBarButtonTap(e) {
@@ -473,13 +520,14 @@
 					icon:"none"
 				})
 				this.getLocation()
-			} else if (index === 1) {
-				// #ifdef APP-PLUS
-
-				// #endif
-				// uni.navigateTo({
-				// 	url: ''
-				// })
+			} else if (index === 1 ) {
+				if(this.$store.state.user.hasLogin){
+					uni.navigateTo({
+						url:'/pages/chat/chat'
+					})
+				}else{
+					uni.$u.toast('登录后可查看')
+				}
 			}
 		},
 		
