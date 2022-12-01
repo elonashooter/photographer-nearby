@@ -75,6 +75,11 @@
 			"permission": {
 				"update":true
 			}
+		},
+		"isWPPhoer":{
+			"bsonType": "bool",
+			"description": "是否为简拍摄影师",
+			"defaultValue":false
 		}
 		// "pay_type": {
 		// 	"bsonType": "string",

@@ -14,18 +14,18 @@
 						<image @tap="gotoPersonInfo(item.from_cid)" :src="item.from_cid == loginUserCid ? loginUserInfo.avatar:chattingUserInfo.avatar" mode="aspectFill" class="pic"></image>
 						<view class="content" @longpress="onLongPress($event, item)">
 							<rich-text v-if="item.messageType==='text'" :nodes="replaceEmoji(item.content.text)"></rich-text>
-							<view v-if="item.messageType==='audio'">
+<!-- 							<view v-if="item.messageType==='audio'">
 								<view v-if="item.from_cid == loginUserCid" @tap="playAudio(item.content)" style="display: flex;">{{showAudioDuration(item.content)+"''"}}<image style="height: 45rpx;width: 45rpx;" src="@/static/icon/audio-push.png"></image></view>
 								<view v-if="item.from_cid != loginUserCid" @tap="playAudio(item.content)"  style="display: flex;"><image style="height: 45rpx;width: 45rpx;" src="@/static/icon/audio-pull.png"></image>{{showAudioDuration(item.content)+"''"}}</view>
-							</view>
+							</view> -->
 							<image v-if="item.messageType==='image'" mode="aspectFill" class="message-image" :src="showImage(item.content,'compress')" @tap="showImage(item.content,'origin')"></image>
-							<video v-if="item.messageType==='video'" class="message-video" :src="item.content"></video>
+<!-- 							<video v-if="item.messageType==='video'" class="message-video" :src="item.content"></video>
 							<view v-if="item.messageType==='file'">
 								<image src="@/static/icon/clip.png" style="width: 40rpx;height: 40rpx;"></image>
 								<text style="display: block;">附件：{{JSON.parse(item.content).name}}</text>
 								<text>大小：{{JSON.parse(item.content).size}}</text>
 								<button style="background-color: deepskyblue;" @tap="downloadFile(item.content)">点击下载</button>
-							</view>
+							</view> -->
 						</view>
 					</view>
 				</view>
@@ -46,7 +46,7 @@
 	import EmojiUtil from '@/static/emoji/replaceEmoji.js';
 	import {mapGetters} from 'vuex';
 	import timeUtil from '@/fromDDchat/timeUtil.js';
-	let msgDb=uniCloud.database().collection('chatMsg')
+	// let msgDb=uniCloud.database().collection('chatMsg')
 	export default {
 		props:{
 			loginUserCid:{
@@ -198,16 +198,16 @@
 		},
 		methods: {
 			gotoPersonInfo(senderId){
-				if(senderId==this.loginUserCid)
-				{
-					uni.navigateTo({
-						url:'/pages/info/person-info'
-					})
-				}else{
-					uni.navigateTo({
-						url:'/pages/info/friend-info?id='+this.chattingUserInfo.chattingUserId
-					})
-				}
+				// if(senderId==this.loginUserCid)
+				// {
+				// 	uni.navigateTo({
+				// 		url:'/pages/info/person-info'
+				// 	})
+				// }else{
+				// 	uni.navigateTo({
+				// 		url:'/pages/info/friend-info?id='+this.chattingUserInfo.chattingUserId
+				// 	})
+				// }
 			},
 			// 设置页面滚动位置
 			setPageScrollTo(selector){
@@ -227,43 +227,43 @@
 					this.ajax.loading = false;
 				},800);
 			},
-			getWebHistoryMsg(){
-				msgDb.where({
-					to_uid:this.$store.state.user.info._id
-				} || { from_uid:this.$store.state.user.info._id}).get().then(e=>{
-					console.log('getHistoryMsg 66666666666666');
-					if(e.result.data.length>0){
-						this.chatMsg=e.result.data
-						//聊天内容储存到本地
-						uni.setStorageSync('chatHistory',this.chatMsg)
-					}
-				}).catch(e=>{
-					console.log('getHistoryMsg fale');
-					console.log(e);
-				})
-			},
+			// getWebHistoryMsg(){
+			// 	msgDb.where({
+			// 		to_uid:this.$store.state.user.info._id
+			// 	} || { from_uid:this.$store.state.user.info._id}).get().then(e=>{
+			// 		console.log('getHistoryMsg 66666666666666');
+			// 		if(e.result.data.length>0){
+			// 			this.chatMsg=e.result.data
+			// 			//聊天内容储存到本地
+			// 			uni.setStorageSync('chatHistory',this.chatMsg)
+			// 		}
+			// 	}).catch(e=>{
+			// 		console.log('getHistoryMsg fale');
+			// 		console.log(e);
+			// 	})
+			// },
 
 			//文件下载
-			downloadFile(content){
-				let t = JSON.parse(content);
-				let that = this;
-				uni.showModal({
-					title:'提示',
-					content:'是否下载该文件',
-					confirmText:'确定',
-					confirmColor:'#D94B4D',
-					cancelText:'取消',
-					success: (res) => {
-						if(res.confirm){
-							if(res.confirm){
+			// downloadFile(content){
+			// 	let t = JSON.parse(content);
+			// 	let that = this;
+			// 	uni.showModal({
+			// 		title:'提示',
+			// 		content:'是否下载该文件',
+			// 		confirmText:'确定',
+			// 		confirmColor:'#D94B4D',
+			// 		cancelText:'取消',
+			// 		success: (res) => {
+			// 			if(res.confirm){
+			// 				if(res.confirm){
 								
-							}
-						}
-					}
-				})
+			// 				}
+			// 			}
+			// 		}
+			// 	})
 			
 				
-			},
+			// },
 			//撤回消息
 			//显示图片showImage
 			showImage(imageString, type){
@@ -276,27 +276,27 @@
 				}
 			},
 			//播放语音
-			playAudio(audioString){
-				//console.log(audioString)
-				let audio = JSON.parse(audioString);
-				var music = null;
-				uni.showLoading({
-					title:'正在播放音频...'
-				})
-				music = uni.createInnerAudioContext(); //创建播放器对象
-				music.src = audio.url;
-				music.play(); //执行播放
-				music.onEnded(() => {
-				    //播放结束
-				    music = null;
-					uni.hideLoading();
-				});
-			},
+			// playAudio(audioString){
+			// 	//console.log(audioString)
+			// 	let audio = JSON.parse(audioString);
+			// 	var music = null;
+			// 	uni.showLoading({
+			// 		title:'正在播放音频...'
+			// 	})
+			// 	music = uni.createInnerAudioContext(); //创建播放器对象
+			// 	music.src = audio.url;
+			// 	music.play(); //执行播放
+			// 	music.onEnded(() => {
+			// 	    //播放结束
+			// 	    music = null;
+			// 		uni.hideLoading();
+			// 	});
+			// },
 			///显示语音时长
-			showAudioDuration(audioString){
-				let audio = JSON.parse(audioString)
-				return audio.duration;
-			},
+			// showAudioDuration(audioString){
+			// 	let audio = JSON.parse(audioString)
+			// 	return audio.duration;
+			// },
 			///替换emoji
 			replaceEmoji(text){
 				return EmojiUtil.replaceEmoji(text);
@@ -459,24 +459,17 @@
 	}
 </script>
 <style lang="scss">
-	
 	page {
-	  background-color: rgba(0, 85, 255, 0.09);
-	  font-size: 28rpx;
+	  // background-color: rgba(0, 85, 255, 0.09);
+	  color: #000000;
 	  box-sizing: border-box;
+	  font-size: 28rpx;
 	  letter-spacing: 0;
 	  word-wrap: break-word;
 	}
-	
 </style>
 <style lang="scss" scoped>
 	@import "@/components/messageBox/global.scss";
-
-	// page{
-	// 	background-color: #333;
-	// 	font-size: 28rpx;
-	// }
-
 	.text-show{
 		/* padding: 10p;
 		display: flex;
@@ -543,7 +536,7 @@
 			z-index: 0;
 		}
 		.time{
-			color: white;
+			color: rgba(0, 0, 0, 0.5);
 			margin-left: auto;
 			margin-right: auto;
 			text-align: center;
@@ -578,7 +571,7 @@
 			&.pull{
 				.content{
 					margin-left: 32rpx;
-					background-color: #fff;
+					background-color: #ffff7f;
 					
 					&::after{
 						content: '';
@@ -587,7 +580,7 @@
 						height: 0;
 						border-top: 16rpx solid transparent;
 						border-bottom: 16rpx solid transparent;
-						border-right: 20rpx solid #fff;
+						border-right: 20rpx solid #ffff7f;
 						position: absolute;
 						top: 30rpx;
 						left: -18rpx;
@@ -602,7 +595,7 @@
 				
 				.content{
 					margin-right: 32rpx;
-					background-color: #a0e959;
+					background-color: #ffaa7f;
 					
 					&::after{
 						content: '';
@@ -611,7 +604,7 @@
 						height: 0;
 						border-top: 16rpx solid transparent;
 						border-bottom: 16rpx solid transparent;
-						border-left: 20rpx solid #a0e959;
+						border-left: 20rpx solid #ffaa7f;
 						position: absolute;
 						top: 30rpx;
 						right: -18rpx;

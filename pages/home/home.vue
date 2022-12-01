@@ -492,22 +492,18 @@
 		// 标题栏input搜索框点击
 		onNavigationBarSearchInputClicked: async function(e) {
 			// this.getSwiperPhoer()
-			uni.removeStorageSync('chatHistory')
-			uniCloud.database().collection('chatMatch').where({}).remove()
-			uniCloud.database().collection('chatMsg').where({}).remove()
-			if(this.$store.state.user.info._id=="62a583a2f17d020001237dda"){
+			if(this.$store.state.user.hasLogin&&this.$store.state.user.character=='phoer')
 				uni.getPushClientId({
-					success(res) {
+					success: (res) => {
 						let cid=''
 						cid=res.cid
-						uniCloud.database().collection('photographer').doc('633eed1c0a5aba00016abcda').update({
+						uniCloud.database().collection('photographer').doc(this.$store.state.user.info._id).update({
 							push_clientid:cid,
 							workedUserId:[]
-						})
+						}).then(e=>{uni.$u.toast('摄影师识别码认证成功')})
 					}
 				})
 
-			}
 			
 			
 		},

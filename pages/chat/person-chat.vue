@@ -46,11 +46,14 @@
 				loginUserAvatar:''
 			}
 		},
-		onUnload() {
-			console.log('退出聊天窗口')
-			console.log('addChatMsg');
+		// onUnload() { //路由返回是是不触发onUnload的
+		// 	uni.$u.toast('addChatMsg');
+		// 	this.setChatMsg()
+		// 	// $store.state.chattingUserInfo = null
+		// },
+		onBackPress(){
+			console.log('onBackPress');
 			this.setChatMsg()
-			// $store.state.chattingUserInfo = null
 		},
 		computed:{
 			...mapGetters({
@@ -69,13 +72,13 @@
 		onPageScroll(h) {
 			this.$refs.inputBox.showDrawer = 0
 			if(h.scrollTop==0){
-				this.$refs.messageBox.getWebHistoryMsg()
+				// this.$refs.messageBox.getWebHistoryMsg()
 			}
 		},
 		onLoad(e) {	
 			//摄影师界面点击聊天跳转过来
-			console.log('store chatHistory');
-			console.log(e);
+			// console.log('store chatHistory');
+			// console.log(e);
 			if(e.chattingUserCid){
 				this.chattingUserAvatar=e.chattingUserAvatar
 				this.chattingUserCid=e.chattingUserCid
@@ -87,22 +90,8 @@
 			}
 			uni.getPushClientId({
 				success: (e) => {
-					console.log(e);
+					// console.log(e);
 					this.loginUserCid=e.cid
-				}
-			})
-			uni.getStorage({
-				key:'chatHistory',
-				success: (res) => {
-					chatHistory=res.data
-					for(var i of chatHistory){
-						if(i.chatMatchId==this.chatMatchId){
-							this.chatMsg=i.chatMsg
-							msgIndex=chatHistory.indexOf(i)
-							console.log('msgIndex is');
-							console.log(msgIndex);
-						}
-					}
 				}
 			})
 			// if(this.chattingUserInfo==null){
@@ -115,7 +104,30 @@
 			// this.showOnline()
 		},
 		onShow() {
-
+			uni.getStorage({
+				key:'chatHistory',
+				success: (res) => {
+					chatHistory=res.data
+					console.log(chatHistory);
+					for(var i of chatHistory){
+						if(i.chatMatchId){
+							if(i.chatMatchId==this.chatMatchId){
+								this.chatMsg=i.chatMsg
+								msgIndex=chatHistory.indexOf(i)
+								console.log('msgIndex is');
+								console.log(msgIndex);
+							}else{
+								console.log('it is a new chatMatch');
+							}
+						}else{
+							console.log('have not i.chatMatch yet');
+						}
+					}
+				},
+				fail: () => {
+					console.log('chatHistory have not created');
+				}
+			})
 		},
 		methods: {
 			//查看在线人数
@@ -152,8 +164,8 @@
 				 // 	message.senderAvatar=this.$store.state.user.info.avatar_file.url
 				 // }
 				 //message传过来之前已处理部分 end
-				console.log('message');
-				console.log(message);
+				// console.log('message');
+				// console.log(message);
 				message.to_cid=this.chattingUserCid,
 				message.chattingUserAvatar=this.chattingUserAvatar
 				message.chattingUserName=this.chattingUserName
@@ -182,9 +194,16 @@
 				
 			 },
 			 setChatMsg(){
-				chatHistory[msgIndex].chatMsg=this.chatMsg
-				chatHistory[msgIndex].unReadNum=0
-				uni.setStorageSync('chatHistory',chatHistory)
+				if(msgIndex!==-1){
+					chatHistory[msgIndex].chatMsg=this.chatMsg
+					chatHistory[msgIndex].unReadNum=0
+					console.log('setChatMsg');
+					console.log(chatHistory);
+					uni.setStorageSync('chatHistory',chatHistory)
+				}else{
+					uni.$u.toast('can not match setChatMsg')
+				}
+
 				// this.$store.commit('chat/updateChatMatch',chatHistory) //不明白为什么会出问题
 			 },
 			 pushMsgToCloud(message){
@@ -219,13 +238,14 @@
 			//console.log(timeUtil.getFormatTime(new Date()))
 		},
 		onHide() {
+			console.log(this.chatMsg);
 			this.setChatMsg()
 		}
 	}
 </script>
 
 <style>
-	.img-background{
+/* 	.img-background{
 		position: absolute;
 		z-index: -1;
 		height: 100%;
@@ -234,5 +254,5 @@
 /* 		margin: 0 auto;
 		left:0; right:0; 
 		top: -1rpx; */
-	}
+	/* } */ 
 </style>

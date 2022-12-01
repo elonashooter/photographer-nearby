@@ -1,6 +1,6 @@
 <template>
-	<view v-if="WP_manager">
-		<view class="cate-section" >
+	<view >
+		<view class="cate-section" v-if="WP_manager">
 			<view class="cate-item">
 				<u-icon name='file-text' size="40" @tap="getAllOrder()"></u-icon>
 				<text>检查订单</text>
@@ -19,9 +19,15 @@
 				<u-icon name='thumb-down' size="20" @tap="getFeedBack()"></u-icon>
 				<text>反馈收集</text>
 			</view>
+			<view class="cate-item">
+				<u-icon name='star' size="40" @tap="phoerConfirm()"></u-icon>
+				<text>平台认证</text>
+			</view>
 		</view>
 		
 		<button @click="clearData()">清空当前用户数据</button>
+		<button @click="clearHistoryImg()">清空历史图片</button>
+		
 
 	</view>
 </template>
@@ -76,6 +82,11 @@
 					url: '/pages/ucenter/about/about'
 				});
 			},
+			phoerConfirm(){
+				uni.navigateTo({
+					url:'/pages/WP_manager/phoerConfirm'
+				})
+			},
 			clearData(){
 				//删图
 				let photos=[]
@@ -109,6 +120,12 @@
 				uniCloud.database().collection('photographer').where({userId:did}).remove()
 				uniCloud.database().collection('uni-id-users').doc(did).update({
 					role:[]
+				})
+			},
+			clearHistoryImg(){
+				uniCloud.callFunction({
+					name:'clearHistoryImg',
+					data:''
 				})
 			}
 			

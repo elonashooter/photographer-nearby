@@ -75,6 +75,10 @@
 						}
 						//储存到本地
 						this.chatGroup=data
+						uni.setStorage({
+							key:'chatHistory',
+							data:this.chatGroup
+						})
 						// console.log('chatGroup');
 						// console.log(this.chatGroup);
 					}else{

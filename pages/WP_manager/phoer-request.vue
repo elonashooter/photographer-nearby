@@ -211,8 +211,6 @@
 				this.showReject=false
 				this.phoerInfo=JSON.parse(decodeURIComponent(e.dealMsg))
 				this.symbols=this.phoerInfo.symbolsUrl
-				console.log('???');
-				debugger
 			}
 		},
 		methods: {

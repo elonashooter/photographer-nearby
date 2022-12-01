@@ -9,8 +9,8 @@
 			<image class="input-icon" @tap="openDrawer(1)" src="@/static/icon/emoji.png"></image>
 			<image class="input-icon" @tap="selectImage()" src="@/static/icon/image.png"></image>
 			<!-- <image class="input-icon" @tap="selectVideo()" src="@/static/icon/video.png"></image> -->
-			<!-- #ifdef APP-PLUS -->
-			<lsj-upload
+			<!-- #ifde APP-PLUS -->
+<!-- 			<lsj-upload
 				style="width: 55rpx;height: 55rpx;hebackground-color: red;margin-left: 0rpx;"
 				class="input-icon"
 				ref="lsjUpload"
@@ -21,11 +21,11 @@
 				@change="fileOnChange"
 			>
 				<image  class="input-icon" src="@/static/icon/file.png"></image>
-			</lsj-upload>
-			<!-- #endif -->
-			<!-- #ifdef H5 -->
+			</lsj-upload> -->
+			<!-- #endi -->
+			<!-- #ifde H5 -->
 			<!-- <image class="input-icon" @tap="selectFile()" src="@/static/icon/file.png"></image> -->
-			<!-- #endif -->
+			<!-- #endi -->
 			<!-- <image class="input-icon" @tap="openDrawer(5)" src="@/static/icon/microphone.png"></image> -->
 		</view>
 		<!-- 这部分小程序会报错，可能是因为读不了表情 所以暂时加条件为仅app-->
@@ -50,7 +50,7 @@
 					 <audioPlayer :src='recorder.localUrl' v-if='recorder' :autoplay="false" :continue="false"></audioPlayer>
 				 </view>
 				
-					 <image v-show="recorder===null" class="record-btn" @click='handlerOnCahnger' :src="!status?'../../static/icon/record-start.png':'../../static/icon/record-pause.png'"></image>
+					 <image v-show="recorder===null" class="record-btn" @click='handlerOnChanger' :src="!status?'../../static/icon/record-start.png':'../../static/icon/record-pause.png'"></image>
 					 <text v-show="recorder===null && status">{{audioTime+'s'}}</text>
 		
 				<view style="display: flex;position: fixed;width: 90%;margin-left: 4%;bottom: 50rpx;" v-show="recorder!=null">
@@ -91,6 +91,7 @@
 				<u-button style="margin-left: 2%;" @tap="sendFile()" text="发送"  size="normal" class="send-btn-able" type="primary"></u-button>
 			</view>
 		</view> -->
+		<!-- 占位view inputBox往上多少  messageBox也往上多少 -->
 		<view :style="{'height':keyboradHeight+'px'}"></view>
 	</view>
 </template>
@@ -132,6 +133,7 @@
 					}
 				}else this.isDisable = true
 			},
+			// 通过设置showDrawer来动态改变message的buttom高度
 			showDrawer: function(newData,oldData){
 				// if(oldData === 5){
 				// 	if(this.status){
@@ -142,7 +144,7 @@
 				// if(newData !==4 ) this.fileCancel()
 				// if(newData !==5 ) this.audioCancel()
 				switch(newData){
-					case 0: this.height = 0; break;
+					case 0: this.height = 0; break; //keyboard
 					case 1: this.height = 600; break;
 					case 2: 
 					// case 3: 
@@ -158,6 +160,7 @@
 			uni.onKeyboardHeightChange(res => {
 				if(res.height === 0){
 					 this.keyboradHeight = 0;
+					 //改变message 的最低高度为20
 					 this.$emit('keyboradHeight', 20);
 				}else{
 					this.$emit('keyboradHeight', 90);
@@ -165,7 +168,7 @@
 						this.keyboradHeight = 35
 					}
 					else{
-						this.showDrawer = 0;
+						// this.showDrawer = 0; //注释掉之后表情可以正常拉取
 						this.keyboradHeight = res.height
 					}			  
 				}
@@ -185,9 +188,9 @@
 				status: false,
 				recorder: null,
 				selectedImage: null,
-				selectedVideo: null,
-				selectedFile: null,
-				audioTime: 0,
+				// selectedVideo: null,
+				// selectedFile: null,
+				// audioTime: 0,
 				fileOption: {
 					url: 'null'
 				},
@@ -200,31 +203,31 @@
 				this.showDrawer = 0
 			},
 			//发送文件消息
-			sendFile(){
-				// #ifdef APP-PLUS
-				uni.showToast({
-					icon:'none',
-					title:'手机端暂时不行'
-				})
-				return
-				// #endif
-				let that = this
-				uni.showLoading({
-					title:'正在上传文件'
-				})
-				uni.uploadFile({});
-			},
+			// sendFile(){
+			// 	// #ifdef APP-PLUS
+			// 	uni.showToast({
+			// 		icon:'none',
+			// 		title:'手机端暂时不行'
+			// 	})
+			// 	return
+			// 	// #endif
+			// 	let that = this
+			// 	uni.showLoading({
+			// 		title:'正在上传文件'
+			// 	})
+			// 	uni.uploadFile({});
+			// },
 			//发送视频消息
-			sendVideo(){
-				let that = this
-				uni.showLoading({
-					title:'正在上传视频'
-				})
-				uni.uploadFile({
+			// sendVideo(){
+			// 	let that = this
+			// 	uni.showLoading({
+			// 		title:'正在上传视频'
+			// 	})
+			// 	uni.uploadFile({
 
-				});
+			// 	});
 				
-			},
+			// },
 			//发送图片消息
 			sendImage(){
 				let that = this
@@ -236,24 +239,24 @@
 				});
 			},
 			//发送语音消息
-			sendAudio(){
-				// #ifdef APP-PLUS
-				uni.showToast({
-					icon:'none',
-					title:'手机端暂时不行'
-				})
-				return
-				// #endif
-				let that = this
-				uni.showLoading({
-					title:'正在上传音频'
-				})
-				//console.log(this.recorder)
-				uni.uploadFile({
+			// sendAudio(){
+			// 	// #ifdef APP-PLUS
+			// 	uni.showToast({
+			// 		icon:'none',
+			// 		title:'手机端暂时不行'
+			// 	})
+			// 	return
+			// 	// #endif
+			// 	let that = this
+			// 	uni.showLoading({
+			// 		title:'正在上传音频'
+			// 	})
+			// 	//console.log(this.recorder)
+			// 	uni.uploadFile({
 
-				});
+			// 	});
 				
-			},
+			// },
 			///发送文字
 			sendText(){
 				if(this.isDisable) return;
@@ -280,77 +283,81 @@
 				
 			},
 			openDrawer(index){
-				if(this.showDrawer === index)	this.showDrawer = 0;
-				else this.showDrawer = index
+				if(this.showDrawer === index){
+					this.showDrawer = 0;
+				}
+				else {
+					this.showDrawer = index
+				}
 			},
 			deleteAEmoji(){
 				if(this.text==='' || this.text.lastIndexOf('[') === '-1') return;
 				this.text = this.text.slice(0, this.text.lastIndexOf('['));
 			},
-			handlerSave() {
-			    let tag = document.createElement('a')
-			    tag.href = this.recorder.localUrl
-			    tag.download = '录音'
-			    tag.click()
-			},
-			handlerOnCahnger() {
-			    if (this.status) {
-			        this.$refs.recorder.stop()
-			    } else {
-			        this.$refs.recorder.start()
-					setTimeout(() => {
-						this.handleAudioTime()
-					}, 1000)
-			    }
-			    this.status = !this.status
-			},
-			handleAudioTime(){
-				if(this.status){
-					this.audioTime ++;
-					setTimeout(() => {
-						this.handleAudioTime()
-					}, 1000)
-				}
-			},
-			handlerSuccess(res) {
-				//console.log(res)
-				if(res.duration<1){
-					uni.showToast({
-						icon:'error',
-						title:'录音时长太短！'
-					})
-					this.$refs.recorder.reSet();
-					return
-				}
-				if(res.duration>60){
-					uni.showToast({
-						icon:'error',
-						title:'录音时长太长！'
-					})
-					this.$refs.recorder.reSet();
-					return
-				}
-			    this.recorder = res
-			},
-			handlerError(code) {
-			    switch (code) {
-			        case '101':
-			            uni.showModal({
-			                content: '当前浏览器版本较低，请更换浏览器使用，推荐在微信中打开。'
-			            })
-			            break;
-			        case '201':
-			            uni.showModal({
-			                content: '麦克风权限被拒绝，请刷新页面后授权麦克风权限。'
-			            })
-			            break
-			        default:
-			            uni.showModal({
-			                content: '未知错误，请刷新页面重试'
-			            })
-			            break
-			    }
-			},
+			// handlerSave() {
+			//     let tag = document.createElement('a')
+			//     tag.href = this.recorder.localUrl
+			//     tag.download = '录音'
+			//     tag.click()
+			// },
+			// handlerOnChanger() {
+			//     if (this.status) {
+			//         this.$refs.recorder.stop()
+			//     } else {
+			//         this.$refs.recorder.start()
+			// 		setTimeout(() => {
+			// 			this.handleAudioTime()
+			// 		}, 1000)
+			//     }
+			//     this.status = !this.status
+			// },
+			// handleAudioTime(){
+			// 	if(this.status){
+			// 		this.audioTime ++;
+			// 		setTimeout(() => {
+			// 			this.handleAudioTime()
+			// 		}, 1000)
+			// 	}
+			// },
+			// handlerSuccess(res) {
+			// 	//console.log(res)
+			// 	if(res.duration<1){
+			// 		uni.showToast({
+			// 			icon:'error',
+			// 			title:'录音时长太短！'
+			// 		})
+			// 		this.$refs.recorder.reSet();
+			// 		return
+			// 	}
+			// 	if(res.duration>60){
+			// 		uni.showToast({
+			// 			icon:'error',
+			// 			title:'录音时长太长！'
+			// 		})
+			// 		this.$refs.recorder.reSet();
+			// 		return
+			// 	}
+			//     this.recorder = res
+			// },
+			// handlerError(code) {
+			//     switch (code) {
+			//         case '101':
+			//             uni.showModal({
+			//                 content: '当前浏览器版本较低，请更换浏览器使用，推荐在微信中打开。'
+			//             })
+			//             break;
+			//         case '201':
+			//             uni.showModal({
+			//                 content: '麦克风权限被拒绝，请刷新页面后授权麦克风权限。'
+			//             })
+			//             break
+			//         default:
+			//             uni.showModal({
+			//                 content: '未知错误，请刷新页面重试'
+			//             })
+			//             break
+			//     }
+			// },
 			// audioCancel(){
 			// 	this.recorder = null,
 			// 	this.$refs.recorder.reSet();
@@ -472,11 +479,14 @@
 			// 	   }
 			// 	})
 			// },
+		},
+		onUnload() {
+			uni.offKeyboardHeightChange()
 		}
 	}
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 	.container{
 		position: fixed;
 		bottom: 0;

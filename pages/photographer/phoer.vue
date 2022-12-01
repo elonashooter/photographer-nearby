@@ -47,7 +47,7 @@
 					<view style="margin: 20rpx 10rpx;display: flex;flex-direction: row;" >
 						<image src="/static/36x36.png" style="width: 50rpx;height: 50rpx; ">
 						<u--text
-							:text="'作品:  '+phoerInfo.symbolsTag"
+							:text="'作品关键词:  '+phoerInfo.symbolsTag"
 							customStyle='color:rgb(1, 120, 204);'
 						></u--text>
 					</view>
@@ -96,6 +96,7 @@
 	//第一次与摄影师聊天，gochat方法创建的聊天配对chatMatch表的Id
 	let newMatchId=''
 	import AES from '@/js_sdk/ar-aes/ar-aes.js'
+import chat from '../../store/modules/chat'
 import user from '../../store/modules/user'
 	export default {
 		data() {
@@ -165,6 +166,9 @@ import user from '../../store/modules/user'
 			}else{
 
 			}
+
+		},
+		onShow() {
 			//查询当前用户与该摄影师是否有聊天配对记录 没有则在跳转聊天时新建
 			if(this.phoerInfo.workedUserId.includes(this.$store.state.user.info._id)){
 				haveChatMatch=true
@@ -178,6 +182,7 @@ import user from '../../store/modules/user'
 				haveChatMatch=false
 				this.phoerInfo.workedUserId.push(this.$store.state.user.info._id)
 			}
+			// uni.$u.toast(haveChatMatch)
 		},
 		methods: {
 			goChat(){
@@ -196,32 +201,30 @@ import user from '../../store/modules/user'
 						phoerAvatar:phoer.phoerShow[0],
 						phoerName:phoer.name,
 						phoerPushId:phoer.push_clientid,
-						userName:user.nickname,
+						userName:user.nickname?user.nickname:'约拍用户',
 						userId:user._id,
-						userAvatar:user.avatar_file.url,//可能会报错 因为头像可能没设置
+						userAvatar:user.avatar_file?user.avatar_file.url:'/static/36x36.png',//可能会报错 因为头像可能没设置
 						userPushId:userPushId
 					}
 					// 添加聊天配对记录 以确保!haveChatMatch===false下次此if不执行
-					console.log(this.phoerInfo.workedUserId);
+					// console.log(this.phoerInfo.workedUserId);
 					uniCloud.database().collection('photographer').doc(this.phoerInfo._id).update({
 						workedUserId:this.phoerInfo.workedUserId
 					}).then(e=>{
 						console.log('pdb seccess');
-						console.log(e);
+						// console.log(e);
 					}).catch(e=>{
 						console.log('pdb fail');
 						console.log(e);
 					})
 					// 创建聊天配对
 					cdb.add(chatMatchMsg).then(e=>{
-						console.log('cdb add success');
-						console.log(e);
-						this.loading=false
+						// console.log('cdb add success');
+						// console.log(e);
+						
 						let chatMatchId=e.result.id
 						// console.log(e.result.id);// 新建数据的id
-						uni.navigateTo({
-							url:'/pages/chat/person-chat?chattingUserCid='+this.phoerInfo.push_clientid+'&chattingUserAvatar='+this.phoerInfo.phoerShow[0]+'&chattingUserName='+this.phoerInfo.name+'&chatMatchId='+e.result.id,
-						})
+
 						//
 						uniCloud.callFunction({
 							name:'push-chatMsg',
@@ -245,8 +248,17 @@ import user from '../../store/modules/user'
 									chatMsg:[],
 									unReadNum:0
 								})
-							uni.setStorageSync("chatHistory",chatHistory)
-							console.log('push chat succcess');
+							uni.setStorage({
+								key:'chatHistory',
+								data:chatHistory,
+								success: () => {
+									this.loading=false
+									uni.navigateTo({
+										url:'/pages/chat/person-chat?chattingUserCid='+this.phoerInfo.push_clientid+'&chattingUserAvatar='+this.phoerInfo.phoerShow[0]+'&chattingUserName='+this.phoerInfo.name+'&chatMatchId='+chatMatchId,
+									})
+								}
+							})
+							// console.log('push chat succcess');
 						}).catch(e=>{
 							console.log("push chat fail");
 							console.log(e);
@@ -260,6 +272,7 @@ import user from '../../store/modules/user'
 						userId:this.$store.state.user.info._id,
 						phoerId:this.phoerInfo.userId
 					}).get().then(res=>{
+						console.log("have match")
 						console.log(res);
 						this.loading=false
 						uni.navigateTo({

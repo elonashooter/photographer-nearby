@@ -10,7 +10,6 @@
 				:key="index"
 			>
 				<u-cell
-					:title="item.name"
 					:value="item.intro"
 					:label="item.phoneNumber"
 					center
@@ -25,6 +24,15 @@
 						customStyle="margin: -3px 5px -3px 0"
 						mode="aspectFill"
 					></u-avatar>
+					<view slot="title" style="display: flex;flex-direction: row;font-size:29rpx">
+						<text style="margin-right: 15rpx;">{{item.name}}</text>
+						<u-tag
+							text="平台摄影师"
+							type="success"
+							size="mini"
+							v-if="item.isWPPhoer"
+						></u-tag>
+					</view>
 				</u-cell>
 			</u-list-item>
 			

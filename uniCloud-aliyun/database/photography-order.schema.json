@@ -118,6 +118,11 @@
 		"phoer_push_clientid":{
 			"bsonType": "string",
 			"description": "此单摄影师被推送设备识别码"
+		},
+		"symbolPhotos":{
+			"bsonType": "array",
+			"description": "样片，可选",
+			"defaultValue":[]
 		}
 
 

@@ -59,6 +59,13 @@
 			}
 		}, 
 		{
+			"path": "pages/HzComponents/imagePicker",
+			"style": {
+				"navigationBarTitleText": "照片操作组件"
+			}
+		}, 
+		
+		{
 			"path": "pages/photographer/phoer",
 			"style": {
 				"navigationStyle": "custom",
@@ -139,6 +146,12 @@
 		}, 
 		{
 			"path": "pages/WP_manager/Wpage",
+			"style": {
+
+			}
+		}, 
+		{
+			"path": "pages/WP_manager/phoerConfirm",
 			"style": {
 
 			}

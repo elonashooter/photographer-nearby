@@ -34,7 +34,8 @@
 		},
 		"symbolsHistory":{
 			"bsonType": "array",
-			"description": "所有上传过的代表作记录"
+			"description": "所有上传过的代表作记录",
+			"defaultValue":[]
 		},
 		"userId": {
 			"bsonType": "string",
@@ -46,7 +47,8 @@
 		},
 		"phoerShowHistory":{
 			"bsonType": "array",
-			"description": "所有上传过的个人形象记录"
+			"description": "所有上传过的个人形象记录",
+			"defaultValue":[]
 		},
 		"AuditStatus": {
 			"bsonType": "int",
