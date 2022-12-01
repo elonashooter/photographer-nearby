@@ -6,6 +6,11 @@
 		<text style="margin: 5vh;font-size: 20px;color: #ff5500;" >qq群 273467930</text>
 		<br>
 		<text style="margin: 5vh;font-size: 20px;color: #005500;" >联系电话 18277709303 </text>
+		<br>
+		<view class="qrcode">
+			<text style="font-size: 20px;color: #365531;" >APP下载</text>
+			<image src="../static/0.618.png" mode="aspectFit"></image>
+		</view>
 		<view class="OrderCard">
 			<view class="OrderCardItem">
 				<image src="../static/temp/vol-after.png" mode="heightFix"></image>
@@ -14,6 +19,10 @@
 				<image src="../static/temp/greenWall.png" mode="heightFix"></image>
 			</view>
 		</view>
+
+
+		
+		
 <!-- 		<view class="" style="position: absolute;bottom: 0px; height: 10vh;width: 100vh; border-style: groove;border-width: 7px;margin: 3vh;">
 			小屏幕滚动填充
 		</view> -->
@@ -28,17 +37,27 @@
 		},
 		data() {
 			return {
-				title: 'Hello'
+				title: 'Hello',
+				apkUrl:''
 			}
 		},
 		created(e) {
 			//监听自定义事件，该事件由详情页列表的点击触发
-			uni.$on('updatePage', (e) => {
+			uni.$on('updateRightPage', (e) => {
 				// 执行 /pages/news/detail.nvue页面的load方法
 				// this.$refs.detailPage.load(e.detail);
 				
-				console.log("updatePage success");
+
 			})
+			
+		},
+		onLoad() {
+			
+		},
+		methods:{
+			getApkUrl(){
+
+			}
 		}
 	}
 </script>
@@ -63,7 +82,7 @@
 	}
 	.OrderCard{
 		background-color: rgba(255, 250, 232, 0.3);
-		margin-top: 15vh;
+		margin-top: 5vh;
 		// display: flex;
 		// justify-items: flex-start;
 		display: grid;
@@ -84,5 +103,12 @@
 		right:0;
 		top: 0;
 		width: 40vw;
+	}
+	.qrcode{
+		margin-left: 2vw;
+		image{
+			height: 15vh;
+			width: 10vw;
+		}
 	}
 </style>

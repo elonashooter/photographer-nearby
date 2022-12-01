@@ -3,18 +3,19 @@
 			"path": "pages/home/home",
 			"style": {
 				// "navigationBarTitleText":"我的大学，北大，这是两所学校"
-				// #ifdef MP 
+				// #ifdef MP
 				"navigationBarTitleText": "湾大简拍",
 				//"navigationStyle": "custom",
-				// #endif 
+				 // #endif
 				// "navigationStyle": "custom",
+				// #ifdef APP-PLUS||H5
 				"app-plus": {
 					"titleNView": { //鼠标悬停有提示
 						"type": "transparent",
 						"searchInput": {
 							"backgroundColor": "rgba(231, 231, 231,.7)",
 							"borderRadius": "16px",
-							"placeholder": "查看预约中的订单",
+							"placeholder": "点击照片查看此图摄影师",
 							"disabled": true,
 							"placeholderColor": "#606266"
 						},
@@ -31,12 +32,12 @@
 								"text": "\ue744",
 								"fontSize": "27",
 								"color": "#303133",
-								"background": "rgba(0,0,0,0)",
-								"redDot": true
+								"background": "rgba(0,0,0,0)"
 							}
 						]
 					}
 				}
+				// #endif
 			}
 		},
 		{
@@ -58,9 +59,28 @@
 			}
 		}, 
 		{
+			"path": "pages/HzComponents/imagePicker",
+			"style": {
+				"navigationBarTitleText": "照片操作组件"
+			}
+		}, 
+		
+		{
 			"path": "pages/photographer/phoer",
 			"style": {
-			
+				"navigationStyle": "custom",
+				"app-plus": {
+					"titleNView":false
+				}
+			}
+		}, 
+		{
+			"path": "pages/photographer/phoer-test",
+			"style": {
+				"navigationStyle": "custom",
+				"app-plus": {
+					"titleNView":false
+				}
 			}
 		}, 
 		{
@@ -81,7 +101,31 @@
 			
 			}
 		}, 
-		// ifd
+		{
+			"path": "pages/home/supportWP",
+			"style": {
+				"navigationBarTitleText": "manager界面"
+			}
+		}, 
+		{
+			"path": "pages/chat/chat",
+			"style": {
+				"navigationBarTitleText": "消息"
+			}
+		},
+		{
+			"path": "pages/chat/person-chat",
+			"style": {
+				"navigationBarTitleText": "动态标题"
+			}
+		},
+		{
+			"path": "pages/chat/group-chat",
+			"style": {
+				"navigationBarTitleText": "动态标题"
+			}
+		},
+		// #ifde APP-PLUS
 		{
 			"path": "pages/WP_manager/business-request",
 			"style": {
@@ -107,6 +151,12 @@
 			}
 		}, 
 		{
+			"path": "pages/WP_manager/phoerConfirm",
+			"style": {
+
+			}
+		}, 
+		{
 			"path": "pages/WP_manager/phoer-quit-request",
 			"style": {
 		
@@ -118,7 +168,7 @@
 		
 			}
 		}, 
-		// endi
+		// #endi
 		{
 			"path": "pages/ucenter/login-page/index/index",
 			"style": {
@@ -258,6 +308,7 @@
 				"navigationBarTitleText": "意见反馈",
 				"enablePullDownRefresh": false
 			}
+
 		}
     
 	// #ifndef MP

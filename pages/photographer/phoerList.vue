@@ -10,7 +10,6 @@
 				:key="index"
 			>
 				<u-cell
-					:title="item.name"
 					:value="item.intro"
 					:label="item.phoneNumber"
 					center
@@ -25,6 +24,15 @@
 						customStyle="margin: -3px 5px -3px 0"
 						mode="aspectFill"
 					></u-avatar>
+					<view slot="title" style="display: flex;flex-direction: row;font-size:29rpx">
+						<text style="margin-right: 15rpx;">{{item.name}}</text>
+						<u-tag
+							text="平台摄影师"
+							type="success"
+							size="mini"
+							v-if="item.isWPPhoer"
+						></u-tag>
+					</view>
 				</u-cell>
 			</u-list-item>
 			
@@ -70,12 +78,12 @@
 				// #ifdef H5 || MP
 				let version='H5OrMP'
 				// #endif
+				//真机调试暂用  
+				// let version='H5OrMP'
 				uniCloud.database().action('filterLowVersion').collection('photographer').where({
 					OnlineStatus:true,
 					version:version
 				}).get().then((res)=>{
-					console.log('phoerList');
-					console.log(res);
 					res.result.data=AES.AES.decrypt(res.result.data,'1234567891234567','1234567891234567')
 					res.result.data=JSON.parse(decodeURIComponent(res.result.data))
 					if(res.result.data.length>0){
@@ -86,6 +94,9 @@
 					if(this.phoerList.length==0){
 						this.empty=true
 					}
+				}).catch(e=>{
+					console.log('phoerlist catch');
+					console.log(e);
 				})
 			}
 		},

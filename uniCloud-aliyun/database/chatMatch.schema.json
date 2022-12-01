@@ -1,0 +1,62 @@
+// 文档教程: https://uniapp.dcloud.net.cn/uniCloud/schema
+{
+	"bsonType": "object",
+	"required": [],
+	"permission": {
+		"read": true,
+		"create": true,
+		"update": true,
+		"delete": true
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+		"chatMsg":{
+			"description": "用于前端查询时返回对应chatMatchId的chatMsg表数据",
+			"defaultValue":"doc._id"
+		},
+		"phoerAvatar":{
+			"bsonType": "string",
+			"description": "摄影师头像 其实应该是photographer.phoerShow[0]"
+			// ,"foreignKey": "photographer.phoerShow"
+		},
+		"phoerId":{
+			"bsonType": "string",
+			"description": ""
+			// ,"foreignKey": "photographer.userId"
+		},
+		"phoerName":{
+			"bsonType": "string",
+			"description": ""
+			// ,"foreignKey": "photographer.name"
+		},
+		"phoerPushId":{
+			"bsonType": "string",
+			"description": "推送id,同时也是chatMsg表的to_cid或from_cid"
+			// ,"foreignKey": "photographer.push_clientid"
+		},
+		"userAvatar":{
+			"bsonType": "string",
+			"description": ""
+		},
+		"userId":{
+			"bsonType": "string",
+			"description": ""
+			// ,"foreignKey": "uni-id-users._id"
+		},
+		"userName":{
+			"bsonType": "string",
+			"description": ""
+			// ,"foreignKey": "uni-id-users.nickname"
+		},
+		"userPushId":{
+			"bsonType": "string",
+			"description": "chatMsg表的to_cid或from_cid"
+			
+		}
+		
+
+	}
+	
+}

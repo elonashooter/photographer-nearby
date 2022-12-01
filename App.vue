@@ -14,12 +14,46 @@
 		onLaunch: function() {
 			// #ifde APP-PLUS
 			uni.onPushMessage((res) => {
-				//4种情况  摄影师接单 摄影师接单得到确认  用户预约  用户预约得到确认
-				console.log("push rec123");
+				//	1用于接收聊天信息  2用于接收摄影师相关信息
+				// 摄影师通知的4种情况  摄影师接单 摄影师接单得到确认  用户预约  用户预约得到确认
 				console.log(res);
-				uni.navigateTo({
-					url:"/pages/order/fab?bothMsg="+encodeURIComponent(JSON.stringify(res.data))
-				})
+				let payload = res.data.payload
+				if(res.data.title=='isChatMsg'){
+					console.log("isChatMsg");
+					// home页面右上角的红点  因为是练习所以store+computed+watch/$emit+$on两种监听方式都尝试一下  emit的方式不知道为什么不行
+					this.$store.commit('chat/setRedDot',true) //待定 可能有问题要换成getCurrentPages()[0].$vm.$store
+					uni.getStorage({
+						key:'chatHistory',
+						success(res) {
+							let chatHistory=res.data
+							for(var i of chatHistory){
+								if(i.chatMatchId==payload.chatMatchId){
+									i.unReadNum+=1
+									chatHistory[chatHistory.indexOf(i)].chatMsg.push(payload)
+								}
+							}
+							uni.setStorageSync('chatHistory',chatHistory)
+						}
+					})
+					this.$store.commit('chat/lastMsg',payload)
+					this.$store.commit('chat/addChatHistory',{chatMatchId:payload.chatMatchId,chatMsg:payload})
+					
+					// uni.$emit('updateChatMatch',res.data.payload)
+					// uni.$emit('updateChatMsg',res.data.payload)
+				}else if(res.data.title=='addChatMatch'){
+					console.log('addChatMatch');
+					this.$store.commit('chat/setRedDot',true)
+					this.$store.commit('chat/addChatMatch',payload)
+					let chatHistory = uni.getStorageSync('chatHistory') || [];
+					chatHistory.push(payload)
+					uni.setStorageSync("chatHistory",chatHistory)
+				}
+				//摄影师相关信息
+				else{
+					uni.navigateTo({
+						url:"/pages/order/fab?bothMsg="+encodeURIComponent(JSON.stringify(res.data))
+					})
+				}
 				// uni.createPushMessage({
 				// 	title:res.data.title,
 				// 	content:res.data.content,
@@ -28,7 +62,20 @@
 			});
 
 			// #endi
+			uni.getStorage({
+				key:'chatHistory',
+				success() {
+					
+				},
+				fail() {
+					uni.setStorage({
+						key:'chatHistory',
+						data:[]
+					})
+				}
+			})
 			console.log('App Launch')
+			
 			this.globalData.$i18n = this.$i18n
 			this.globalData.$t = str => this.$t(str)
 

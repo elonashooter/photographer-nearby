@@ -77,7 +77,8 @@
 		},
 		"rejectIds": {
 			"bsonType": "array",
-			"description": "拒绝过的摄影师id"
+			"description": "拒绝过的摄影师id",
+			"defaultValue":[]
 		},
 		"userId": {
 			"bsonType": "string",
@@ -118,6 +119,11 @@
 			"bsonType": "string",
 			"description": "此单摄影师被推送设备识别码"
 		},
+		"symbolPhotos":{
+			"bsonType": "array",
+			"description": "样片，可选",
+			"defaultValue":[]
+		}
 
 
 		// "pay_type": {

@@ -211,7 +211,6 @@
 				this.showReject=false
 				this.phoerInfo=JSON.parse(decodeURIComponent(e.dealMsg))
 				this.symbols=this.phoerInfo.symbolsUrl
-				debugger
 			}
 		},
 		methods: {
@@ -331,10 +330,14 @@
 			
 			phoneCall(){
 				console.log("phoneCall");
-				// #ifdef APP-PLUS
+				// #ifdef H5 || MP
 				uni.makePhoneCall({
 					phoneNumber:this.phoerInfo.phoneNumber
 				})
+				// #endif
+				//#ifdef APP-PLUS
+				plus.device.dial(this.phoerInfo.phoneNumber,true)
+				console.log('plus');
 				// #endif
 			}
 		},

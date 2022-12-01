@@ -36,11 +36,8 @@
 							placeholder="联系电话"
 							:disabled="inputDisable"
 						></u--input>
-						<u-icon
-							size="28"
-							name='phone'
-							@click="phoneCall"
-						></u-icon>
+
+						<uni-icons type='phone' size='30' color="#55aa00" @click="phoneCall"></uni-icons>
 					</u-form-item>
 					<u-form-item
 						label=""
@@ -62,7 +59,7 @@
 								<view class="uni-uploader__files">
 									<block v-for="(image,index) in phoerInfo.phoerShow" :key="index">
 										<view class="uni-uploader__file">
-											<uni-icons type="closeempty" class="close" size="20" @click="DelPShow()"></uni-icons>
+											<uni-icons type="closeempty" class="close" size="20" @click="DelPShow()" v-if="!showLoading"></uni-icons>
 											<image class="uni-uploader__img" :src="image" mode="aspectFill" :data-src="image" @tap="previewPhoerShow"></image>
 										</view>
 									</block>
@@ -81,15 +78,17 @@
 						ref="item3"
 					>
 						<u--textarea
-							placeholder="填写擅长的内容，也可当个性签名使用"
+							placeholder="填写擅长的内容，也可当个性签名使用,要求精简"
 							v-model="phoerInfo.intro"
 							count
 							confirmType="done"
 							:disabled="inputDisable"
+							count
+							maxlength='25'
 						></u--textarea>
 					</u-form-item>
 					<u-form-item
-						label="代表作"
+						label="作品"
 						prop="symbols"
 						ref="item5"
 					>
@@ -99,12 +98,13 @@
 							<view class="uni-uploader-title">点击可预览选好的图片</view>
 							<view class="uni-uploader-info">{{symbols.length}}/9</view>
 						</view>
+						<!-- <imagePicker :images="symbols" imageName="symbolsOf " count=9  @delImg='DelSymbols'></imagePicker> -->
 						<view class="uni-uploader-body">
 							<view class="uni-uploader__files">
 								<block v-for="(image,index) in symbols" :key="index">
 									<view class="uni-uploader__file">
 										<!-- 注：uni.preview函数写在这只能是不加括号的，不然会报错 -->
-										<uni-icons type="closeempty" class="close" size="20" @click="DelImg(index)"></uni-icons>
+										<uni-icons type="closeempty" class="close" size="20" @click="DelImg(index)" v-if="!showLoading"></uni-icons>
 										<image class="uni-uploader__img" mode="aspectFill" :src="image" :data-src="image" @tap="previewSymbols"></image>
 									</view>
 								</block>
@@ -113,10 +113,11 @@
 								</view>
 							</view>
 						</view>
+						
 					</view>
 					<view style="margin: 20rpx 10rpx;">
 						<u--text
-							text='作品名称'
+							text='作品关键词'
 							type="warning"
 						></u--text>
 						<u--input
@@ -129,7 +130,7 @@
 					</view>
 					<view style="margin: 20rpx 10rpx;" >
 						<u--text
-							:text="'作品名:  '+phoerInfo.symbolsTag"
+							:text="'作品关键词:  '+phoerInfo.symbolsTag"
 							type="warning"
 						></u--text>
 					</view>
@@ -142,6 +143,28 @@
 					@click="submit()"
 				></u-button>
 			</view>
+			
+<!-- 			symbolUploadMsg
+			<view class="uni-uploader-body">
+				<view class="uni-uploader__files">
+					<block v-for="(image,index) in symbolsUploadMsg" :key="index">
+						<view class="uni-uploader__file">
+							<image class="uni-uploader__img" mode="aspectFill" :src="image.url" :data-src="image" @tap="previewSymbols"></image>
+						</view>
+					</block>
+				</view>
+			</view>
+			phoerInfo.symbols
+			<view class="uni-uploader-body">
+				<view class="uni-uploader__files">
+					<block v-for="(image,index) in phoerInfo.symbolsUrl" :key="index">
+						<view class="uni-uploader__file">
+							<image class="uni-uploader__img" mode="aspectFill" :src="image" :data-src="image" @tap="previewSymbols"></image>
+						</view>
+					</block>
+				</view>
+			</view> -->
+			
 			
 			<view style="margin-top: 25rpx;">
 				用户查看到的效果：
@@ -215,24 +238,39 @@
 				@confirm="modalConfirm()"
 				@cancel="() => showModal = false"
 			></u-modal>
+			
+			<u-loading-page
+			    :loadingText=loadingText
+				image='/static/11layCircle.png'
+				iconSize='200'
+			    bgColor="#ffffff"
+			    :loading="showLoading"
+			    color="#ff5500"
+			>
+			</u-loading-page>
 		</view>
 	</view>
 </template>
 
 <script>
+	// import imagePicker from '../HzComponents/imagePicker.vue'
 	let pdb=uniCloud.database().collection('photographer')
 	let ppdb=uniCloud.database().collection('pre-photographer')
-	let symbolsUploadMsg=[]
 	let initAvatar=''
 	let symbols_online=[]//读取到的已存在云端的图，用于给DELIMG方法识别
 	let phoerShowHistory=[]
 	let symbolsHistory=[]
 	export default {
+		// components{
+		// 	imagePicker
+		// },
 		data() {
 			return {
+				symbolsUploadMsg:[],
 				showPopup:false,//个人形象说明框
 				showModal:false,//提交确认框
 				showWaitingPage:false,//提交信息在审核中的显示页面参数
+				showLoading:false,
 				inputDisable:false,
 				phoerInfo: {
 					name: '',
@@ -262,6 +300,7 @@
 						trigger: ['change']
 					},
 				},
+				loadingText:"夹崽中"
 			}
 		},
 		onReady() {
@@ -271,20 +310,22 @@
 		},
 		onLoad(e) {		//根据传来的参数确定是什么角色点进来的
 			// 只有摄影师与新摄影师
+			// console.log(this.$store.state.user.info);
 			if(e.phoerId){
 				// 摄影师提交修改
-				console.log("onload get an e");
-				console.log(e);
+				// console.log("onload get an e");
+				// console.log(e);
 				this.phoerId=e.phoerId  //其他页面传过来的
 				ppdb.where({userId:this.phoerId}).orderBy('create_time').get().then(res=>{
 					// console.log("ppdb");
-					console.log(res.result.data);
+					// console.log(res.result.data);
 					this.phoerInfo=res.result.data[res.result.data.length-1] //最新数据
+					// console.log(this.phoerInfo);
 					this.symbols=this.phoerInfo.symbolsUrl
 					symbols_online=this.phoerInfo.symbolsUrl
 					initAvatar=this.phoerInfo.phoerShow[0]
 					delete this.phoerInfo._id  //删除_id用于新增
-					phoerShowHistory=this.phoerInfo.phoerShowHistory
+					phoerShowHistory=this.phoerInfo.phoerShowHistory.concat()
 					symbolsHistory=this.phoerInfo.symbolsHistory
 					if(this.phoerInfo.AuditStatus!==0){
 						this.inputDisable=false
@@ -324,6 +365,13 @@
 
 		},
 		methods: {
+			loading(loadingText){
+				this.showLoading=true
+				loadingText?this.loadingText=loadingText:''
+			},
+			HideLoading(){
+				this.showLoading=false
+			},
 			popupOpen() {
 				// console.log('open');
 				this.showPopup = true
@@ -356,8 +404,8 @@
 			getPushClientId(){
 				uni.getPushClientId({
 						success: (res) => {
-							console.log('获取手机识别码成功')
-							console.log(res.cid);
+							// console.log('获取手机识别码成功')
+							// console.log(res.cid);
 							this.phoerInfo.push_clientid=res.cid
 						},
 						fail(err) {
@@ -403,7 +451,7 @@
 				sizeType:'compressed',
 				uni.chooseImage({
 					count:1,
-					success: (res) => {
+					success: (res) => {//H5端和app端的返回res是不一样的
 						 
 						this.phoerInfo.phoerShow=this.phoerInfo.phoerShow.concat(res.tempFilePaths)
 						this.phoerShowName="phoerShowNameOf "+this.$store.state.user.info._id
@@ -452,21 +500,34 @@
 						 
 						//这样写有个好处  摄影师修改信息时只会上传symbolsUploadMsg新增的照片
 						for(let i=0;i<res.tempFilePaths.length;i++){
-							symbolsUploadMsg.push({
-								name:"symbolsOf "+this.$store.state.user.info._id+" "+symbolsUploadMsg.length.toString(),
+							this.symbolsUploadMsg.push({  //增删新图
+								name:"symbolsOf "+this.$store.state.user.info._id+" "+this.symbolsUploadMsg.length.toString(),
 								url:res.tempFilePaths[i]
 							})
 						}
 					},
 				})
-				console.log(this.symbolsUploadMsg);
 			},// 代表作导入并预览  end
+			// DelSymbols(item){
+			// 	this.phoerInfo.symbolsUrl=this.phoerInfo.symbolsUrl.filter((x)=>x!=item)
+			// },
 			DelImg(index){
 				//判断要删的对象是本地新上传的还是online已有的
-				if(this.symbols[index] in symbols_online){
+				console.log(symbols_online);
+				if(symbols_online.includes(this.symbols[index])){
+					console.log('symbols deleted');
 					this.phoerInfo.symbolsUrl=this.phoerInfo.symbolsUrl.filter((x)=>x!=this.symbols[index])
+					// this.phoerInfo.symbolsUrl.splice(this.phoerInfo.symbolsUrl.indexOf(this.symbols[index]),1)
 				}else{
-					symbolsUploadMsg.filter((x)=>x.url!=this.symbols[index])
+					console.log('this.symbolsUploadMsg deleted');
+					this.symbolsUploadMsg=this.symbolsUploadMsg.filter((x)=>x.url!=this.symbols[index])//增删新图
+					// for(var i of this.symbolsUploadMsg){
+					// 	if(i.url==this.symbols[index]){
+					// 		this.symbolsUploadMsg.splice(this.symbolsUploadMsg.indexOf(i),1)
+					// 	}
+					// }
+					// console.log(this.symbolsUploadMsg[0].url==this.symbols[index]);
+					// console.log(this.symbolsUploadMsg);
 				}
 				this.symbols.splice(index,1)
 
@@ -477,14 +538,16 @@
 			},
 			
 			phoneCall(){
-				console.log(this.phoerInfo.phoerShow);
-				console.log(symbolsUploadMsg);
 				console.log("phoneCall");
 				// console.log(typeof(this.phoerInfo.phoneNumber));
-				// #ifdef APP-PLUS
+				// #ifdef H5 || MP
 				uni.makePhoneCall({
-					phoneNumber:this.phoerInfo.phoneNumber
+					phoneNumber:phoneNumber
 				})
+				// #endif
+				//#ifdef APP-PLUS
+				plus.device.dial(phoneNumber,true)
+				console.log('plus');
 				// #endif
 			},
 			submit() {
@@ -503,10 +566,14 @@
 			},
 			uploadMsg(){
 					//用户申请一般流程
+				this.loading("正在提交信息")
 				ppdb.add({...this.phoerInfo,
 					AuditStatus:0,
 					symbolsHistory:symbolsHistory,
 					phoerShowHistory:phoerShowHistory}).then((res) => {
+
+							this.HideLoading()
+
 							uni.showToast({
 								icon: 'none',
 								title: '提交成功'
@@ -523,8 +590,10 @@
 				
 			},
 			getImgUrlAndUpload(){
+				this.loading()
 				//上传个人形象
 				if (this.phoerInfo.phoerShow[0]!=initAvatar || initAvatar=='') {
+					this.loading("正在上传个人形象")
 					uniCloud.uploadFile({
 					filePath: this.phoerInfo.phoerShow[0],
 					cloudPath: this.phoerShowName,
@@ -547,9 +616,9 @@
 
 			},
 			uploadSymbols(){
-				 
-				if(symbolsUploadMsg.length>0){
-					for(var i of symbolsUploadMsg){
+				if(this.symbolsUploadMsg.length>0){
+					this.loading("正在上传作品")
+					for(var i of this.symbolsUploadMsg){
 						uniCloud.uploadFile({
 							filePath:i.url,
 							cloudPath:i.name,
@@ -561,7 +630,15 @@
 								// 上传的图片连接等于返回的代表作链接  意味着图片上传完毕 url获取完毕 可以上传了
 								if(this.phoerInfo.symbolsUrl.length==this.symbols.length){
 									this.uploadMsg()
+								}else{
+									console.log(this.phoerInfo.symbolsUrl);
+									console.log(this.symbols);
 								}
+							},
+							fail: (res) => {
+								this.HideLoading()
+								console.log('uploadSymbols fail');
+								console.log(res);
 							}
 						})		
 					}
@@ -574,90 +651,5 @@
 </script>
 
 <style lang="scss">
-.uni-uploader {
-	flex: 1;
-	flex-direction: column;
-}
-.uni-uploader-head {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-}
-.uni-uploader-info {
-	color: #B2B2B2;
-}
-.uni-uploader-body {
-	margin-top: 16rpx;
-}
-.uni-uploader__files {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-}
-.uni-uploader__file {
-	position: relative;
-	margin: 10rpx;
-	width: 210rpx;
-	height: 210rpx;
-}
-.uni-uploader__img{
-	display: block;
-	width: 210rpx;
-	height: 210rpx;
-}
-.uni-uploader__input-box {
-	position: relative;
-	margin:10rpx;
-	width: 208rpx;
-	height: 208rpx;
-	border: 2rpx solid #D9D9D9;
-}
-.uni-uploader__input-box {
-	position: relative;
-	margin:10rpx;
-	width: 208rpx;
-	height: 208rpx;
-	border: 2rpx solid #D9D9D9;
-}
-.uni-uploader__input-box:before,
-.uni-uploader__input-box:after {
-	content: " ";
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	-webkit-transform: translate(-50%, -50%);
-	transform: translate(-50%, -50%);
-	background-color: #D9D9D9;
-}
-.uni-uploader__input-box:before {
-	width: 4rpx;
-	height: 79rpx;
-}
-.uni-uploader__input-box:after {
-	width: 79rpx;
-	height: 4rpx;
-}
-.uni-uploader__input-box:active {
-	border-color: #999999;
-}
-.uni-uploader__input-box:active:before,
-.uni-uploader__input-box:active:after {
-	background-color: #999999;
-}
-.uni-uploader__input {
-	position: absolute;
-	z-index: 1;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	opacity: 0;
-}
-.close{
-	position: absolute;
-	right: 0;
-	background-color: rgba(0, 0, 0, .4);
-	color:#fff;
-	z-index:10
-}	
+	@import '../../common/imagePicker.scss'
 </style>

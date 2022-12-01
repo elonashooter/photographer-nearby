@@ -1,0 +1,7 @@
+{
+  "name": "clearHistoryImg",
+  "dependencies": {},
+  "extensions": {
+    "uni-cloud-jql": {}
+  }
+}

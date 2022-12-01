@@ -88,7 +88,7 @@
 							v-model="agreed.place"
 							border="none"
 							placeholder="在哪拍摄  非必填"
-							prefixIcon="photo-fill"
+							prefixIcon="search"
 							prefixIconStyle="font-size: 22px;color: #909399"
 						></u--input>
 					</u-form-item>
@@ -118,7 +118,6 @@
 						<u--input
 							:disabled="disabled"
 							v-model="agreed.time"
-							disabled
 							disabledColor="#ffffff"
 							placeholder="拍摄时间"
 							border="none"
@@ -130,6 +129,38 @@
 							name="arrow-right"
 						></u-icon>
 					</u-form-item>
+					<u-form-item
+						label="样片"
+						v-if="ButtonText=='提交' || ButtonText=='修改'"
+					>
+						<u--input
+							disabled
+							disabledColor="#ffffff"
+							placeholder="心仪风格的照片,非必填"
+							border="none"
+							prefixIcon="photo-fill"
+							prefixIconStyle="font-size: 22px;color: #909399"
+						></u--input>
+						<view class="uni-uploader__input-box" v-if="showLoading===false">
+							<view class="uni-uploader__input" @tap="chooseSymbols()"></view>
+						</view>
+					</u-form-item>
+					
+					<view class="uni-uploader__files">
+						<u--text
+							text='样片'
+							type="warning"
+							v-if="!(ButtonText=='提交' || ButtonText=='修改') && agreed.symbolPhotos.length>0"
+						></u--text>
+						<block v-for="(image,index) in symbolPhotos" :key="index">
+							<view class="uni-uploader__file">
+								<!-- 注：uni.preview函数写在这只能是不加括号的，不然会报错 -->
+								<uni-icons type="closeempty" class="close" size="20" @click="DelImg(index)" v-if="showLoading==false && (ButtonText=='提交' || ButtonText=='修改')" ></uni-icons>
+								<image class="uni-uploader__img" mode="aspectFill" :src="image" :data-src="image" @tap="previewSymbols"></image>
+							</view>
+						</block>
+					</view>
+					
 				</u--form>
 				<!-- 提交按钮 -->
 				<u-button
@@ -170,15 +201,15 @@
 							<text class="u-demo-block__title">个人照</text>
 							<view class="u-demo-block__content">
 								<view class="text-item">
-									<u--text text="25元每组，每组10张"></u--text>
+									<u--text text="128元,9张精修,底片全送"></u--text>
 								</view>
 							</view>
 						</view>
 						<view class="u-demo-block">
-							<text class="u-demo-block__title">宿舍集体照</text>
+							<text class="u-demo-block__title">多人照</text>
 							<view class="u-demo-block__content">
 								<view class="text-item">
-									<u--text text="150元每组，每组10张"></u--text>
+									<u--text text="4人428元,15张精修,底片全送"></u--text>
 								</view>
 							</view>
 						</view>
@@ -186,15 +217,7 @@
 							<text class="u-demo-block__title">情侣照</text>
 							<view class="u-demo-block__content">
 								<view class="text-item">
-									<u--text text="60元每组，每组10张">60元每组，每组10张</u--text>
-								</view>
-							</view>
-						</view>
-						<view class="u-demo-block">
-							<text class="u-demo-block__title">班级集体照</text>
-							<view class="u-demo-block__content">
-								<view class="text-item">
-									<u--text text="500元每组，每组5张"></u--text>
+									<u--text text="188元,9张精修,底片全送"></u--text>
 								</view>
 							</view>
 						</view>
@@ -237,7 +260,7 @@
 						
 		</view>
 				<u-loading-page
-				    loadingText="加崽中..."
+				    :loadingText="loadingText"
 					image='/static/11layCircle.png'
 					iconSize='200'
 				    bgColor="#ffffff"
@@ -250,17 +273,21 @@
 
 <script>
 	let odb=uniCloud.database().collection('photography-order')
+	let symbols_online=[]
 	export default {
 		data() {
 			return {
+				symbolsUploadMsg:[],
 				disabled:false,
 				orderId:'',
 				fileList1: [],
 				showTime: false,
 				showPopup:false,
 				showLoading:false,
+				loadingText:'夹崽中',
 				ButtonText:'',
 				ButtonAction:'',
+				symbolPhotos:[],
 				agreed: {  //约定拍摄的时间、地点等信息
 					userInfo: {
 						name: '',
@@ -273,7 +300,8 @@
 					time:'',
 					userId:this.$store.state.user.info._id,
 					phoerId:'',
-					order_push_clientid:''
+					order_push_clientid:'',
+					symbolPhotos:[]
 				},
 				radiolist1: [{
 						name: '个人照',
@@ -379,6 +407,8 @@
 			//用户点列表过来的
 			if(e.orderMsg){
 				this.agreed=JSON.parse(decodeURIComponent(e.orderMsg))
+				console.log('agree');
+				console.log(this.agreed);
 				if(this.agreed.orderStatus===0){
 					this.ButtonText='修改'
 					this.ButtonAction='editOrder'
@@ -449,6 +479,10 @@
 				this.stepActive=0
 			}
 			
+			if(this.agreed.symbolPhotos.length>0){
+				symbols_online=this.agreed.symbolPhotos
+				this.symbolPhotos=this.agreed.symbolPhotos
+			}
 			
 		},
 		methods: {
@@ -459,9 +493,35 @@
 					message: '上传中'
 				})
 			},
-
-			navigateBack() {
-				uni.navigateBack()
+			chooseSymbols(){
+				uni.chooseImage({
+					sizeType:'compressed',
+					count: 9,
+					// sourceType: 'album',
+					// sizeType: 'original',
+					success: (res) => {
+						console.log(res);
+						this.symbolPhotos=this.symbolPhotos.concat(res.tempFilePaths)
+						for(let i=0;i<res.tempFilePaths.length;i++){
+							this.symbolsUploadMsg.push({  //增删新图
+								name:"userSymbolPhotos "+this.$store.state.user.info._id+" "+this.symbolsUploadMsg.length.toString(),
+								url:res.tempFilePaths[i]
+							})
+						}
+					},
+				})
+			},
+			DelImg(index){
+				//判断要删的对象是本地新上传的还是online已有的
+				if(symbols_online.includes(this.symbolPhotos[index])){
+					this.agreed.symbolPhotos=this.agreed.symbolPhotos.filter((x)=>x!=this.symbolPhotos[index])
+				}else{
+					console.log('delete symbolsUploadMsg');
+					this.symbolsUploadMsg=this.symbolsUploadMsg.filter((x)=>x.url!=this.symbolPhotos[index])//增删新图
+					console.log(this.symbolsUploadMsg);
+				}
+				this.symbolPhotos.splice(index,1)
+			
 			},
 
 			TimeClose() {
@@ -500,7 +560,8 @@
 				}
 				
 			},
-			loading(){
+			loading(text){
+				this.loadingText=text
 				this.showLoading=true
 			},
 			HideLoading(){
@@ -509,27 +570,37 @@
 			submit() {
 				// 校验表单  如果有错误，会在catch中返回报错信息数组，校验通过则在then中返回true
 				this.$refs.form1.validate().then(res => {
-					this.loading()
+					this.loading('正在上传作品')
+					for(var i of this.symbolsUploadMsg){
+						uniCloud.uploadFile({
+							filePath:i.url,
+							cloudPath:i.name,
+							success: (res) => {
+								this.agreed.symbolPhotos.push(res.fileID)
+								if(this.agreed.symbolPhotos.length==this.symbolPhotos.length){
+									this.loading('正在上传信息')
+									odb.add(this.agreed).then((res) => {
+										// console.log("res here");
+										// console.log(res);
+									  // // debugger
+									  // this.getOpenerEventChannel().emit('refreshData')
+									  uni.$u.toast('上传成功')
+									  setTimeout(() => uni.reLaunch({
+										url:"/pages/home/home"
+									  }), 500)
+									  this.HideLoading()
+									  //提交成功后跳转至订单列表页面
+									}).catch(e=>{
+										console.log( "odb上传失败");
+										console.log(e);
+									})
+								}
+								
+							}
+						})
+					}
 					//有传来订单id则为修改  否则为上传
-					odb.add(this.agreed).then((res) => {
-						// console.log("res here");
-						// console.log(res);
-					  this.HideLoading()
-					  uni.showToast({
-					    icon: 'none',
-					    title: '提交成功'
-					  })
-					  // // debugger
-					  // this.getOpenerEventChannel().emit('refreshData')
-					  setTimeout(() => uni.reLaunch({
-					  	url:"/pages/home/home"
-					  }), 500)
-					  
-					  //提交成功后跳转至订单列表页面
-					}).catch(e=>{
-						console.log( "odb上传失败");
-						console.log(e);
-					})
+
 					
 				}).catch(errors => {
 					console.log("error here")
@@ -635,7 +706,8 @@
 					price:this.agreed.price,
 					place:this.agreed.place,
 					intro:this.agreed.intro,
-					time:this.agreed.time
+					time:this.agreed.time,
+					symbolPhotos:this.symbolPhotos
 				}).then(res=>{
 					this.HideLoading()
 					uni.showToast({
@@ -674,10 +746,17 @@
 					
 				})
 			},
+			previewSymbols: function(e) {
+				var current = e.target.dataset.src
+				uni.previewImage({
+					current: current,
+					urls: this.symbolPhotos
+				})
+			},
 			yuyue(){
 				console.log("yuyue agreed here");
 				console.log(this.agreed);
-				this.loading()
+				this.loading('正在发起预约')
 				this.$refs.form1.validate().then(res => {
 					// uni.$u.toast('校验通过')
 					this.agreed.orderStatus=101
@@ -725,9 +804,11 @@
 </script>
 
 <style lang="scss">
+	@import '../../common/imagePicker.scss';
+	
 	.text-item {
 		margin-right: 10px;
 		flex: 1;
 	}
-
+	
 </style>

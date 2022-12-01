@@ -190,7 +190,9 @@
 						success: res => {
 							if (res.confirm) {
 								this.logout()
-								uni.navigateBack();
+								uni.reLaunch({
+									url:'/pages/ucenter/login-page/pwd-login/pwd-login'
+								})
 							}
 						},
 						fail: () => {},

@@ -2,9 +2,9 @@
 	"bsonType": "object",
 	"required": [],
 	"permission": {
-		"read": "'filterLowVersion' in action",
+		"read": "'filterLowVersion' in action|| 'photographer' in auth.role",
 		"create": true,
-		"update": "doc._id==auth.uid || 'WP_manager' in auth.role",
+		"update": true,
 		"delete": "doc._id==auth.uid || 'WP_manager' in auth.role"
 	},
 	"fieldRules": [{
@@ -43,10 +43,6 @@
 			"bsonType": "array",
 			"description": "摄影师形象"
 		},
-		"phoerShowUrl": {
-			"bsonType": "string",
-			"description": "摄影师形象连接"
-		},
 		"WorkState": {
 			"bsonType": "bool",
 			"description": "true为在职，false为不在职（含离职与审核中）",
@@ -72,6 +68,18 @@
 		"push_clientid":{
 			"bsonType": "string",
 			"description": "摄影师被推送设备识别码"
+		},
+		"workedUserId":{
+			"bsonType": "array",
+			"description": "聊天、电话、接单过的用户Id",
+			"permission": {
+				"update":true
+			}
+		},
+		"isWPPhoer":{
+			"bsonType": "bool",
+			"description": "是否为简拍摄影师",
+			"defaultValue":false
 		}
 		// "pay_type": {
 		// 	"bsonType": "string",
