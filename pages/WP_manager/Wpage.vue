@@ -24,15 +24,20 @@
 				<text>平台认证</text>
 			</view>
 		</view>
-		
-		<button @click="clearData()">清空当前用户数据</button>
-		<button @click="clearHistoryImg()">清空历史图片</button>
+		<view style="display: flex;flex-direction: row;">
+			<button @click="clearData()">清空当前用户数据</button>
+			<!-- <button @click="clearHistoryImg()">清空历史图片</button>
+			 -->
+			 <button @click="resetChatMatch()">重置聊天信息</button>
+		</view>
+
 		
 
 	</view>
 </template>
 
 <script>
+	const db = uniCloud.database()
 	import {
 		mapGetters
 	} from 'vuex';
@@ -91,7 +96,7 @@
 				//删图
 				let photos=[]
 				let Msg={}
-				uniCloud.database().collection('photographer').where({userId:this.$store.state.user.info._id}).get().then(res=>{
+				db.collection('photographer').where({userId:this.$store.state.user.info._id}).get().then(res=>{
 					if(res.length>0){
 						Msg=res.data[res.data.length-1]
 						photos=Msg.phoerShowHistory.concat(Msg.symbolsHistory)
@@ -107,18 +112,18 @@
 						this.threeDelete()
 					}
 				})
-				// uniCloud.database().collection('pre-photographer').where({
+				// db.collection('pre-photographer').where({
 				// 	create_time:dbCmd.gt(1664273248)
 				// }).remove()
-				// uniCloud.database().collection('pre-photographer').where("create_time>1664273248").remove()
+				// db.collection('pre-photographer').where("create_time>1664273248").remove()
 
 				
 			},
 			threeDelete(){
 				let did=this.$store.state.user.info._id
-				uniCloud.database().collection('pre-photographer').where({userId:did}).remove()
-				uniCloud.database().collection('photographer').where({userId:did}).remove()
-				uniCloud.database().collection('uni-id-users').doc(did).update({
+				db.collection('pre-photographer').where({userId:did}).remove()
+				db.collection('photographer').where({userId:did}).remove()
+				db.collection('uni-id-users').doc(did).update({
 					role:[]
 				})
 			},
@@ -127,8 +132,16 @@
 					name:'clearHistoryImg',
 					data:''
 				})
+			},
+			resetChatMatch(){
+				db.collection('chatMatch').where({}).remove()
+				db.collection('chatMsg').where({}).remove()
+				db.collection('photographer').where({}).update({
+					workedUserId:[]
+				})
+				uni.removeStorageSync('chatHistory')
+				uni.$u.toast('1')
 			}
-			
 		},
 
 	}

@@ -240,7 +240,7 @@
 			></u-modal>
 			
 			<u-loading-page
-			    :loadingText=loadingText
+			    :loadingText="loadingText"
 				image='/static/11layCircle.png'
 				iconSize='200'
 			    bgColor="#ffffff"
@@ -593,7 +593,7 @@
 				this.loading()
 				//上传个人形象
 				if (this.phoerInfo.phoerShow[0]!=initAvatar || initAvatar=='') {
-					this.loading("正在上传个人形象")
+					this.loading("正在提交信息")
 					uniCloud.uploadFile({
 					filePath: this.phoerInfo.phoerShow[0],
 					cloudPath: this.phoerShowName,
@@ -617,7 +617,7 @@
 			},
 			uploadSymbols(){
 				if(this.symbolsUploadMsg.length>0){
-					this.loading("正在上传作品")
+					this.loading("正在提交信息")
 					for(var i of this.symbolsUploadMsg){
 						uniCloud.uploadFile({
 							filePath:i.url,

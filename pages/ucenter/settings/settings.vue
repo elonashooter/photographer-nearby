@@ -3,7 +3,7 @@
 		<!-- 功能列表 -->
 		<uni-list class="mt10" :border="false">
 			<uni-list-item :title="$t('settings.userInfo')" to="/pages/ucenter/userinfo/userinfo" link="navigateTo"></uni-list-item>
-			<uni-list-item v-if="userInfo.mobile" :title="$t('settings.changePassword')" :to="'/pages/ucenter/login-page/pwd-retrieve/pwd-retrieve?phoneNumber='+ userInfo.mobile" link="navigateTo"></uni-list-item>
+			<!-- <uni-list-item v-if="userInfo.mobile" :title="$t('settings.changePassword')" :to="'/pages/ucenter/login-page/pwd-retrieve/pwd-retrieve?phoneNumber='+ userInfo.mobile" link="navigateTo"></uni-list-item> -->
 		</uni-list>
 		<uni-list class="mt10" :border="false">
 		<!-- #ifndef H5 -->
@@ -26,6 +26,10 @@
 		<view class="bottom-back" @click="clickLogout">
 			<text class="bottom-back-text" v-if="hasLogin">{{$t('settings.logOut')}}</text>
 			<text class="bottom-back-text" v-else>{{$t('settings.login')}}</text>
+		</view>
+		
+		<view class="bottom-back" @click="clearImg" v-if="userInfo.role.includes('WP_manager')">
+			<text class="bottom-back-text">清除历史图片</text>
 		</view>
 	</view>
 </template>
@@ -82,6 +86,23 @@
 			//#endif
 		},
 		methods: {
+			clearImg(){
+				uniCloud.database().collection('photographer').where({
+					userId:this.userInfo._id
+				}).get().then(e=>{
+					// console.log(e.result.data[0].symbolsUrl);
+					
+					let fileList=e.result.data[0].symbolsUrl
+					uniCloud.callFunction({
+						name:'deleteImg',
+						data:{fileList:fileList}
+					})
+				}).catch(e=>{
+					console.log('clearaImg catch');
+					console.log(e);
+				})
+
+			},
 			...mapActions({
 				logout: 'user/logout'
 			}),

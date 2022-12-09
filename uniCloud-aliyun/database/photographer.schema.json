@@ -4,7 +4,7 @@
 	"permission": {
 		"read": "'filterLowVersion' in action|| 'photographer' in auth.role",
 		"create": true,
-		"update": true,
+		"update": "'photographer' in auth.role || 'WP_manager' in auth.role",
 		"delete": "doc._id==auth.uid || 'WP_manager' in auth.role"
 	},
 	"fieldRules": [{
@@ -74,7 +74,8 @@
 			"description": "聊天、电话、接单过的用户Id",
 			"permission": {
 				"update":true
-			}
+			},
+			"defaultValue":[]
 		},
 		"isWPPhoer":{
 			"bsonType": "bool",

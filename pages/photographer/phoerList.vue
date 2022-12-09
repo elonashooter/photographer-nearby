@@ -10,7 +10,7 @@
 				:key="index"
 			>
 				<u-cell
-					:value="item.intro"
+					:value="item.intro.length<11?item.intro:item.intro.substring(0,10)+'...'"
 					:label="item.phoneNumber"
 					center
 					isLink
@@ -24,14 +24,9 @@
 						customStyle="margin: -3px 5px -3px 0"
 						mode="aspectFill"
 					></u-avatar>
-					<view slot="title" style="display: flex;flex-direction: row;font-size:29rpx">
-						<text style="margin-right: 15rpx;">{{item.name}}</text>
-						<u-tag
-							text="平台摄影师"
-							type="success"
-							size="mini"
-							v-if="item.isWPPhoer"
-						></u-tag>
+					<view slot="title" style="display: flex;flex-direction: row;font-size:32rpx;position: relative;">
+						<text style="margin-right: 8rpx;">{{item.name}}</text>
+						<text v-if="item.isWPPhoer" style="color: white;background-color: seagreen;border-radius: 8rpx;font-size:6rpx;padding: 8rpx;width: 16vw;position: absolute;top:-45rpx">平台摄影师</text>
 					</view>
 				</u-cell>
 			</u-list-item>

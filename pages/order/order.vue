@@ -571,44 +571,44 @@
 				// 校验表单  如果有错误，会在catch中返回报错信息数组，校验通过则在then中返回true
 				this.$refs.form1.validate().then(res => {
 					this.loading('正在上传作品')
-					for(var i of this.symbolsUploadMsg){
-						uniCloud.uploadFile({
-							filePath:i.url,
-							cloudPath:i.name,
-							success: (res) => {
-								this.agreed.symbolPhotos.push(res.fileID)
-								if(this.agreed.symbolPhotos.length==this.symbolPhotos.length){
-									this.loading('正在上传信息')
-									odb.add(this.agreed).then((res) => {
-										// console.log("res here");
-										// console.log(res);
-									  // // debugger
-									  // this.getOpenerEventChannel().emit('refreshData')
-									  uni.$u.toast('上传成功')
-									  setTimeout(() => uni.reLaunch({
-										url:"/pages/home/home"
-									  }), 500)
-									  this.HideLoading()
-									  //提交成功后跳转至订单列表页面
-									}).catch(e=>{
-										console.log( "odb上传失败");
-										console.log(e);
-									})
+					if(this.symbolsUploadMsg.length>0){
+						for(var i of this.symbolsUploadMsg){
+							uniCloud.uploadFile({
+								filePath:i.url,
+								cloudPath:i.name,
+								success: (res) => {
+									this.agreed.symbolPhotos.push(res.fileID)
+									if(this.agreed.symbolPhotos.length==this.symbolPhotos.length){
+										this.loading('正在上传信息')
+										this.addOrder(this.agreed)
+									}
+									
 								}
-								
-							}
-						})
+							})
+						}
+					}else{
+						this.addOrder(this.agreed)
 					}
 					//有传来订单id则为修改  否则为上传
-
-					
 				}).catch(errors => {
 					console.log("error here")
 					console.log(errors);
 					uni.$u.toast('请完整填写数据')
 				})
-				
-				
+			},
+			addOrder(msg){
+				odb.add(msg).then((res) => {
+				  uni.$u.toast('上传成功')
+				  setTimeout(() => uni.reLaunch({
+					url:"/pages/home/home"
+				  }), 500)
+				  this.HideLoading()
+				  //提交成功后跳转至订单列表页面
+				}).catch(e=>{
+					this.HideLoading()
+					uni.$u.toast( "odb上传失败");
+					console.log(e);
+				})
 			},
 			hideKeyboard() {
 				uni.hideKeyboard()

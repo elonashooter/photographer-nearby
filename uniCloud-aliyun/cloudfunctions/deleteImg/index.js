@@ -1,16 +1,18 @@
 'use strict';
 exports.main = async (event, context) => {
+	let returnData = {}
 	uniCloud.deleteFile({
-		fileList:event,
-		success(){
-			console.log("删除成功");
-		},
-		fail(){
-			console.log("删除失败");
-		}
+		fileList:event.fileList
+
+	}).then(e=>{
+		console.log(e);
+		returnData=e
+	}).catch(e=>{
+		console.log(e);
+		returnData=e
 	})
 	//event为客户端上传的参数
 	
 	//返回数据给客户端
-	return
+	return returnData
 };

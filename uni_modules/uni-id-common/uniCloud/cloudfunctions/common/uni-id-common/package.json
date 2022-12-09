@@ -1,0 +1,6 @@
+{
+  "name": "uni-id-common",
+  "dependencies": {
+    "uni-id": "file:../../../../../uni-id/uniCloud/cloudfunctions/common/uni-id"
+  }
+}
