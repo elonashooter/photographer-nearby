@@ -619,10 +619,14 @@
 				if(this.symbolsUploadMsg.length>0){
 					this.loading("正在提交信息")
 					for(var i of this.symbolsUploadMsg){
+						console.log("i");
+						console.log(i);
 						uniCloud.uploadFile({
 							filePath:i.url,
 							cloudPath:i.name,
 							success:(res)=> {
+								console.log('success here')
+								console.log(res);
 								this.phoerInfo.symbolsUrl.push(res.fileID)
 								symbolsHistory=symbolsHistory.concat(res.fileID)
 								console.log("res.fileID");

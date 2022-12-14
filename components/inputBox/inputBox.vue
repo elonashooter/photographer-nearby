@@ -7,7 +7,7 @@
 		
 		<view class="icon-container">
 			<image class="input-icon" @tap="openDrawer(1)" src="@/static/icon/emoji.png"></image>
-			<image class="input-icon" @tap="selectImage()" src="@/static/icon/image.png"></image>
+			<!-- <image class="input-icon" @tap="selectImage()" src="@/static/icon/image.png"></image> -->
 			<!-- <image class="input-icon" @tap="selectVideo()" src="@/static/icon/video.png"></image> -->
 			<!-- #ifde APP-PLUS -->
 <!-- 			<lsj-upload
@@ -64,13 +64,13 @@
 				</view>
 			 </view>
 		</view> -->
-		<view class="image-container" v-show="selectedImage!==null">
+<!-- 		<view class="image-container" v-show="selectedImage!==null">
 			<image @tap="selectImage()" style="width: 80%;height: 70%;overflow: hidden;margin-top: 1%;border-radius: 2%;" :src="selectedImage"></image>
 			<view style="display: flex;position: fixed;width: 90%;margin-left: 4%;bottom: 50rpx;">
 				<u-button @tap="imageCancel()" text="取消"  size="normal"></u-button>
 				<u-button style="margin-left: 2%;" @tap="sendImage()" text="发送"  size="normal" class="send-btn-able" type="primary"></u-button>
 			</view>
-		</view>
+		</view> -->
 		<!-- <view class="video-container" v-show="selectedVideo!==null">
 			<video style="width: 80%;height: 70%;overflow: hidden;margin-top: 1%;border-radius: 2%;" :src="selectedVideo"></video>
 			<view style="display: flex;position: fixed;width: 90%;margin-left: 4%;bottom: 50rpx;">

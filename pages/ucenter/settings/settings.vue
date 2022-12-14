@@ -97,9 +97,6 @@
 						name:'deleteImg',
 						data:{fileList:fileList}
 					})
-				}).catch(e=>{
-					console.log('clearaImg catch');
-					console.log(e);
 				})
 
 			},
