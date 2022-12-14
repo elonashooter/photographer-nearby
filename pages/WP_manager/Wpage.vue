@@ -24,12 +24,12 @@
 				<text>平台认证</text>
 			</view>
 		</view>
-		<view style="display: flex;flex-direction: row;">
-			<button @click="clearData()">清空当前用户数据</button>
+<!-- 		<view style="display: flex;flex-direction: row;">
+			<button @click="clearData()">清空当前用户数据</button> -->
 			<!-- <button @click="clearHistoryImg()">清空历史图片</button>
 			 -->
-			 <button @click="resetChatMatch()">重置聊天信息</button>
-		</view>
+<!-- 			 <button @click="resetChatMatch()">重置聊天信息</button>
+		</view> -->
 
 		
 
