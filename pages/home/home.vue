@@ -64,13 +64,13 @@
 		
 		
 		
-		<view class="ltsAnd2hand" @click="changeCid()">
-			<image src="../../static/bg.png" mode="aspectFill"></image>
+		<view class="ltsAnd2hand">
+			<image :src="imgSrc" mode="aspectFill"   @click="changeCid()"></image>
 			<view class="ltsItem">
-				<text>聊天室</text>
+				<text>爱国 敬业</text>
 			</view>
 			<view class="ltsItem">
-				<text>校内二手</text>
+				<text>诚信 友善</text>
 			</view>
 		</view>
 		
@@ -101,6 +101,7 @@
 				containerStyle:'',
 				orderId:'',
 				phoerId:'',
+				imgSrc:'../../static/bg.png',
 				carouselList:[{
 						src: "/static/temp/green.jpg",
 						// src: "/static/temp/11layWebTip.png",
@@ -140,7 +141,20 @@
 
 		},
 		onLoad() {
-
+			// uni.getPushClientId({
+			// 	success: (res) => {
+			// 		console.log(res.cid);
+			// 	}
+			// })
+			// uni.getStorage({
+			// 	key:'chatHistory',
+			// 	success: (res) => {
+			// 		console.log(res.data);
+			// 	}
+			// })
+			// uni.removeStorage({
+			// 	key:'chatHistory'
+			// })
 			// uni.clearStorage()
 			//检测网络状态
 			// this.haveNoNet=true
@@ -257,7 +271,28 @@
 		methods: {
 			//发布预约
 			changeCid(){
-
+				if(this.$store.state.user.hasLogin&&this.$store.state.user.character=='phoer')
+					uni.getPushClientId({
+						success: (res) => {
+							console.log(res.cid);
+							uniCloud.database().collection('photographer').where({userId:this.$store.state.user.info._id}).update({
+								push_clientid:res.cid
+							}).then(e=>{
+								uni.$u.toast('摄影师识别码认证成功')
+								this.imgSrc='../../static/11NoBgCut.png'
+							})
+							uniCloud.database().collection('chatMatch').where({phoerId:this.$store.state.user.info._id}).update({
+								phoerPushId:res.cid
+							}).then(e=>{
+								console.log('云聊天库重匹配完毕');
+							}).catch(e=>{
+								console.log('云聊天库重匹配完毕失败');
+							})
+						},
+						fail: (res) => {
+							uni.$u.toast('获取失败，请联系管理员')
+						}
+					})
 			},
 			//宽屏适配
 			// #ifdef H5
@@ -492,20 +527,6 @@
 		// 标题栏input搜索框点击
 		onNavigationBarSearchInputClicked: async function(e) {
 			// this.getSwiperPhoer()
-			if(this.$store.state.user.hasLogin&&this.$store.state.user.character=='phoer')
-				uni.getPushClientId({
-					success: (res) => {
-						let cid=''
-						cid=res.cid
-						uniCloud.database().collection('photographer').doc(this.$store.state.user.info._id).update({
-							push_clientid:cid,
-							workedUserId:[]
-						}).then(e=>{uni.$u.toast('摄影师识别码认证成功')})
-					}
-				})
-
-			
-			
 		},
 		//点击导航栏 buttons 时触发
 		onNavigationBarButtonTap(e) {

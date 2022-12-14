@@ -1,8 +1,9 @@
 <template>
 	<view>
-		<view style="display: flex;">
-			<text style="flex: 1;">待定搜索栏</text>
-			<button style='flex: 1;' @click="getChatMatch()">刷新</button>
+		<view style="display: flex;flex-direction: row;align-items: center;">
+			<text style="flex: 1;padding: 20rpx;color:coral">反馈Q群273467930</text>
+<!-- 			<text style="flex: 1;">待定搜索栏</text> -->
+			<button style='flex:1;size: mini;font-size: 30rpx;color:cadetblue' @click="getChatMatch()">刷新消息列表</button>
 		</view>
 		
 		

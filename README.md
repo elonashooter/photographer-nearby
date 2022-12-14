@@ -1,10 +1,77 @@
-1.用户预约摄影师流程(未包含支付):
-方式一:发起预约等待摄影师接单
-方式二:查找在线摄影师发起预约
+##本应用各功能执行逻辑及其关键函数
+#uniStarter自带的路由控制跳转到登录页，并记录用户角色
+登陆成功loginSuccess.js触发
+1.获取user表信息并缓存到本地
+2.到首页 pages/home/home
+	home-onShow 执行:通过user缓存的role字段确认用户角色为“普通用户”、“摄影师”or“应用管理员”(应用管理员角色只能通过改数据库or在admin设置角色设置)
+					并在store里记录角色字段，下文中的角色若无特殊说明，均指store内记录的角色
+#推送
+基于uniPush 2.0
+推送函数：云函数push-chatMsg
+接收及其返回：APP.vue-uni.onPushMessage
+下文中的“推送”均指此项
+#首次打开app的提示
+插件cms-easy-guide
+#GPS定位
+uni.getLocation获取+uni.setStorage储存获取记录避免重复获取
+#用户发布预约需求
+db.collection('order')增删查改
+操作入口pages/home/home 发布预约
+根据角色不同 页面中<input disable不同> 页面底部的button也不同
+判断角色的方式为跳转到此页面时的跳转参数，不同参数代表的对应角色都有注释
+#用户直接预约摄影师
+db.collection('photographer')查
+db.collection('order')增
+操作入口pages/home/home 在线摄影师或轮播图
+推送预约信息给摄影师
+注:云操作action对返回的摄影师信息进行了一次AES加密
+#用户申请成为摄影师
+db.collection('pre-photographer')增、查；同一userId用户首次发起申请为增，申请通过后再次发起也为增，记为两条申请数据以用于保留申请记录；查最后一次的申请记录填充申请界面
+操作入口pages/ucenter/ucenter 加入湾拍
+推送申请结果给发起申请的用户
+申请通过后重新登陆
+#摄影师编辑信息
+db.collection('pre-photographer')增、查；查最后的申请记录填充申请界面
+操作入口pages/ucenter/ucenter 编辑自己(原加入湾拍位置)
+#应用管理员审核用户成为摄影师的申请
+db.collection('pre-photographer')查；
+若通过，则删除部分字段，删除后的数据作为photographer的新增或修改数据
+db.collection('photographer')增或改；同一userId用户首次通过为增，申请通过后再次通过为改
+操作入口pages/ucenter/ucenter Wpage组件 摄影师管理，仅角色含“应用管理员”用户可见
+#摄影师获取设备识别码
+操作入口pages/home/home 点击卡通人物形象(名为11，念做依依)
+db.collection('photographer')改 修改摄影师设备识别码
+db.collection('chatMatch')改 修改当前摄影师id的聊天匹配信息的摄影师设备识别码
+获取识别码后聊天和推送都会推送到当前设备
+#摄影师主动接单
+db.collection('order')改 将此单负责摄影师改为接单摄影师uid
+推送接单信息给发布用户
+操作入口pages/ucenter/ucenter 已接
+#摄影师辞职
+db.collection('pre-photographer')改 将“是否在岗”改为false
+db.collection('photographer')改 将“是否在岗”改为false;将“处于接单状态”改为false
+db.collection('uni-id-users')改 将角色权限“摄影师”删除
+辞职后重新登陆
+操作入口pages/ucenter/ucenter 润
+#聊天功能
+推送聊天信息
+接收返回新增或修改store数据
+聊天页面chat和personChat都用mapgetter+computed+watch监听聊天消息
+uni.setStorage("chatHistory")缓存聊天数据
+db.collection('chatMatch')增
+db.collection('chatMsg')增
+chat页面的刷新按钮：chatMatch表与chatMsg表联查
+personChat页面-onBackPress清除未读
+操作入口：pages/photographer/phoer 左上角聊天标志；pages/home/home右上角聊天标志
+#应用管理员的预约管理、摄影师管理、收集用户反馈、清除云数据库指定时间前的图片
+操作入口pages/ucenter/ucenter Wpage组件 仅角色含“应用管理员”用户可见
+db.collection('order')查
+db.collection('pre-photographer')查
+db.collection('photographer')查、改  见上文“应用管理员审核用户成为摄影师的申请”；将摄影师是否为平台认证摄影师设为true or false
+db.collection('opendb-feedback')查
 
-方式一业务流程：用户在order页新增，新增的数据会在orderList  摄影师可访问orderList页面点击对应order数据并接单  
-方式二业务流程：摄影师点击首页上线按钮进入在线状态，用户在phoerList查看在线摄影师，点击相应摄影师信息即可进入点击预约
 
-2.基于以上用户使用流程，页面设计要点
-
-进入 phoer页面 
+##使用调试数据时需要注意的点
+chatmatch删完就要删photographer的workeduserid
+photographer删完就要删user的role-photographer
+和prephotographer

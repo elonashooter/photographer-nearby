@@ -225,6 +225,48 @@
 			navigateBack() {
 				uni.navigateBack()
 			},
+			dealPdbMsg(pdbMsg){
+				// 删除审核状态字段和拒绝理由字段
+				let dealMsg=pdbMsg
+				delete dealMsg._id
+				delete dealMsg.AuditStatus
+				delete dealMsg.rejectReason
+				delete dealMsg.requestTimes
+				delete dealMsg.phoerShowHistory
+				delete dealMsg.symbolsHistory
+				dealMsg.WorkState=true
+				return dealMsg
+			},
+			setRole(){
+				if(this.$store.state.user.info.role.includes("WP_manager")&&this.$store.state.user.info._id==this.phoerInfo.userId){
+
+					uniCloud.database().collection('uni-id-users').where({
+						_id:this.phoerInfo.userId
+					}).update({
+						role:['WP_manager','photographer']
+					})
+				}else{
+					uniCloud.database().collection('uni-id-users').where({
+						_id:this.phoerInfo.userId
+					}).update({
+						role:['photographer']
+					})
+				}
+			},
+			pushPhoer(){
+				uniCloud.callFunction({
+					name:"push2",
+					data:{
+						cid:this.phoerInfo.push_clientid,
+						title:"申请通过",
+						content:"你现在是简拍的摄影师了！",
+						payload:{
+							fabShowText:"加入湾拍申请通过,重新登陆一次你就是简拍的摄影师了",
+							CharacterChange:1
+						}
+					}
+				})
+			},
 			submit() {
 				console.log(this.phoerInfo);
 				let requestTimes=this.phoerInfo.requestTimes
@@ -237,54 +279,35 @@
 					console.log("ppdb修改报错");
 					console.log(e);
 				})
-				let pdbMsg=this.phoerInfo
-				// 删除审核状态字段和拒绝理由字段
-				delete pdbMsg._id
-				delete pdbMsg.AuditStatus
-				delete pdbMsg.rejectReason
-				delete pdbMsg.requestTimes
-				delete pdbMsg.phoerShowHistory
-				delete pdbMsg.symbolsHistory
+				let pdbMsg=Object.assign({},this.phoerInfo) 
+				pdbMsg=this.dealPdbMsg(pdbMsg)
 				// console.log(this.phoerInfo);this.phoerInfo里的这四个字段也被删了
 				if(requestTimes>0){
+					console.log('pdbMsg');
+					console.log(pdbMsg);
+					console.log(this.phoerInfo.WorkState);
 					pdb.where({userId:this.phoerInfo.userId}).update(pdbMsg).then(res=>{
 						console.log('update success');
 						console.log(res);
+						//在user表-role加入phoer
+						if(this.phoerInfo.WorkState==false){
+							this.setRole()
+							this.pushPhoer()
+						}
+						
 					}).catch(e=>{
 						console.log("pdb修改报错");
 						console.log(e);
 					})
 				}else{
 					pdb.add(pdbMsg).then(()=>{
-						uniCloud.callFunction({
-							name:"push2",
-							data:{
-								cid:this.phoerInfo.push_clientid,
-								title:"申请通过",
-								content:"你现在是简拍的摄影师了！",
-								payload:{
-									fabShowText:"加入湾拍申请通过,重新登陆一次你就是简拍的摄影师了",
-									CharacterChange:1
-								}
-							}
-						})
+						this.pushPhoer()
 					}).catch(e=>{
 						console.log("pdb新增报错");
 						console.log(e);
 					})
-					if(this.$store.state.user.info.role.includes("WP_manager")&&this.$store.state.user.info._id==this.phoerInfo.userId){
-						uniCloud.database().collection('uni-id-users').where({
-							_id:this.phoerInfo.userId
-						}).update({
-							role:['WP_manager','photographer']
-						})
-					}else{
-						uniCloud.database().collection('uni-id-users').where({
-							_id:this.phoerInfo.userId
-						}).update({
-							role:['photographer']
-						})
-					}
+					this.setRole()
+
 					
 				}
 				uni.showToast({

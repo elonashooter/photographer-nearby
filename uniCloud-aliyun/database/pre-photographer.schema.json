@@ -85,6 +85,11 @@
 		"push_clientid":{
 			"bsonType": "string",
 			"description": "摄影师被推送设备识别码"
+		},
+		"WorkState":{
+			"bsonType": "bool",
+			"description": "默认true，只有辞职过才会变成一次false",
+			"defaultValue":true
 		}
 	}
 }

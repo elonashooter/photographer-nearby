@@ -13,7 +13,7 @@
 		2.记得交接
 		查询是否有在预约的订单，没有就可以润了。
 		
-		有的话交接完，对用户负责喔
+		有的话交接完，因为辞职后作为摄影师的聊天记录会被清空
 		
 		3.辞职申请通过后，到时会需要重新登陆一次，
 		就像你当时成为摄影师 要重新登陆一次一样</text>
@@ -45,13 +45,15 @@
 		data() {
 			return {
 				phoerId:'',
-				showPopup:false
+				showPopup:false,
+				chatHistory:[]
 			};
 		},
 
 		onLoad(e) {
 			if(e.phoerId){
 				this.phoerId=e.phoerId
+				console.log('this.phoerId:'+this.phoerId);
 			}
 		},
 		onShow() {
@@ -63,14 +65,53 @@
 		
 		methods: {
 			quitPhoer(){
-				pdb.where({
+				let role=[]
+				const uInfo=this.$store.state.user.info
+				if(uInfo.role.includes('WP_manager')){
+					role=['WP_manager']
+				}else{
+					role=[]
+				}
+				
+				//清除作为摄影师的聊天记录
+				uni.getStorage({
+					key:'chatHistory',
+					success: (res) => {
+						this.chatHistory=res.data
+						this.chatHistory=this.chatHistory.filter((x)=>x.phoerId!=uInfo._id)
+						uni.setStorage({
+							key:'chatHistory',
+							data:this.chatHistory
+						})
+					}
+				})
+				ppdb.where({
 					userId:this.phoerId
 				}).update({
 					WorkState:false
-				}).then(res=>{
-					
-					this.$store.commit(['user/character'],'order')
 				})
+				
+				pdb.where({
+					userId:this.phoerId
+				}).update({
+					WorkState:false,
+					OnlineStatus:false
+				}).then(res=>{
+					this.$store.commit('user/character','order')
+					uniCloud.database().collection('uni-id-users').doc(uInfo._id).update({
+						role:role
+					}).then(e=>{
+						uni.reLaunch({
+							url:'/pages/ucenter/login-page/pwd-login/pwd-login'
+						})
+					}).catch(e=>{
+						uni.$u.toast('quit udb fail')
+						console.log(e);
+					})
+				}).catch(e=>{
+						uni.$u.toast('quit pdb fail')
+						console.log(e);
+					})
 			},
 			popupOpen(){
 				this.showPopup=true

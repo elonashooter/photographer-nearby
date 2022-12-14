@@ -49,7 +49,7 @@
 					center
 					:label="orderMsg.phoerPhoneNumber"
 					isLink
-					:url="'/pages/photographer/phoer?phoerId='+orderMsg.phoerId"
+					:url="'/pages/photographer/phoer?phoerId='+orderMsg.phoerId+'&verifyNavi='+1"
 				>
 					<u-avatar
 						slot="icon"

@@ -116,8 +116,8 @@
 					}
 
 				})
-				console.log("pddd");
-				console.log(this.pendingData);
+				// console.log("pddd");
+				// console.log(this.pendingData);
 			}
 		},
 	}

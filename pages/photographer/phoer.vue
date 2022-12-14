@@ -20,7 +20,7 @@
 		  <view style="">
 		    <view style="display: flex;flex-direction: column;align-items: center;">
 		      <text style="font-weight: bold;font-size: 40rpx;color: brown;">摄影 {{phoerInfo.name}}</text>
-		      <text style="font-size: 32rpx;color:rgba(175, 163, 169, 1.0);margin: 10rpx;">{{phoerInfo.intro}}</text>
+		      <text style="font-size: 32rpx;color:rgba(175, 163, 169, 1.0);margin: 10rpx;padding: 0 80rpx;">{{phoerInfo.intro}}</text>
 			  <u-button
 			  	v-if="SubmitButtonText=='返回'"
 			  	type="primary"
@@ -65,19 +65,12 @@
 			</view>
 			
 
-			<!-- 提交提示弹出框 -->
-			<u-modal
-				:show="showModal"
-				title="确定提交预约?"
-				content="提交成功后,直到审核通过或驳回之前无法修改"
-				showCancelButton
-				closeOnClickOverlay
-				@confirm="modalConfirm()"
-				@cancel="() => showModal = false"
-			></u-modal>
+
 			<!-- 加载提示框 -->
 			<u-loading-page
-			    :loadingText="'即将与'+phoerInfo.name+'交流'"
+			    loadingText="夹崽中"
+				image='/static/loading11-2.gif'
+				iconSize="200"
 			    bgColor="#ffffff"
 			    :loading="loading"
 			    color="#C8C8C8"
@@ -101,7 +94,6 @@ import user from '../../store/modules/user'
 	export default {
 		data() {
 			return {
-				showModal:false,//提交确认框
 				SubmitButtonText:'',
 				inputDisable:true,
 				phoerInfo: {
@@ -111,7 +103,7 @@ import user from '../../store/modules/user'
 					symbolsTag:'',//作品名称
 					symbolsUrl:[],
 					phoerShow:[],//摄影师形象对象  本来可以直接用字符串的，但uni.preview的预览参数格式为uni.chooseimage返回的数组请求体格式
-					
+					workedUserId:[],
 					userId:this.$store.state.user.info._id,
 				},
 				phoerShowName:'',
@@ -142,7 +134,7 @@ import user from '../../store/modules/user'
 		onLoad(e) {		//根据传来的参数确定是什么角色点进来的
 			// verifyOrder界面传过来  或  首页点击传过来
 			if(e.phoerId){
-				this.phoerId=e.phoerId  //其他页面传过来的
+				this.phoerId=e.phoerId 
 				// #ifdef APP-PLUS
 				let version=plus.runtime.version
 				// #endif
@@ -157,8 +149,16 @@ import user from '../../store/modules/user'
 					console.log(res.result.data);
 					this.phoerInfo={...res.result.data[0]}
 					this.symbols=this.phoerInfo.symbolsUrl
+					
+					if(this.phoerInfo.workedUserId.includes(this.$store.state.user.info._id)){
+						haveChatMatch=true
+					}
 				})
-				this.SubmitButtonText="返回"
+				this.SubmitButtonText="预约"
+				if(e.verifyNavi){
+					this.SubmitButtonText="返回"
+				}
+				
 			}else if(e.orderChoicePhoer){
 				this.SubmitButtonText="预约"
 				this.phoerInfo=JSON.parse(decodeURIComponent(e.orderChoicePhoer));
@@ -274,9 +274,44 @@ import user from '../../store/modules/user'
 					}).get().then(res=>{
 						console.log("have match")
 						console.log(res);
+						const chatMatchId=res.result.data[0]._id
+						let cache=0 //无记录为0 有则为1
+						//如果删除过缓存 那就重新创 但不会发送push
+						uni.getStorage({
+							key:'chatHistory',
+							success: (res) => {
+								let chatHistory=res.data
+								for(var c of res.data){
+									if(c.chatMatchId==chatMatchId){
+										cache+=1
+									}
+								}
+								if(cache===0){
+									let phoer=this.phoerInfo
+									let user=this.$store.state.user.info
+									chatHistory.push({
+														chatMatchId:chatMatchId,
+														phoerId:phoer.userId,
+														phoerAvatar:phoer.phoerShow[0],
+														phoerName:phoer.name,
+														phoerPushId:phoer.push_clientid,
+														userName:user.nickname?user.nickname:'约拍用户',
+														userId:user._id,
+														userAvatar:user.avatar_file?user.avatar_file.url:'/static/36x36.png',//可能会报错 因为头像可能没设置
+														userPushId:userPushId,
+														chatMsg:[],
+														unReadNum:0
+													})
+									uni.setStorage({
+										key:'chatHistory',
+										data:chatHistory
+									})
+								}
+							}
+						})
 						this.loading=false
 						uni.navigateTo({
-							url:'/pages/chat/person-chat?chattingUserCid='+this.phoerInfo.push_clientid+'&chattingUserAvatar='+this.phoerInfo.phoerShow[0]+'&chattingUserName='+this.phoerInfo.name+'&chatMatchId='+res.result.data[0]._id,
+							url:'/pages/chat/person-chat?chattingUserCid='+this.phoerInfo.push_clientid+'&chattingUserAvatar='+this.phoerInfo.phoerShow[0]+'&chattingUserName='+this.phoerInfo.name+'&chatMatchId='+chatMatchId,
 						})
 					})
 					
@@ -285,13 +320,7 @@ import user from '../../store/modules/user'
 			backVOrder(){
 				uni.navigateBack()
 			},
-			openModal(){
-				this.showModal=true
-			},
-			modalConfirm(){
-				this.showModal=false
-				this.getImgUrlAndUpload()
-			},
+
 			hideKeyboard() {
 				uni.hideKeyboard()
 			},
@@ -346,7 +375,7 @@ import user from '../../store/modules/user'
 
 <style lang="scss">
 .u-demo-block{
-	margin-top: 750upx;
+	margin-top: 800upx;
 }
 .uni-uploader {
 	flex: 1;

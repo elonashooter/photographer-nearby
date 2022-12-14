@@ -333,7 +333,7 @@
 				}
 				else if(index==3){
 					uni.navigateTo({
-						url:'/pages/photographer/phoer-quit'
+						url:'/pages/photographer/phoer-quit?phoerId='+this.userInfo._id
 					})
 				}
 				

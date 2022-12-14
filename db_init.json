@@ -1,0 +1,702 @@
+{
+    "chatMatch": {
+        "data": [
+            {
+                "_id": "638f4fb153a7f3000195171d",
+                "chatMsg": "doc._id",
+                "phoerId": "63231beffab7ca000123c188",
+                "phoerAvatar": "https://vkceyugu.cdn.bspapp.com/VKCEYUGU-d99fde47-bfd5-4248-9dd2-8e7bc2af3ded/4f4e64df-de2d-4c2f-ad77-b5c0f771492d.",
+                "phoerName": "测试",
+                "phoerPushId": "8c5f6530354f4621fd3be65211e1871c",
+                "userName": "用户零",
+                "userId": "62a583a2f17d020001237dda",
+                "userAvatar": "https://vkceyugu.cdn.bspapp.com/VKCEYUGU-d99fde47-bfd5-4248-9dd2-8e7bc2af3ded/bedb0b73-377b-491b-912c-b63b9589d00c.",
+                "userPushId": "321083281e1f22bea416f1bb5458db88"
+            }
+        ],
+        "schema": {
+            "bsonType": "object",
+            "required": [],
+            "permission": {
+                "read": true,
+                "create": true,
+                "update": true,
+                "delete": true
+            },
+            "properties": {
+                "_id": {
+                    "description": "ID，系统自动生成"
+                },
+                "chatMsg": {
+                    "description": "用于前端查询时返回对应chatMatchId的chatMsg表数据",
+                    "defaultValue": "doc._id"
+                },
+                "phoerAvatar": {
+                    "bsonType": "string",
+                    "description": "摄影师头像 其实应该是photographer.phoerShow[0]"
+                },
+                "phoerId": {
+                    "bsonType": "string",
+                    "description": ""
+                },
+                "phoerName": {
+                    "bsonType": "string",
+                    "description": ""
+                },
+                "phoerPushId": {
+                    "bsonType": "string",
+                    "description": "推送id,同时也是chatMsg表的to_cid或from_cid"
+                },
+                "userAvatar": {
+                    "bsonType": "string",
+                    "description": ""
+                },
+                "userId": {
+                    "bsonType": "string",
+                    "description": ""
+                },
+                "userName": {
+                    "bsonType": "string",
+                    "description": ""
+                },
+                "userPushId": {
+                    "bsonType": "string",
+                    "description": "chatMsg表的to_cid或from_cid"
+                }
+            }
+        }
+    },
+    "chatMsg": {
+        "data": [
+            {
+                "_id": "638f4fb6e7f27c0001944954",
+                "isWithdrawn": 0,
+                "chatMatchId": "638f4fb153a7f3000195171d",
+                "from_cid": "321083281e1f22bea416f1bb5458db88",
+                "to_cid": "8c5f6530354f4621fd3be65211e1871c",
+                "sendTime": "2022-12-06 22:20:39",
+                "content": {
+                    "text": "12321"
+                },
+                "messageType": "text",
+                "is_read": false
+            }
+        ],
+        "schema": {
+            "bsonType": "object",
+            "required": [],
+            "permission": {
+                "read": true,
+                "create": true,
+                "update": true,
+                "delete": true
+            },
+            "properties": {
+                "_id": {
+                    "description": "ID，系统自动生成"
+                },
+                "chatMatchId": {
+                    "bsonType": "string",
+                    "description": "对应chatMatch表的Id，用户Id由chatMatch表记录",
+                    "foreignKey": "chatMatch._id"
+                },
+                "is_read": {
+                    "description": "是否已读",
+                    "bsonType": "bool",
+                    "forceDefaultValue": false
+                },
+                "isWithdrawn": {
+                    "description": "是否撤回消息",
+                    "bsonType": "int",
+                    "defaultValue": 0
+                },
+                "from_cid": {
+                    "bsonType": "string",
+                    "description": "消息发送方的push设备识别码"
+                },
+                "to_cid": {
+                    "description": "消息接收方的push设备识别码",
+                    "bsonType": "string"
+                },
+                "sendTime": {
+                    "bsonType": "string",
+                    "description": "消息发送时间"
+                },
+                "content": {
+                    "bsonType": "object",
+                    "description": "消息内容，包含的键会随type变化。需要自己写valedateFunction验证"
+                },
+                "messageType": {
+                    "bsonType": "string",
+                    "enum": [
+                        {
+                            "text": "文本",
+                            "value": "text"
+                        },
+                        {
+                            "text": "图像",
+                            "value": "image"
+                        },
+                        {
+                            "text": "语音",
+                            "value": "sound"
+                        },
+                        {
+                            "text": "视频",
+                            "value": "video"
+                        },
+                        {
+                            "text": "文件",
+                            "value": "file"
+                        },
+                        {
+                            "text": "位置",
+                            "value": "location"
+                        }
+                    ]
+                }
+            },
+            "version": "0.0.1"
+        }
+    },
+    "photographer": {
+        "data": [
+            {
+                "_id": "633eed1c0a5aba00016abcda",
+                "WorkState": true,
+                "OnlineStatus": true,
+                "presentOrder": 0,
+                "create_time": 1665068279752,
+                "name": "用户零",
+                "phoneNumber": "18277709303",
+                "intro": "复活测试",
+                "symbolsTag": "日常",
+                "symbolsUrl": [
+                    "https://vkceyugu.cdn.bspapp.com/VKCEYUGU-d99fde47-bfd5-4248-9dd2-8e7bc2af3ded/03efa3ee-1070-4cc6-8bce-9e2024f05151.",
+                    "https://vkceyugu.cdn.bspapp.com/VKCEYUGU-d99fde47-bfd5-4248-9dd2-8e7bc2af3ded/ddd754d1-f897-4743-91e3-804bf2c77a51.",
+                    "https://vkceyugu.cdn.bspapp.com/VKCEYUGU-d99fde47-bfd5-4248-9dd2-8e7bc2af3ded/1802925f-f9c3-4237-b323-06f06631ea0c."
+                ],
+                "phoerShow": [
+                    "https://vkceyugu.cdn.bspapp.com/VKCEYUGU-d99fde47-bfd5-4248-9dd2-8e7bc2af3ded/5f06f51c-f17e-4217-a1b5-28fe677c72d2."
+                ],
+                "userId": "62a583a2f17d020001237dda",
+                "push_clientid": "321083281e1f22bea416f1bb5458db88",
+                "workedUserId": [],
+                "isWPPhoer": false
+            }
+        ],
+        "schema": {
+            "bsonType": "object",
+            "required": [],
+            "permission": {
+                "read": "'filterLowVersion' in action|| 'photographer' in auth.role",
+                "create": true,
+                "update": "'photographer' in auth.role || 'WP_manager' in auth.role",
+                "delete": "doc._id==auth.uid || 'WP_manager' in auth.role"
+            },
+            "fieldRules": [
+                {
+                    "rule": "WorkStatus == true",
+                    "errorMessage": "您处于非在职状态"
+                }
+            ],
+            "properties": {
+                "_id": {
+                    "description": "存储文档 ID（统一订单 ID），系统自动生成"
+                },
+                "name": {
+                    "bsonType": "string",
+                    "description": "摄影师姓名 物理本211张怀民"
+                },
+                "phoneNumber": {
+                    "bsonType": "string",
+                    "description": "摄影师电话号码"
+                },
+                "intro": {
+                    "bsonType": "string",
+                    "description": "自我介绍、个性签名"
+                },
+                "symbolsTag": {
+                    "bsonType": "string",
+                    "description": "代表作名称"
+                },
+                "symbolsUrl": {
+                    "bsonType": "array",
+                    "description": "代表作图片链接"
+                },
+                "userId": {
+                    "bsonType": "string",
+                    "description": "摄影师在user表的id"
+                },
+                "phoerShow": {
+                    "bsonType": "array",
+                    "description": "摄影师形象"
+                },
+                "WorkState": {
+                    "bsonType": "bool",
+                    "description": "true为在职，false为不在职（含离职与审核中）",
+                    "defaultValue": true
+                },
+                "OnlineStatus": {
+                    "bsonType": "bool",
+                    "description": "摄影师是否处于在线接单状态",
+                    "defaultValue": false
+                },
+                "presentOrder": {
+                    "bsonType": "int",
+                    "description": "该摄影师当前所接单数，平台规定不可超过3 2022/7/12",
+                    "defaultValue": 0
+                },
+                "create_time": {
+                    "bsonType": "timestamp",
+                    "description": "订单创建时间/发起退款时间",
+                    "defaultValue": {
+                        "$env": "now"
+                    }
+                },
+                "push_clientid": {
+                    "bsonType": "string",
+                    "description": "摄影师被推送设备识别码"
+                },
+                "workedUserId": {
+                    "bsonType": "array",
+                    "description": "聊天、电话、接单过的用户Id",
+                    "permission": {
+                        "update": true
+                    },
+                    "defaultValue": []
+                },
+                "isWPPhoer": {
+                    "bsonType": "bool",
+                    "description": "是否为简拍摄影师",
+                    "defaultValue": false
+                }
+            }
+        }
+    },
+    "photography-order": {
+        "data": [
+            {
+                "_id": "63880a1a89171400018e8340",
+                "orderStatus": 3,
+                "rejectIds": [],
+                "symbolPhotos": [
+                    "https://vkceyugu.cdn.bspapp.com/VKCEYUGU-d99fde47-bfd5-4248-9dd2-8e7bc2af3ded/b0170692-ce74-4296-b750-5c30f01e1cd7."
+                ],
+                "userInfo": {
+                    "name": "用户零",
+                    "phoneNumber": "18277709303"
+                },
+                "type": "个人照",
+                "intro": "",
+                "place": "",
+                "price": 80,
+                "time": "2022-12-01 09:57",
+                "userId": "62a583a2f17d020001237dda",
+                "phoerId": "629779368c195b0001e2f55c",
+                "order_push_clientid": "5467ac49fb754cc224ec370b68fceae4",
+                "create_time": 1669859866511,
+                "phoerIntro": "可接个人写真、情侣写真、闺蜜写真和班级毕业照、宿舍毕业照等，擅长修图，还原美貌的那种。",
+                "phoerName": "黎贻怡",
+                "phoerPhoneNumber": "18977567673",
+                "phoerShowUrl": "https://vkceyugu.cdn.bspapp.com/VKCEYUGU-d99fde47-bfd5-4248-9dd2-8e7bc2af3ded/5ad9587a-8327-496c-bd4c-59cf9a91e620.",
+                "phoer_push_clientid": "acf869d7ecbdfc9c1f132c457568dd0a",
+                "rejectReason": ""
+            }
+        ],
+        "index": [
+            {
+                "IndexName": "type",
+                "MgoKeySchema": {
+                    "MgoIndexKeys": [
+                        {
+                            "Name": "type",
+                            "Direction": "1"
+                        }
+                    ],
+                    "MgoIsUnique": false
+                }
+            },
+            {
+                "IndexName": "userId",
+                "MgoKeySchema": {
+                    "MgoIndexKeys": [
+                        {
+                            "Name": "userId",
+                            "Direction": "1"
+                        }
+                    ],
+                    "MgoIsUnique": false
+                }
+            },
+            {
+                "IndexName": "payType",
+                "MgoKeySchema": {
+                    "MgoIndexKeys": [
+                        {
+                            "Name": "payType",
+                            "Direction": "1"
+                        }
+                    ],
+                    "MgoIsUnique": false
+                }
+            },
+            {
+                "IndexName": "status",
+                "MgoKeySchema": {
+                    "MgoIndexKeys": [
+                        {
+                            "Name": "status",
+                            "Direction": "1"
+                        }
+                    ],
+                    "MgoIsUnique": false
+                }
+            },
+            {
+                "IndexName": "refundStatus",
+                "MgoKeySchema": {
+                    "MgoIndexKeys": [
+                        {
+                            "Name": "refundStatus",
+                            "Direction": "1"
+                        }
+                    ],
+                    "MgoIsUnique": false
+                }
+            },
+            {
+                "IndexName": "isRefund",
+                "MgoKeySchema": {
+                    "MgoIndexKeys": [
+                        {
+                            "Name": "isRefund",
+                            "Direction": "1"
+                        }
+                    ],
+                    "MgoIsUnique": false
+                }
+            },
+            {
+                "IndexName": "transactionId",
+                "MgoKeySchema": {
+                    "MgoIndexKeys": [
+                        {
+                            "Name": "transactionId",
+                            "Direction": "1"
+                        }
+                    ],
+                    "MgoIsUnique": false
+                }
+            },
+            {
+                "IndexName": "createTime",
+                "MgoKeySchema": {
+                    "MgoIndexKeys": [
+                        {
+                            "Name": "createTime",
+                            "Direction": "1"
+                        }
+                    ],
+                    "MgoIsUnique": false
+                }
+            }
+        ],
+        "schema": {
+            "bsonType": "object",
+            "required": [],
+            "permission": {
+                "read": "doc.userId == auth.uid ||'photographer' in auth.role",
+                "create": true,
+                "update": "doc.userId == auth.uid ||'photographer' in auth.role",
+                "delete": "doc.userId == auth.uid"
+            },
+            "properties": {
+                "_id": {
+                    "description": "存储文档 ID（统一订单 ID），系统自动生成"
+                },
+                "userInfo": {
+                    "bsonType": "object",
+                    "name": {
+                        "bsonType": "string",
+                        "description": "下单给谁",
+                        "defaultValue": "自己"
+                    },
+                    "phoneNumber": {
+                        "bsonType": "string",
+                        "description": "摄影对象电话号码"
+                    }
+                },
+                "intro": {
+                    "bsonType": "string",
+                    "description": "备注"
+                },
+                "time": {
+                    "bsonType": "string",
+                    "description": "约定/发起约定摄影的时间"
+                },
+                "place": {
+                    "bsonType": "string",
+                    "description": "约定/发起约定摄影的地点"
+                },
+                "price": {
+                    "bsonType": "int",
+                    "description": "约定价格 单位:元"
+                },
+                "type": {
+                    "bsonType": "string",
+                    "description": "个人照、情侣照or集体照"
+                },
+                "orderStatus": {
+                    "bsonType": "int",
+                    "description": "订单状态：0 已发起 1 待下单方回应 101待摄影师回应 2 约拍进行中  3已完成",
+                    "title": "订单状态",
+                    "defaultValue": 0,
+                    "enum": [
+                        {
+                            "text": "已发起",
+                            "value": 0
+                        },
+                        {
+                            "text": "待下单方回应",
+                            "value": 1
+                        },
+                        {
+                            "text": "待摄影师回应",
+                            "value": 101
+                        },
+                        {
+                            "text": "约拍进行中",
+                            "value": 2
+                        },
+                        {
+                            "text": "已完成",
+                            "value": 3
+                        }
+                    ]
+                },
+                "rejectReason": {
+                    "bsonType": "string",
+                    "description": "用户拒绝摄影师的理由"
+                },
+                "rejectIds": {
+                    "bsonType": "array",
+                    "description": "拒绝过的摄影师id",
+                    "defaultValue": []
+                },
+                "userId": {
+                    "bsonType": "string",
+                    "description": "下单用户的id"
+                },
+                "phoerId": {
+                    "bsonType": "string",
+                    "description": "接单摄影师用户id"
+                },
+                "phoerPhoneNumber": {
+                    "bsonType": "string",
+                    "description": "接单摄影师用户id"
+                },
+                "phoerName": {
+                    "bsonType": "string",
+                    "description": "接单摄影师的name字段"
+                },
+                "phoerIntro": {
+                    "bsonType": "string",
+                    "description": "摄影师自我介绍"
+                },
+                "phoerShowUrl": {
+                    "bsonType": "string",
+                    "description": "摄影师形象连接"
+                },
+                "create_time": {
+                    "bsonType": "timestamp",
+                    "description": "订单创建时间/发起退款时间",
+                    "forceDefaultValue": {
+                        "$env": "now"
+                    }
+                },
+                "order_push_clientid": {
+                    "bsonType": "string",
+                    "description": "下单者被推送设备识别码"
+                },
+                "phoer_push_clientid": {
+                    "bsonType": "string",
+                    "description": "此单摄影师被推送设备识别码"
+                },
+                "symbolPhotos": {
+                    "bsonType": "array",
+                    "description": "样片，可选",
+                    "defaultValue": []
+                }
+            }
+        }
+    },
+    "pre-photographer": {
+        "data": [
+            {
+                "_id": "633eecf7702e9d000149c4a0",
+                "AuditStatus": 1,
+                "requestTimes": 1,
+                "create_time": 1665068279752,
+                "name": "用户零",
+                "phoneNumber": "18277709303",
+                "intro": "应用创始人",
+                "symbolsTag": "日常",
+                "symbolsUrl": [
+                    "https://vkceyugu.cdn.bspapp.com/VKCEYUGU-d99fde47-bfd5-4248-9dd2-8e7bc2af3ded/5dc7f815-8a39-4418-ab96-60795fc3ce53."
+                ],
+                "phoerShow": [
+                    "https://vkceyugu.cdn.bspapp.com/VKCEYUGU-d99fde47-bfd5-4248-9dd2-8e7bc2af3ded/5f06f51c-f17e-4217-a1b5-28fe677c72d2."
+                ],
+                "userId": "62a583a2f17d020001237dda",
+                "push_clientid": "f075bed93bc9f9157675314bd648b9c5",
+                "symbolsHistory": [
+                    "https://vkceyugu.cdn.bspapp.com/VKCEYUGU-d99fde47-bfd5-4248-9dd2-8e7bc2af3ded/ecc778d3-7631-4558-8b69-b749ae711b9b.",
+                    "https://vkceyugu.cdn.bspapp.com/VKCEYUGU-d99fde47-bfd5-4248-9dd2-8e7bc2af3ded/5dc7f815-8a39-4418-ab96-60795fc3ce53."
+                ],
+                "phoerShowHistory": [
+                    "https://vkceyugu.cdn.bspapp.com/VKCEYUGU-d99fde47-bfd5-4248-9dd2-8e7bc2af3ded/fb554fc4-0e6e-4ea1-9f95-1a3bbf80c795.",
+                    "https://vkceyugu.cdn.bspapp.com/VKCEYUGU-d99fde47-bfd5-4248-9dd2-8e7bc2af3ded/5f06f51c-f17e-4217-a1b5-28fe677c72d2."
+                ],
+                "rejectReason": "",
+                "WorkState": false
+            }
+        ],
+        "schema": {
+            "bsonType": "object",
+            "required": [],
+            "permission": {
+                "read": true,
+                "create": true,
+                "update": true,
+                "delete": true
+            },
+            "fieldRules": [],
+            "properties": {
+                "_id": {
+                    "description": "存储文档 ID（统一订单 ID），系统自动生成"
+                },
+                "name": {
+                    "bsonType": "string",
+                    "description": "摄影师姓名 物理本211张怀民"
+                },
+                "phoneNumber": {
+                    "bsonType": "string",
+                    "description": "摄影师电话号码"
+                },
+                "intro": {
+                    "bsonType": "string",
+                    "description": "自我介绍、个性签名"
+                },
+                "symbolsTag": {
+                    "bsonType": "string",
+                    "description": "代表作名称"
+                },
+                "symbolsUrl": {
+                    "bsonType": "array",
+                    "description": "当前设置的代表作图片链接"
+                },
+                "symbolsHistory": {
+                    "bsonType": "array",
+                    "description": "所有上传过的代表作记录",
+                    "defaultValue": []
+                },
+                "userId": {
+                    "bsonType": "string",
+                    "description": "摄影师在user表的id"
+                },
+                "phoerShow": {
+                    "bsonType": "array",
+                    "description": "摄影师形象"
+                },
+                "phoerShowHistory": {
+                    "bsonType": "array",
+                    "description": "所有上传过的个人形象记录",
+                    "defaultValue": []
+                },
+                "AuditStatus": {
+                    "bsonType": "int",
+                    "description": "审核状态：0 审核中 1 已通过 2 已驳回",
+                    "title": "订单状态",
+                    "defaultValue": 0,
+                    "enum": [
+                        {
+                            "text": "审核中",
+                            "value": 0
+                        },
+                        {
+                            "text": "已通过",
+                            "value": 1
+                        },
+                        {
+                            "text": "已驳回",
+                            "value": 2
+                        }
+                    ]
+                },
+                "rejectReason": {
+                    "bsonType": "string",
+                    "description": "驳回原因"
+                },
+                "requestTimes": {
+                    "bsonType": "int",
+                    "description": "请求成功次数 用于判断通过时(0次)是增加摄影师(0次以上)还是修改摄影师信息",
+                    "defaultValue": 0
+                },
+                "create_time": {
+                    "bsonType": "timestamp",
+                    "description": "订单创建时间/发起退款时间",
+                    "defaultValue": {
+                        "$env": "now"
+                    }
+                },
+                "push_clientid": {
+                    "bsonType": "string",
+                    "description": "摄影师被推送设备识别码"
+                },
+                "WorkState": {
+                    "bsonType": "bool",
+                    "description": "默认true，只有辞职过才会变成一次false",
+                    "defaultValue": true
+                }
+            }
+        }
+    },
+    "uni-id-users": {
+        "data": [
+            {
+                "_id": "62976fe95e068d0001b1b5a8",
+                "username": "root",
+                "password": "d01a5e7b519421903667e6db8212fb6c084ba9ed",
+                "role": [
+                    "admin"
+                ],
+                "register_env": {
+                    "appid": "__UNI__6C38934",
+                    "uni_platform": "h5",
+                    "os_name": "windows",
+                    "app_name": "",
+                    "app_version": "",
+                    "app_version_code": "",
+                    "channel": "",
+                    "client_ip": "127.0.0.1"
+                },
+                "dcloud_appid": [
+                    "__UNI__6C38934",
+                    "__UNI__CB1342A"
+                ],
+                "register_date": 1654091753128,
+                "token": [
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2Mjk3NmZlOTVlMDY4ZDAwMDFiMWI1YTgiLCJyb2xlIjpbImFkbWluIl0sInBlcm1pc3Npb24iOltdLCJpYXQiOjE2NzA0ODY5MjMsImV4cCI6MTY3MDQ5NDEyM30.WRkq9DOLpeqUpuvo97NuzaC0Ju9gAznB-OVD4Drc6q8"
+                ],
+                "last_login_date": 1670486923804,
+                "last_login_ip": "127.0.0.1",
+                "login_ip_limit": [],
+                "email": "",
+                "mobile": "",
+                "status": 0,
+                "tags": ""
+            }
+        ]
+    }
+}
