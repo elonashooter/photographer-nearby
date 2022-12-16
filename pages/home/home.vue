@@ -22,6 +22,7 @@
 			<view class="titleNview-placing"></view>
 			<!-- 背景色区域 -->
 			<view class="titleNview-background" :style="{backgroundColor:titleNViewBackground}"></view>
+			<!-- swiper标签夜神模拟器会闪退 -->
 			<swiper class="carousel" indicator-color="rgba(255, 170, 127, 0.3)" indicator-active-color="rgba(85, 255, 127, 0.3)" autoplay="true" interval="5000" indicator-dots="true" circular  duration="200" @change="swiperChange">
 				<swiper-item v-for="(item, index) in carouselList" :key="index" class="carousel-item" @click="">
 					<image :src="item.src" mode="aspectFill" @click="getSwiperPhoer(item.phoerId)" />
@@ -738,5 +739,26 @@
 			//position: absolute;居中连击
 		}
 	}
-	
+	.wpphoer{
+		color: white;
+		background-color: seagreen;
+		border-radius: 8rpx;
+		padding: 8rpx;
+		width: 16vw;
+		
+		font-size:18rpx;
+		
+	}
+	.wpphoerCell{
+		display: flex;
+		flex-direction: column;
+		font-size:28rpx;
+		position: absolute;
+		top: 0;
+	}
+	.normal{
+		display: flex;
+		flex-direction: row;
+		font-size:28rpx;
+	}
 </style>

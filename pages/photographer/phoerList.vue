@@ -11,10 +11,11 @@
 			>
 				<u-cell
 					:value="item.intro.length<11?item.intro:item.intro.substring(0,10)+'...'"
-					:label="item.phoneNumber"
 					center
 					isLink
 					@click="getItemAndGo(item)" 
+					customStyle="position:relative"
+					v-if="item.isWPPhoer"
 				>
 					<u-avatar
 						slot="icon"
@@ -24,10 +25,29 @@
 						customStyle="margin: -3px 5px -3px 0"
 						mode="aspectFill"
 					></u-avatar>
-					<view slot="title" style="display: flex;flex-direction: row;font-size:32rpx;position: relative;">
-						<text style="margin-right: 8rpx;">{{item.name}}</text>
-						<text v-if="item.isWPPhoer" style="color: white;background-color: seagreen;border-radius: 8rpx;font-size:6rpx;padding: 8rpx;width: 16vw;position: absolute;top:-45rpx">平台摄影师</text>
+					<view slot="title" class="wpphoerCell">
+						<text v-if="item.isWPPhoer" class="wpphoer">平台摄影师</text>
+						<text>{{item.name}}</text>
+						<text style="margin-top: 16rpx; font-size: 24rpx;color: darkgrey">{{item.phoneNumber}}</text>
 					</view>
+				</u-cell>
+				<u-cell
+					:value="item.intro.length<11?item.intro:item.intro.substring(0,10)+'...'"
+					:label="item.phoneNumber"
+					:title="item.name"
+					center
+					isLink
+					@click="getItemAndGo(item)" 
+					v-else
+				>
+					<u-avatar
+						slot="icon"
+						shape="square"
+						size="70"
+						:src="item.phoerShow[0]"
+						customStyle="margin: -3px 5px -3px 0"
+						mode="aspectFill"
+					></u-avatar>
 				</u-cell>
 			</u-list-item>
 			
@@ -101,5 +121,25 @@
 <style lang="scss">
 	.u-page {
 		padding: 0;
+	}
+	.wpphoer{
+		color: white;
+		background-color: seagreen;
+		border-radius: 8rpx;
+		padding: 8rpx;
+		width: 16vw;
+		font-size:18rpx;
+	}
+	.wpphoerCell{
+		display: flex;
+		flex-direction: column;
+		font-size:28rpx;
+		position: absolute;
+		top: 0;
+	}
+	.normal{
+		display: flex;
+		flex-direction: row;
+		font-size:28rpx;
 	}
 </style>

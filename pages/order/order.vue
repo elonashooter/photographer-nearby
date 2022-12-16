@@ -509,6 +509,11 @@
 							})
 						}
 					},
+					fail() {
+						// #ifdef APP-PLUS
+						this.checkPermission();
+						// #endif
+					}
 				})
 			},
 			DelImg(index){

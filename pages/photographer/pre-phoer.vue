@@ -428,24 +428,6 @@
 					urls: this.symbols
 				})
 			},
-			async checkPermission() {
-				let status = permision.isIOS ? await permision.requestIOS(sourceType[type][0]) :
-					await permision.requestAndroid('android.permission.READ_EXTERNAL_STORAGE');
-				if (status === null || status === 1) {
-					status = 1;
-				} else {
-					uni.showModal({
-						content: "没有开启权限",
-						confirmText: "设置",
-						success: function(res) {
-							if (res.confirm) {
-								permision.gotoAppSetting();
-							}
-						}
-					})
-				}
-				return status;
-			},
 			// 头像上传 1
 			choosePShow(){
 				sizeType:'compressed',
