@@ -492,7 +492,7 @@
 		width: 750rpx;
 		padding: 20rpx;
 		padding-top: 50px;
-		background-image: url(../../static/uni-center/headers.png);
+		background-image: url(../../static/uni-center/headers-pink.png);
 		flex-direction: column;
 		align-items: center;
 	}

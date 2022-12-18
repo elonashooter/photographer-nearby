@@ -123,7 +123,9 @@
 				titleNViewBackground: "rgb(109, 120, 78)",
 				// loadTime:'', //避免被恶意频繁刷访问造成服务器负担  1/4
 				// WP_manager:false,
-				haveNoNet:false
+				haveNoNet:false,
+				naviText:['别点我，点照片','点我没啥用啊','那条懒狗没给我做功能','那为什么把我放在这？我不道啊','我只是条俊美的搜索栏','我躺在这就是一条风景线','别点了，让我安静的躺着','你干嘛~~~~哎哟','答'],
+				naviTextNum:0
 			};
 		},
 		created() {
@@ -528,6 +530,8 @@
 		// 标题栏input搜索框点击
 		onNavigationBarSearchInputClicked: async function(e) {
 			// this.getSwiperPhoer()
+			uni.$u.toast(this.naviTextNum>=this.naviText.length-1?this.naviText[this.naviText.length-1]:this.naviText[this.naviTextNum])
+			this.naviTextNum +=1
 		},
 		//点击导航栏 buttons 时触发
 		onNavigationBarButtonTap(e) {

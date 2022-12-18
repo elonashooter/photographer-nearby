@@ -1,6 +1,7 @@
 <template>
 	<view class="u-page">
-		支持湾拍页面  暂时不写
+		<u--text text="我也支持"></u--text>
+		
 
 		
 

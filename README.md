@@ -93,6 +93,5 @@ chat页面的刷新按钮：chatMatch表与chatMsg表联查
 ## 使用调试数据时需要注意的点  
 0. db_init.json已在项目根目录
 1. chatmatch删完就要删photographer的workeduserid
-2. photographer删完就要删user的role-photographer  
-3. 和prephotographer
+2. photographer删完就要删user的role-photographer和prephotographer
   

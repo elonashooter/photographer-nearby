@@ -39,10 +39,10 @@
   },
   "service": {
     "sms": {
-      "name": "应用名称，对应短信模版的name",
+      "name": "湾大简拍",
       "codeExpiresIn": 300,
-      "smsKey": "短信密钥key，开通短信服务处可以看到",
-      "smsSecret": "短信密钥secret，开通短信服务处可以看到"
+      "smsKey": "2284218c90b56c135658659b23d61dc1",
+      "smsSecret": "daab79aafcaca0150a60e04536e2237c"
     },
     "univerify": {
       "appid": "__UNI__B2F4D33",
