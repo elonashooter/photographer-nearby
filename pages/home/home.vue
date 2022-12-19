@@ -33,14 +33,6 @@
 		</view>
 		<!-- 分类 -->
 		<view class="cate-section" >
-<!-- 			<view class="cate-item">
-				<image src="/static/temp/c3.png"></image>
-				<text>环球美食</text>
-			</view> -->
-<!-- 			<view class="cate-item">
-				<image src="/static/temp/c5.png"></image>
-				<text>个护美妆</text>
-			</view> -->
 			<view class="cate-item">
 				<image src="/static/temp/fbyy.png" @tap="toOrder()"></image>
 				<text>发布预约</text>
@@ -58,13 +50,7 @@
 			</view>
 		
 		</view>
-		
-<!-- 		<view class="ad-1">
-			<image src="/static/temp/ad2.jpg" mode="scaleToFill"></image>
-		</view> -->
-		
-		
-		
+
 		<view class="ltsAnd2hand">
 			<image :src="imgSrc" mode="aspectFill"   @click="changeCid()"></image>
 			<view class="ltsItem">
@@ -143,71 +129,14 @@
 		  
 
 		},
-		onLoad() {
-			// uni.getPushClientId({
-			// 	success: (res) => {
-			// 		console.log(res.cid);
-			// 	}
-			// })
-			// uni.getStorage({
-			// 	key:'chatHistory',
-			// 	success: (res) => {
-			// 		console.log(res.data);
-			// 	}
-			// })
-			// uni.removeStorage({
-			// 	key:'chatHistory'
-			// })
-			// uni.clearStorage()
-			//检测网络状态
-			// this.haveNoNet=true
-			// uni.getNetworkType({
-			// 	success: res=> {
-			// 		// debugger
-			// 		console.log("net status:"+res.networkType);
-			// 		if(res.networkType=="none"){
-			// 			this.haveNoNet=true
-			// 		}
-			// 	},
-			// 	fail: (res) => {
-			// 		uni.showToast({
-			// 			title: '手机网络异常',
-			// 			icon: 'none'
-			// 		});
-			// 	}
-			// });
-			//测试全局弹窗组件
-			// uni.navigateTo({
-			// 	url:"/pages/order/fab"
-			// })
-		},
 		onShow() {
 			this.checkPhoer()
-			// uni.getStorageInfo({
-			// 	success: (res) => {
-			// 		console.log(res);
-			// 	}
-			// })
 			//避免被恶意频繁刷访问造成服务器负担  2/4
 			// this.loadTime=setTimeout(()=>{
 			// 	this.showLoading(),
 				// this.checkPhoer()
 			// },3000)
-			// 静态宽屏检测  与动态二选一即可
-			// uni.getSystemInfo({
-			// 	success(res) {
-			// 		console.log("windowW");
-			// 		console.log(res.windowWidth);
-			// 		if(res.windowWidth>768){
-			// 			console.log("WTF?????");
-			// 			this._isWidescreen=true
-			// 			uni.hideTabBar()
-			// 		}else{
-			// 			this._isWidescreen=false
-			// 			uni.showTabBar()
-			// 		}
-			// 	}
-			// })
+
 			
 		},
 		onHide() {
@@ -215,19 +144,6 @@
 			// clearTimeout(this.loadTime)
 		},
 		onReady() {
-			//公共模块加密返回数据测试
-			// uniCloud.callFunction({
-			// 	name:'AESRequest',
-			// 	data:{},
-			// 	success: (res) => {
-			// 		console.log("aes get");
-			// 		console.log(res);
-			// 	},
-			// 	fail(e) {
-			// 		console.log('aes get fail');
-			// 		console.log(e);
-			// 	}
-			// })
 			// #ifdef H5
 			
 			if(this._isWidescreen&&this.$store.state.user.hasLogin){
