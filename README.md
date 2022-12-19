@@ -44,7 +44,8 @@ db.collection('order')增删查改
 
 <h2 id="1">应用管理员审核用户成为摄影师的申请</h2>
 操作入口pages/ucenter/ucenter Wpage组件 摄影师管理，仅角色含“应用管理员”用户可见  
-* db.collection('pre-photographer')查；  
+* db.collection('pre-photographer')查  
+
 >若通过，则删除部分字段，删除后的数据作为photographer的新增或修改数据  
 
 * db.collection('photographer')增或改；
